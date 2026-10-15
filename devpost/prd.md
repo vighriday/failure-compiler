@@ -61,7 +61,7 @@ A live-filling grid. Failure types across the top and down the side; roughly 12 
 - **Dimmed mark:** the pair breaks, but only because one failure already breaks it alone. Labelled "already broken by X alone." Keeps one weak spot from filling a whole row and column with crosses.
 - **Question mark:** the checker could not determine the result. Never counted as survived.
 
-**Count line** (updates live): "105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived."
+**Count line** (updates live): "105 tests: 1 single weak spot, 3 hidden pairs, 13 already broken by the weak spot, 88 survived."
 
 **Before/After toggle** sits above the grid once any fix is accepted. Compares the original plan against the current fixed version.
 
@@ -72,13 +72,14 @@ Opens on the right when a cross is clicked. The grid stays visible on the left. 
 
 **Contents:**
 - The two failures (for a hidden pair) or the one failure (for a single weak spot), with a plain sentence explaining why the plan breaks.
-- For a hidden pair: a note that each failure alone was fine.
-- A timeline of the broken morning. The late route shown in red past the finish line.
-- Human cost: "Route C: 10 households, 40 minutes late."
+- For a hidden pair: a note that each failure alone was fine. The three example pairs are Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent.
+- A timeline of the broken morning. A not-delivered route is drawn as never leaving, with the reason shown, e.g. “Van back 10:45. Loading team gone.”
+- Human cost: “Route C: 8 households not delivered.” For the other crosses: “Route A: 10 households not delivered” and “Routes A, B, C: 30 households not delivered. Nobody can open the loading area”.
 - Up to three fix suggestions, each a card showing:
   - What the fix changes.
   - Fixes N / still broken N / new crosses N, scored by the checker before the user touches it.
-  - If the fix doesn't solve this case, or creates any new cross: labelled **"Turned down"** with a one-line reason (e.g. "Still only one van"). Turned-down fixes can be previewed but not accepted.
+  - Turn down “Add Maya as backup driver for Route C”: the gap is loading, not driving; show the checker-derived reason “Van back 10:45. Loading team gone.”
+  - The working fixes are “Sam loads Route C” and “Sam backs up Route A.” Turn down “one spare key” because it reveals “Joel absent + Maya absent.” “Spare keys for Maya and Sam” makes all 105 scenarios survive. Turned-down fixes can be previewed but not accepted.
 - Accept button (enabled only for accepted-eligible fixes).
 
 **After accepting a fix:**
@@ -140,7 +141,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 
 ### Paste and Load
 - Single text area; no file upload.
-- "Load example" loads the Saturday food distribution plan: 30 households across three routes, five volunteers, one van, one car, one loading area, 9am to noon.
+- "Load example" loads the Saturday food distribution plan: Route A has 10 households, Route B has 12, and Route C has 8. The van returns from an early pickup at 9:30. Joel has the only loading-area key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team.
 - In example mode: saved AI reading loads (structured map, questions, explanations, fix suggestions). Full flow still runs. Checker always runs live. Label reads "Example mode: using a saved AI reading."
 - Pasting your own plan requires an AI key. Key field surfaces on Screen 1 if none is set.
 
@@ -204,7 +205,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - A fix that does not solve the presenting case, or that creates any new cross, is labelled "Turned down" with a one-line reason.
 - Turned-down fixes: previewable, not acceptable.
 - Acceptance criteria:
-  - [ ] The example plan's obvious fix (add a backup driver) is labelled "Turned down" with "Still only one van, and it's late."
+  - [ ] “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; Sam loads Route C and backs up Route A.
   - [ ] A turned-down fix cannot be accepted regardless of user action.
   - [ ] Scores are present on the card before the user interacts with it.
 
@@ -259,7 +260,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - **Finish time is strict, not adjustable.** One minute late is broken. The human cost display makes the exact delay visible; the coordinator decides what that means. Keeps the checker honest and the results comparable.
 - **Problem sizes use preset choices only.** 15, 30, 45, 60, 90 minutes. No free typing. Keeps results reproducible and the example story reliable.
 - **Corrections do not trigger AI re-reads.** The user's correction goes directly into the map. Preserves the validation pipeline: AI reads once, human confirms, checker acts on the confirmed map.
-- **Turned-down fixes are visible with reasons.** "Still only one van, and it's late" is a stated outcome, not a hidden suppression. The emotional beat of the obvious fix being turned down is a feature, not a footnote.
+- **Turned-down fixes are visible with checker-derived reasons.** “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; “one spare key” reveals Joel + Maya absent. The emotional beat of the obvious fix being turned down is a feature, not a footnote.
 - **Dimmed pairs re-test after a weak spot is removed.** A fix can unmask a hidden pair the weak spot was covering. The report shows this honestly. Keeps the checker's results accurate across fix iterations.
 - **Report is a page in the app with browser print.** No custom export for the PoC. Nicer download is explicitly in Later.
 - **Desktop-first.** The side-by-side grid + panel layout requires screen width. Mobile layout is post-PoC.
@@ -276,7 +277,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - Screen 5: report page with all six sections and browser print.
 - Example mode: saved AI reading ships with the app; full flow runs without a key.
 - The checker runs live in all modes.
-- A locked test confirms the example plan's two hidden pairs and one single weak spot never change.
+- A locked test confirms the example plan's three hidden pairs and one single weak spot never change.
 
 ---
 

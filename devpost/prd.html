@@ -721,7 +721,7 @@
         </div>
         <div class="screen-card-body">
           <p>A live-filling grid: 12 to 15 failure types across and down, around 100 tests. Cells fill in order as the checker runs. Accepted fixes flip changed cells with a short animation.</p>
-          <p><strong>Count line</strong> (live): <span class="mono" style="font-size:13px;">"105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived."</span></p>
+          <p><strong>Count line</strong> (live): <span class="mono" style="font-size:13px;">"105 tests: 1 single weak spot, 3 hidden pairs, 13 already broken by the weak spot, 88 survived."</span></p>
           <p><strong>Before/After toggle</strong> above the grid once any fix is accepted.</p>
           <p><strong>Preview banner</strong> when a fix is selected: "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked, count line shows projected numbers. "Cancel preview" restores exactly.</p>
         </div>
@@ -737,9 +737,9 @@
           <p>Opens on the right when a cross is clicked. Grid stays on the left. No page navigation.</p>
           <ul>
             <li>The failures, with a plain explanation of why the plan breaks.</li>
-            <li>For a hidden pair: note that each failure alone was fine.</li>
-            <li>Timeline of the broken morning. Hard deadline shown as a solid red vertical line labelled "Noon: families waiting."</li>
-            <li>Human cost: "Route C: 10 households, 40 minutes late."</li>
+            <li>For a hidden pair: note that each failure alone was fine. The three example pairs are Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent.</li>
+            <li>Timeline of the broken morning. A not-delivered route is drawn as never leaving, with the reason shown, e.g. “Van back 10:45. Loading team gone.”</li>
+            <li>Human cost: “Route C: 8 households not delivered.” For the other crosses: “Route A: 10 households not delivered” and “Routes A, B, C: 30 households not delivered. Nobody can open the loading area”.</li>
             <li>Up to three fix cards, pre-scored. Turned-down fixes labelled with a one-line reason; previewable, not acceptable.</li>
           </ul>
           <p>After accepting: grid re-tests in place, panel shows "Now survives," button to next broken case. When nothing is left: "All 105 tested scenarios survive" and "See report."</p>
@@ -836,7 +836,7 @@
   <!-- GRID -->
   <section id="grid">
     <h2>The Crash Test Grid</h2>
-    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">Illustration using 5 of the 14 problem types. The real grid has 14 types across and down (105 tests). Each scenario appears once: the diagonal plus the cells below it. Key holder absent is the single weak spot. Supply truck late + Ravi absent and Van late + Anita leaves early are the two hidden pairs. Every pair that includes Key holder absent is dimmed because that single failure already breaks the plan alone.</p>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">Illustration using 5 of the 14 problem types. The real grid has 14 types across and down (105 tests). Each scenario appears once: the diagonal plus the cells below it. Key holder absent is the single weak spot. Supply truck late + Ravi absent, Van late + Anita leaves early, and Van late + Anita absent are the three hidden pairs. Every pair that includes Key holder absent is dimmed because that single failure already breaks the plan alone.</p>
     <div class="grid-demo">
       <table>
         <thead>
@@ -899,7 +899,7 @@
         <div class="legend-item"><span class="legend-sym" style="color:var(--amber);">?</span> Could not determine: never counted as survived</div>
       </div>
     </div>
-    <p style="font-size:13px;color:var(--text-muted);">Count line: <span class="mono">"105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived."</span></p>
+    <p style="font-size:13px;color:var(--text-muted);">Count line: <span class="mono">"105 tests: 1 single weak spot, 3 hidden pairs, 13 already broken by the weak spot, 88 survived."</span></p>
   </section>
 
   <!-- FIX FLOW -->
@@ -911,8 +911,8 @@
       <div class="fix-card turned-down">
         <div class="fix-card-body">
           <div class="turned-down-label">Turned down</div>
-          <div class="fix-card-title">Fix 1: Add another backup driver for the van</div>
-          <div class="reason">"Still only one van, and it's late."</div>
+          <div class="fix-card-title">Fix 1: Add Maya as backup driver for Route C</div>
+          <div class="reason">"The gap is loading, not driving. Van back 10:45. Loading team gone."</div>
           <div class="fix-scores" style="margin-top:10px;">
             <span class="score-fix">Fixes 0</span>
             <span class="score-broken">Still broken 2</span>
@@ -926,8 +926,8 @@
 
       <div class="fix-card">
         <div class="fix-card-body">
-          <div class="fix-card-title">Fix 2: Move Route C to the car + assign van backup</div>
-          <div class="fix-card-desc">Two changes: move Route C from the van to the car, and assign a volunteer not running the loading area as van backup. Exact names lock in when the example is built.</div>
+          <div class="fix-card-title">Fix 2: Sam loads Route C + Sam backs up Route A</div>
+          <div class="fix-card-desc">Sam loads Route C and backs up Route A. These fixes clear all three hidden pairs with no new crosses.</div>
           <div class="fix-scores">
             <span class="score-fix">Fixes 2</span>
             <span class="score-broken">Still broken 0</span>
@@ -940,7 +940,7 @@
       </div>
     </div>
 
-    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;font-family:var(--mono);">Note: exact fix wording locks in when the example plan is built.</p>
+    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;font-family:var(--mono);">Turned down: one spare key, because it reveals Joel absent + Maya absent. Spare keys for Maya and Sam make all 105 scenarios survive.</p>
 
     <div class="callout" style="margin-top:16px;">
       <strong>Preview:</strong> Selecting a fix previews it on the main grid in place. No navigation, no second grid. A banner reads "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked. "Cancel preview" restores exactly. One preview at a time.
@@ -948,14 +948,12 @@
 
     <h3 style="margin-top:28px;">Timeline: Van late + Anita leaves early</h3>
     <div class="timeline-mock">
-      <div class="timeline-header">Route C: Van late + Anita leaves early</div>
-      <div class="timeline-subhead">Each failure alone: fine. Together: Route C cannot finish before the hard deadline.</div>
+      <div class="timeline-header">Route C not delivered: Van late + Anita leaves early</div>
+      <div class="timeline-subhead">Each failure alone: fine. Together: Route C never leaves. Van back 10:45. Loading team gone.</div>
       <div class="timeline-track-wrap">
         <div class="deadline-label">Noon: families waiting</div>
         <div class="deadline-line"></div>
         <div class="timeline-track">
-          <div class="timeline-ok"></div>
-          <div class="timeline-late"></div>
         </div>
       </div>
       <div class="timeline-markers">
@@ -963,9 +961,9 @@
         <span>10:00</span>
         <span>11:00</span>
         <span>Noon</span>
-        <span>12:40</span>
+        <span>Never leaves</span>
       </div>
-      <div class="human-cost">Route C: 10 households, <span>40 minutes late.</span></div>
+      <div class="human-cost">Route C: 8 households <span>not delivered.</span></div>
     </div>
   </section>
 
@@ -1127,7 +1125,7 @@
       </div>
       <div class="decision">
         <div class="decision-choice">Turned-down fixes are visible</div>
-        <div class="decision-reason">"Still only one van, and it's late" is a stated outcome. The emotional beat of the obvious fix being turned down is a feature.</div>
+        <div class="decision-reason">“Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving. “One spare key” reveals Joel absent + Maya absent.</div>
       </div>
       <div class="decision">
         <div class="decision-choice">Dimmed pairs re-test after a fix</div>
@@ -1163,7 +1161,7 @@
       <li>Screen 5: report page with six sections plus example-mode notice, and browser print.</li>
       <li>Example mode: saved AI reading ships with the app; full flow runs without a key.</li>
       <li>Checker runs live in all modes.</li>
-      <li>A locked test confirms the example plan's two hidden pairs and one single weak spot never change.</li>
+      <li>A locked test confirms the example plan's three hidden pairs and one single weak spot never change.</li>
     </ul>
   </section>
 

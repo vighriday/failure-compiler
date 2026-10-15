@@ -372,7 +372,7 @@
               </div>
             </div>
             <div class="count-example">
-              Count adds up to total: <strong>105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived</strong>
+              Count adds up to total: <strong>105 tests: 1 single weak spot, 3 hidden pairs, 13 already broken by the weak spot, 88 survived</strong>
             </div>
           </div>
         </div>
@@ -381,7 +381,7 @@
         <div class="screen-num">4</div>
         <div>
           <div class="screen-title">Broken Case Detail + Fixes</div>
-          <div class="screen-desc">For a hidden pair: shows the two failures and that each alone was fine. For a single weak spot: shows the one failure. Either way: a timeline of the morning with the late route in red past the finish line. Human cost: households affected and delay in minutes (e.g. "Route C: 10 households, 40 minutes late"). Plain one-sentence explanation.</div>
+          <div class="screen-desc">For a hidden pair: shows the two failures and that each alone was fine. The three example pairs are Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent. For a single weak spot: shows the one failure. Either way: a timeline of the morning. A not-delivered route is drawn as never leaving, with its reason, e.g. “Van back 10:45. Loading team gone.” Human cost: “Route A: 10 households not delivered,” “Route C: 8 households not delivered,” or “Routes A, B, C: 30 households not delivered. Nobody can open the loading area”. Plain one-sentence explanation.</div>
           <div class="callout" style="margin-top:0.65rem;">
             <strong>Fix suggestions (up to 3):</strong> each shows fixes-N / breaks-N / new-crosses before acceptance. Selecting a fix previews its grid with changed cells outlined. New crosses are marked distinctly so they cannot hide. Accepting a fix updates the main plan and re-tests everything. <strong>Fixes stack:</strong> accept one, then another; each becomes part of the plan. One fix can contain more than one change. Before/After toggle compares original plan to current fixed version.
           </div>
@@ -399,7 +399,7 @@
       <div class="fixture-label">Example mode: using a saved AI reading</div>
       <p>The example plan is run through the real AI once. The result (structured map, questions, explanations, fix suggestions) is saved and shipped with the app. In example mode, the app loads that saved reading; the full flow still runs: plan map screen, rules check, questions, confirmation gate. The checker always runs live and is never saved or faked. Pasting your own plan requires a key.</p>
     </div>
-    <p style="font-size:0.83rem;color:var(--muted);margin-top:0.75rem;">The example is designed so the story is true: the obvious fix (add another backup driver) fails because there is still only one van; the real fix passes. A test locks in those results so they never change. Target: 12 to 15 failure types, around 100 tests, finished in a few seconds.</p>
+    <p style="font-size:0.83rem;color:var(--muted);margin-top:0.75rem;">The example plan has Route A with 10 households, Route B with 12, and Route C with 8. The van returns from an early pickup at 9:30; Joel has the only loading-area key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving. Sam loads Route C and backs up Route A. One spare key is turned down because it reveals Joel + Maya absent; spare keys for Maya and Sam make all 105 scenarios survive. Target: 12 to 15 failure types, around 100 tests, finished in a few seconds.</p>
   </section>
 
   <hr>

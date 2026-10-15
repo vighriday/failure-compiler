@@ -560,7 +560,7 @@
   </div>
   <p style="margin-top:12px;"><strong>Typography:</strong> IBM Plex Sans for all body, labels, UI. IBM Plex Mono for times, counts, numbers. Self-hosted via <code>@fontsource</code>.</p>
   <p><strong>Grid marks:</strong> SVG stroke marks, not emoji. Colour plus shape so the grid is readable without colour.</p>
-  <p><strong>Timeline:</strong> SVG bars; finish-time deadline is a solid red vertical line labelled "Noon: families waiting." Late segments extend past it in brick red.</p>
+  <p><strong>Timeline:</strong> SVG bars; finish-time deadline is a solid red vertical line labelled “Noon: families waiting.” Late segments extend past it in brick red. A not-delivered route is drawn as never leaving, with the reason shown, e.g. “Van back 10:45. Loading team gone.”</p>
   <p><strong>Motion:</strong> cells fill as SSE results arrive. Accepted-fix cells flip with a short CSS transition. Both effects check <code>prefers-reduced-motion</code>.</p>
 
   <div class="card" style="margin-top:16px;">
@@ -622,7 +622,7 @@
     </div>
   </div>
   <div class="card" style="font-size:13.5px;">
-    <p><strong>Example plan:</strong> 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = <strong>14 problems</strong>. 14 singles + 91 pairs = <strong>105 tests</strong>.</p>
+    <p><strong>Example plan:</strong> Route A has 10 households, Route B has 12, and Route C has 8. The van returns from an early pickup at 9:30; Joel has the only key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. Hidden pairs: Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent.</p><p><strong>Count:</strong> 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = <strong>14 problems</strong>. 14 singles + 91 pairs = <strong>105 tests</strong>: 1 single weak spot, 3 hidden pairs, 13 dimmed, 88 survived.</p>
     <p style="margin-top:8px;"><strong>Hall key:</strong> modelled as <code>holds_key: true</code> on Joel. "Joel absent (only key holder)" is the single weak spot. The loading area rule checks <code>holds_key</code>.</p>
     <p style="margin-top:8px;"><strong>Cap:</strong> 24 problems (300 tests). Exceeding the cap shows a rule message before Confirm.</p>
     <p style="margin-top:8px;"><strong>Deliberately out of scope:</strong> volunteer arrives late. Listed under "What was NOT tested" in every report.</p>
@@ -662,12 +662,12 @@
     <li><strong>Start times</strong> can move freely within people's and vehicles' availability windows.</li>
     <li>Finish time is a soft deadline; the solver minimises total households-times-minutes-late.</li>
   </ul>
-  <p style="font-size:13px;color:var(--ink-mid);">This is what makes "add another backup driver" a real fix the checker can evaluate and turn down: if the van is still the bottleneck, no driver swap changes that.</p>
+  <p style="font-size:13px;color:var(--ink-mid);">The checker evaluates “Add Maya as backup driver for Route C” and turns it down because the gap is loading, not driving. Its reason is “Van back 10:45. Loading team gone.”</p>
 
   <h3>How the checker decides</h3>
   <div class="card" style="font-size:13.5px;">
     <p><span class="badge badge-tick">tick</span> <strong>Proven zero lateness.</strong> Zero is the floor; finding zero proves the plan genuinely survives.</p>
-    <p style="margin-top:8px;"><span class="badge badge-cross">cross</span> <strong>Proven minimum above zero.</strong> That minimum is the human cost, proved optimal. E.g. "Route C: 10 households, 40 minutes late." Routes that cannot run (no driver, loading area cannot open) use a "not delivered" penalty of households times the full horizon (finish time + 180 min), keeping every scenario feasible. Human cost reads "Routes A, B: 20 households not delivered. Nobody can open the loading area."</p>
+    <p style="margin-top:8px;"><span class="badge badge-cross">cross</span> <strong>Proven minimum above zero.</strong> That minimum is the human cost, proved optimal. E.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Routes that cannot run (no driver, loading area cannot open) use a "not delivered" penalty of households times the full horizon (finish time + 180 min), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"</p>
     <p style="margin-top:8px;"><span class="badge badge-amber">qmark</span> <strong>Deterministic time limit hit</strong> before either is proved. Uses <code>max_deterministic_time</code>, not wall clock, so results are the same on every machine. Never a pass. Listed by name under "What was NOT tested."</p>
   </div>
 
@@ -682,7 +682,7 @@
 
   <p>One AI call per broken case. <code>POST /api/suggest-fixes</code> sends the confirmed map plus the checker's facts (failing problem ids, timeline, late routes, lateness in minutes, or "not delivered" if applicable). The AI returns one plain explanation sentence and up to three fix suggestions in one response. The server caches the result keyed by fingerprint and scenario id - reopening a cross never calls the AI again.</p>
 
-  <p>The checker's facts are always shown in the panel. The AI sentence sits next to them, labelled "AI's explanation." Turned-down reasons come from the checker: which resource the late route was waiting on in the best schedule. Example: "Route C still waits for the van until 11:20, 40 minutes late."</p>
+  <p>The checker's facts are always shown in the panel. The AI sentence sits next to them, labelled "AI's explanation." “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; the checker gives “Van back 10:45. Loading team gone.” The fixes are “Sam loads Route C” and “Sam backs up Route A.” One spare key is turned down because it reveals Joel absent + Maya absent; spare keys for Maya and Sam make all 105 scenarios survive.</p>
 
   <h3>Fix operations (fixed list, always gateable)</h3>
   <p>Fixes are composed of one or more of these operations. No new people or vehicles may be invented; references always resolve.</p>
@@ -788,7 +788,7 @@ dim_cause:             str | None       <span class="comment"># Problem id of th
 lateness_minutes:      int | None       <span class="comment"># Minutes, not seconds</span>
 lower_bound_minutes:   int | None
 timeline:              list[TimelineEvent]
-human_cost:            str | None       <span class="comment"># "Route C: 10 households, 40 minutes late"</span>
+human_cost:            str | None       <span class="comment"># "Route C: 8 households not delivered"</span>
 map_fingerprint:       str</code></pre>
 
   <h3>FixSuggestion</h3>
@@ -970,7 +970,7 @@ gate_reason:         str | None</code></pre>
     <li><strong>Browser print for the report.</strong><span>Covers the submission requirement. Nicer download is in scope.md Later.</span></li>
     <li><strong>Fixed failure-type taxonomy.</strong><span>Keeps all results reproducible and the example story reliable. AI-suggested types deferred in scope.md.</span></li>
     <li><strong>No deployment.</strong><span>Local recording satisfies submission. Live public link is in scope.md Later.</span></li>
-    <li><strong>Volunteer arrives late out of scope.</strong><span>Listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's two hidden pairs.</span></li>
+    <li><strong>Volunteer arrives late out of scope.</strong><span>Listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's three hidden pairs.</span></li>
     <li><strong>Hall key as a person attribute.</strong><span>"Joel absent (only key holder)" is the single weak spot. Keeps the taxonomy clean without losing the story.</span></li>
     <li><strong>Preview draws from stored fix results.</strong><span>No re-solve in the browser. One fewer round trip; one fewer failure mode during the demo.</span></li>
   </ul>

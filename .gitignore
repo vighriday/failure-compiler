@@ -5,3 +5,7 @@ devpost/learner-profile.md
 .env
 .env.*
 !.env.example
+
+# Python build and test artifacts
+__pycache__/
+*.py[cod]

@@ -1,0 +1,35 @@
+[project]
+name = "failure-compiler"
+version = "0.1.0"
+description = "A crash-test tool for plans"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "pydantic>=2.10",
+    "ortools>=9.15,<9.16",
+    "python-dotenv>=1.1",
+]
+
+[project.optional-dependencies]
+ai = [
+    "groq>=0.25",
+    "google-genai>=1.14",
+]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.11",
+    "httpx>=0.28",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

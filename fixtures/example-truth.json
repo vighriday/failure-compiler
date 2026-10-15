@@ -1,0 +1,31 @@
+{
+  "people": [
+    {"id": "person-ravi", "name": "Ravi", "can_drive": true, "available_from": 540, "available_until": 780, "holds_key": false},
+    {"id": "person-joel", "name": "Joel", "can_drive": true, "available_from": 540, "available_until": 630, "holds_key": true},
+    {"id": "person-anita", "name": "Anita", "can_drive": true, "available_from": 540, "available_until": 720, "holds_key": false},
+    {"id": "person-maya", "name": "Maya", "can_drive": true, "available_from": 540, "available_until": 645, "holds_key": false},
+    {"id": "person-sam", "name": "Sam", "can_drive": true, "available_from": 540, "available_until": 720, "holds_key": false}
+  ],
+  "vehicles": [
+    {"id": "vehicle-van", "name": "Van", "available_from": 570},
+    {"id": "vehicle-car", "name": "Car", "available_from": 540}
+  ],
+  "places": [
+    {"id": "place-loading-area", "name": "Loading area", "opens_at": 540, "one_vehicle_at_a_time": true, "needs_key": true}
+  ],
+  "deliveries": [
+    {"id": "delivery-supplies", "name": "Supply truck", "arrives_at": 540, "place_id": "place-loading-area"}
+  ],
+  "routes": [
+    {"id": "route-a", "name": "A", "households": 10, "load_minutes": 10, "drive_minutes": 60, "vehicle_id": "vehicle-car", "driver_ids": ["person-ravi", "person-maya", "person-joel"], "loader_ids": ["person-joel", "person-maya", "person-anita", "person-ravi"]},
+    {"id": "route-b", "name": "B", "households": 12, "load_minutes": 10, "drive_minutes": 35, "vehicle_id": "vehicle-van", "driver_ids": ["person-sam", "person-anita", "person-ravi"], "loader_ids": ["person-joel", "person-anita", "person-maya"]},
+    {"id": "route-c", "name": "C", "households": 8, "load_minutes": 10, "drive_minutes": 60, "vehicle_id": "vehicle-van", "driver_ids": ["person-anita", "person-sam", "person-ravi"], "loader_ids": ["person-anita", "person-maya", "person-joel"]}
+  ],
+  "finish_time": 720,
+  "problem_sizes": {
+    "volunteer_leaves_early": 90,
+    "vehicle_returns_late": 30,
+    "supply_delivery_late": 45,
+    "place_blocked": 30
+  }
+}

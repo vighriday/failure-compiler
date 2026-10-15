@@ -149,7 +149,7 @@ Typography:
 
 Grid cells: tick and cross are clean stroke SVG marks, not emoji, not Unicode characters. Colour plus shape so the grid is readable without colour.
 
-Timeline: SVG. Routes as horizontal bars. Finish-time deadline as a solid red vertical line labelled "Noon: families waiting." Late segments extend past it in `--color-cross`.
+Timeline: SVG. Routes as horizontal bars. Finish-time deadline as a solid red vertical line labelled “Noon: families waiting.” Late segments extend past it in `--color-cross`. A not-delivered route is drawn as never leaving, with the reason shown, e.g. “Van back 10:45. Loading team gone.”
 
 Motion: cells fill in sequence as the SSE stream delivers results. Accepted-fix cells flip with a short CSS transition. Both effects check `prefers-reduced-motion` and skip animation if set.
 
@@ -165,7 +165,7 @@ Fixed list. Each type is applied to every matching entity in the confirmed map, 
 | Supply delivery arrives late | Each incoming delivery | Minutes late | 45 |
 | Place blocked | Each place | Minutes blocked from loading start | 30 |
 
-Example plan count: 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = 14 problems. 14 singles + 91 pairs = 105 tests. Matches every number in the scope and PRD.
+Example plan: Route A has 10 households, Route B has 12, and Route C has 8. The van returns from an early pickup at 9:30; Joel has the only key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. Hidden pairs: Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent. Count: 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = 14 problems; 14 singles + 91 pairs = 105 tests, with 1 single weak spot, 3 hidden pairs, 13 dimmed, and 88 survived.
 
 Hall key: not a separate problem type. Joel holds the only key, so "Joel absent (only key holder)" is the single weak spot. The loading area rule checks `holds_key` on the `Person` model.
 
@@ -210,13 +210,13 @@ Implements `prd.md > Features and Behavior`, `prd.md > The Checker's Three Hones
 - **Routes:** households, `load_minutes` (needs a loader present), `drive_minutes` (needs a driver and a vehicle). Jobs are filled only from `driver_ids` and `loader_ids` in the route - primary first, then listed backups. No one else may fill those jobs. Start times can move freely within people's and vehicles' availability windows.
 - **Finish time:** soft deadline. The solver minimises total households-times-minutes-late.
 
-This is what makes "add another backup driver" a real fix the checker can evaluate and turn down: the checker tries the best possible schedule using only the people the plan names, and if the van is still the bottleneck, no driver swap changes that.
+The checker evaluates “Add Maya as backup driver for Route C” and turns it down because the gap is loading, not driving. Its reason is “Van back 10:45. Loading team gone.”
 
 ### How the checker decides
 
 - Proven zero lateness: **tick.** Zero is the floor; finding zero proves the plan survives.
-- Proven minimum above zero: **cross.** The minimum is the human cost - e.g. "Route C: 10 households, 40 minutes late." Proved optimal.
-- **Not delivered** routes use a penalty lateness of households times the full horizon (finish time plus 180 minutes), keeping every scenario feasible. Human cost reads "Routes A, B: 20 households not delivered. Nobody can open the loading area." Still a cross; tick and question mark keep their meaning.
+- Proven minimum above zero: **cross.** The minimum is the human cost - e.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Proved optimal.
+- **Not delivered** routes use a penalty lateness of households times the full horizon (finish time plus 180 minutes), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area" Still a cross; tick and question mark keep their meaning.
 - Deterministic time limit hit before either is proved: **question mark.** Uses `max_deterministic_time`, not wall-clock seconds, so results are the same on every machine. Never counted as survived. Listed by name in the report under "What was NOT tested."
 
 ### Run order
@@ -237,7 +237,7 @@ One AI call per broken case: `POST /api/suggest-fixes` sends the confirmed map p
 
 The checker's facts are always shown in the panel. The AI's sentence sits next to them, labelled "AI's explanation."
 
-Turned-down reasons come from the checker, not the AI. After the server runs each suggested fix through the checker, it derives a concrete reason from which resource the late route was still waiting on in the best schedule. Example: "Route C still waits for the van until 11:20, 40 minutes late." The AI never writes this.
+Turned-down reasons come from the checker, not the AI. “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; the checker gives “Van back 10:45. Loading team gone.” The fixes are “Sam loads Route C” and “Sam backs up Route A.” One spare key is turned down because it reveals Joel absent + Maya absent; spare keys for Maya and Sam make all 105 scenarios survive.
 
 ### Fix operations (fixed list, always gateable)
 
@@ -452,7 +452,7 @@ ScenarioResult
   lateness_minutes:      int | None
   lower_bound_minutes:   int | None      # Known lower bound if qmark
   timeline:              list[TimelineEvent]
-  human_cost:            str | None      # "Route C: 10 households, 40 minutes late"
+  human_cost:            str | None      # "Route C: 8 households not delivered"
   map_fingerprint:       str
 ```
 
@@ -627,7 +627,7 @@ Implements `prd.md > States and Boundaries`.
 - **Browser print for the report** instead of custom export. Covers the submission requirement. Nicer download is in scope.md > Later.
 - **Fixed failure-type taxonomy** instead of AI-suggested types. Keeps results reproducible and the example story reliable. Deferred in scope.md.
 - **No deployment** - local recording satisfies submission. Live public link is in scope.md > Later.
-- **Volunteer arrives late out of scope** - listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's two hidden pairs.
+- **Volunteer arrives late out of scope** - listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's three hidden pairs.
 - **Hall key as a person attribute** (`holds_key: true` on Joel) rather than a separate problem type. "Joel absent (only key holder)" is the single weak spot. Keeps the taxonomy clean without losing the story.
 - **Preview never re-solves** - fix results are cached by fingerprint at scoring time. The browser draws from them. One less round trip; one less failure mode during the demo.
 
@@ -659,7 +659,7 @@ Implements `prd.md > States and Boundaries`.
 
 **One AI call returns both the explanation and the fix suggestions.** Fewer round trips; the explanation and fixes are consistent because they came from the same context. The checker's facts are always shown regardless; the AI adds only the plain sentence.
 
-**Turned-down reasons from the checker, not the AI.** The checker knows which resource the late route was waiting on. A machine-derived reason like "Route C still waits for the van until 11:20, 40 minutes late" is more honest and more useful than a generated one.
+**Turned-down reasons from the checker, not the AI.** The checker shows the loading gap directly: “Van back 10:45. Loading team gone.” This is more honest and more useful than a generated reason.
 
 **Preview draws from stored fix results.** `suggest-fixes` returns full per-scenario results, not counts. The browser draws the projected grid without re-solving. Accepting a previewed fix replays from the cache.
 

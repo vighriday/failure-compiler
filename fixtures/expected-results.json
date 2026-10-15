@@ -1,0 +1,632 @@
+[
+  {
+    "scenario_id": "volunteer_absent__person-ravi",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel",
+    "state": "cross",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-ravi",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+    "state": "cross",
+    "lateness_minutes": 9000,
+    "human_cost": "Route A: 10 households not delivered"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_absent__person-anita",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_absent__person-maya",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_absent__person-sam",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-ravi",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-joel",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-anita",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-maya",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-sam",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+vehicle_returns_late__vehicle-van",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+vehicle_returns_late__vehicle-car",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+supply_delivery_late__delivery-supplies",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-joel+place_blocked__place-loading-area",
+    "state": "dim",
+    "lateness_minutes": 27000,
+    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_absent__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_absent__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-joel",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
+    "state": "cross",
+    "lateness_minutes": 7200,
+    "human_cost": "Route C: 8 households not delivered"
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-anita+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+volunteer_absent__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-maya+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_absent__person-sam+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
+    "state": "cross",
+    "lateness_minutes": 7200,
+    "human_cost": "Route C: 8 households not delivered"
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  },
+  {
+    "scenario_id": "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area",
+    "state": "tick",
+    "lateness_minutes": 0,
+    "human_cost": null
+  }
+]
