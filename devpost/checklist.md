@@ -19,13 +19,13 @@ Build mode: fast
   Learner check: Run the CLI on the truth map and read the count line.
   Commit: `Add checker, truth map, locked tests, fix-story tests, LICENSE, .env.example`
 
-- [ ] **2. The gate rejects bad AI output and the rules catch broken maps**
+- [x] **2. The gate rejects bad AI output and the rules catch broken maps**
   Becomes usable: The format gate rejects malformed, extra-field, duplicate-id, and unknown-reference AI output with specific reasons. The rules engine catches missing drivers, incoherent times, key-holder absence, and the 24-problem cap. Dependent items lose confirmed status on upstream changes. The fingerprint function produces stable hashes.
   Why now: The gate is the second half of the learning-goal pipeline. It must work before any AI reading can land safely, and the fingerprint is how every later slice keys cached results.
   PRD ref: `prd.md > Plain Rules Validation`, `prd.md > AI Reading and Structured Map`
   Spec ref: `spec.md > The Validation Gate`, `spec.md > Data Model`
-  Build: `server/validation/gate.py` (parse JSON, Pydantic validation with `extra="forbid"`, duplicate and unknown id rejection, id normalisation to stable slugs); `server/validation/rules.py` (every route has a driver and vehicle, `driver_ids` entries must have `can_drive: true`, coherent times, explicit finish time, 24-problem cap); dependent items losing confirmed status when an upstream item changes; fingerprint function (SHA-256 of canonical sorted checker inputs, excluding timestamps and status).
-  Verify (mechanical): `uv run -- python -m pytest -q` passes, including the cascade case (flip `can_drive` -> route loses confirmed mark and a rule fires). Fingerprint stability: same plan with different AI-assigned ids -> same fingerprint; changed problem size -> different fingerprint.
+  Build: `server/validation/gate.py` (parse JSON, Pydantic validation with `extra="forbid"`, duplicate and unknown id rejection, id normalisation to stable slugs; gate errors name the field and bad value, e.g. `Unknown person id 'person-dave' in route-c driver_ids`); `server/validation/rules.py` (every route has a driver and vehicle, `driver_ids` entries must have `can_drive: true`, coherent times, explicit finish time, 24-problem cap); dependent items losing confirmed status when an upstream item changes; fingerprint function (SHA-256 of canonical sorted checker inputs, excluding timestamps and status).
+  Verify (mechanical): `uv run -- python -m pytest -q` passes, including the cascade case: set Ravi's `can_drive` to false in a confirmed map built from the truth map; every route listing Ravi loses its confirmed mark, and a rule issue names Ravi. Fingerprint assertions: (1) shuffle people, vehicles, and routes, preserve each route's `driver_ids` and `loader_ids` order, rename all IDs to AI-style IDs and update references, then normalise IDs; fingerprint equals the truth map. (2) Change `problem_sizes["vehicle_returns_late"]` from 30 to 45; fingerprint differs. (3) Change item status marks, AI metadata (provider, model, timestamp), or source lines; fingerprint stays the same.
   Learner check: Run the tests and read one rejection message.
   Commit: `Add validation gate, rules engine, fingerprint, and tests`
 
