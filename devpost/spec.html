@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Failure Compiler - Technical Spec (approved)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F8F6F1;
+    --ink: #1A1A18;
+    --ink-mid: #4A4A46;
+    --ink-dim: #8A8A85;
+    --tick: #1A6B3C;
+    --cross: #B23A2A;
+    --amber: #C47A00;
+    --dim: #8A8A85;
+    --rule: #D8D5CD;
+    --card-bg: #EFEDE7;
+    --highlight: #E8E4DA;
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 0 0 80px;
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 36px 48px 28px;
+  }
+  header .label {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    opacity: .5;
+    font-family: var(--font-mono);
+    display: block;
+    margin-bottom: 6px;
+  }
+  header h1 { font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+  header p { opacity: .6; font-size: 14px; margin-top: 4px; }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    gap: 0;
+    padding: 0 48px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav a {
+    display: block;
+    color: rgba(255,255,255,.5);
+    text-decoration: none;
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    padding: 9px 11px 8px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .12s, border-color .12s;
+  }
+  nav a:hover { color: rgba(255,255,255,.85); }
+  nav a.active { color: #fff; border-color: var(--tick); }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 0 48px; }
+
+  section { padding-top: 52px; }
+
+  h2 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--rule);
+    margin-bottom: 20px;
+  }
+  h3 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; }
+  h4 {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--ink-mid);
+    margin: 20px 0 6px;
+  }
+
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  strong { font-weight: 600; }
+  a { color: var(--tick); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    background: var(--highlight);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  pre {
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.75;
+  }
+  .comment { color: var(--ink-dim); }
+
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 4px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 12px 0;
+  }
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--ink-mid);
+    border-bottom: 1.5px solid var(--rule);
+    padding: 6px 10px 6px 0;
+  }
+  td {
+    border-bottom: 1px solid var(--rule);
+    padding: 8px 10px 8px 0;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  .prd-ref {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    background: var(--highlight);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: var(--ink-mid);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 12px 0;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    border-radius: 3px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    vertical-align: middle;
+  }
+  .badge-tick  { background: #E2F0E9; color: var(--tick); }
+  .badge-cross { background: #F5E5E3; color: var(--cross); }
+  .badge-amber { background: #FBF2E0; color: var(--amber); }
+  .badge-dim   { background: #EBEBEA; color: var(--dim); }
+
+  /* Journey stepper */
+  .journey { list-style: none; padding: 0; margin: 16px 0; }
+  .journey li {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 18px;
+    position: relative;
+  }
+  .journey li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 28px;
+    bottom: 0;
+    width: 1.5px;
+    background: var(--rule);
+  }
+  .jnum {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .jbody { padding-top: 4px; font-size: 14px; }
+  .jbody strong { display: block; margin-bottom: 2px; font-size: 14.5px; }
+
+  /* Architecture diagram */
+  .arch { background: var(--card-bg); border: 1px solid var(--rule); border-radius: 8px; padding: 24px 16px; margin: 16px 0; overflow-x: auto; }
+
+  /* Pipeline */
+  .pipeline { display: flex; flex-direction: column; margin: 14px 0; }
+  .pipe-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-top: none;
+    font-size: 13.5px;
+  }
+  .pipe-step:first-child { border-top: 1px solid var(--rule); border-radius: 8px 8px 0 0; }
+  .pipe-step:last-child { border-radius: 0 0 8px 8px; }
+  .pipe-n { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--ink-mid); flex-shrink: 0; width: 20px; padding-top: 1px; }
+  .pipe-body strong { display: block; margin-bottom: 2px; }
+  .pipe-body span { color: var(--ink-mid); font-size: 13px; }
+
+  /* Problem cards */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .prob-card { background: var(--card-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; font-size: 13.5px; }
+  .prob-card .type { font-weight: 600; display: block; margin-bottom: 3px; }
+  .prob-card .meta { font-size: 11.5px; color: var(--ink-mid); font-family: var(--font-mono); }
+  .prob-card p { font-size: 13px; margin-top: 6px; color: var(--ink-mid); }
+
+  /* Schema split */
+  .schema-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  .schema-box { background: var(--card-bg); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; }
+  .schema-box .schema-label {
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--ink-mid);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .schema-box .schema-name { font-size: 16px; font-weight: 600; display: block; margin-bottom: 6px; }
+  .schema-box ul { font-size: 13px; color: var(--ink-mid); padding-left: 16px; }
+  .schema-box li { margin-bottom: 2px; }
+
+  /* Fix operations table */
+  .op-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0; }
+  .op-table th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-mid); border-bottom: 1.5px solid var(--rule); padding: 6px 10px 6px 0; }
+  .op-table td { border-bottom: 1px solid var(--rule); padding: 8px 10px 8px 0; vertical-align: top; }
+  .op-table tr:last-child td { border-bottom: none; }
+
+  /* Provider cards */
+  .provider-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .pcard { background: var(--card-bg); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; font-size: 13.5px; }
+  .pcard .role { font-size: 10.5px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-dim); display: block; margin-bottom: 4px; }
+  .pcard .name { font-size: 15px; font-weight: 600; display: block; }
+  .pcard .model { font-family: var(--font-mono); font-size: 12px; color: var(--ink-mid); display: block; margin-bottom: 10px; }
+  .pcard dt { font-weight: 600; float: left; margin-right: 6px; color: var(--ink-mid); font-size: 12.5px; }
+  .pcard dd { font-size: 12.5px; margin-bottom: 4px; }
+
+  /* Swatches */
+  .swatches { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0; }
+  .swatch { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .swatch-dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.08); flex-shrink: 0; }
+
+  /* Cell state demo */
+  .cell-demo { display: flex; gap: 28px; flex-wrap: wrap; padding: 16px 0 4px; }
+  .cell-item { text-align: center; }
+  .cell-item .cell-label { font-size: 12px; color: var(--ink-mid); margin-top: 4px; }
+
+  /* Decision entries */
+  .decision { border-left: 3px solid var(--rule); padding: 4px 0 4px 16px; margin: 16px 0; }
+  .decision h4 { margin-top: 0; }
+
+  /* Uncertainty callout */
+  .uncertainty {
+    background: #FBF2E0;
+    border: 1px solid #E8D8A0;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+  .uncertainty .ulabel {
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--amber);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* Failure modes */
+  .flist { list-style: none; padding: 0; margin: 12px 0; }
+  .flist li {
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13.5px;
+  }
+  .ficon { color: var(--cross); font-weight: 700; flex-shrink: 0; }
+
+  /* Simplify list */
+  .slist { list-style: none; padding: 0; margin: 12px 0; }
+  .slist li { border-left: 3px solid var(--rule); padding: 4px 0 4px 14px; margin-bottom: 10px; font-size: 13.5px; }
+  .slist li strong { display: block; margin-bottom: 2px; }
+  .slist li span { color: var(--ink-mid); font-size: 13px; }
+
+  /* File tree */
+  .file-tree {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.75;
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+  }
+
+  @media print {
+    nav { display: none; }
+    header { background: white; color: var(--ink); padding: 20px 0; }
+    body { font-size: 12px; padding: 0; }
+    .content { max-width: 100%; padding: 0; }
+    section { padding-top: 28px; }
+    a { color: inherit; text-decoration: none; }
+    .arch { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="label">4-spec &middot; approved</span>
+  <h1>Failure Compiler - Technical Spec</h1>
+  <p>The blueprint before code.</p>
+</header>
+
+<nav id="nav">
+  <a href="#plain" class="active">How It Works</a>
+  <a href="#journey">Core Journey</a>
+  <a href="#stack">Stack</a>
+  <a href="#runs">Where It Runs</a>
+  <a href="#look">Look and Feel</a>
+  <a href="#problems">Problem Types</a>
+  <a href="#gate">Validation Gate</a>
+  <a href="#checker">Checker</a>
+  <a href="#fixes">Explain and Fix</a>
+  <a href="#components">Components</a>
+  <a href="#data">Data Model</a>
+  <a href="#fixtures">Fixtures and Tests</a>
+  <a href="#files">File Structure</a>
+  <a href="#services">Services</a>
+  <a href="#failures">Failure Modes</a>
+  <a href="#simplified">Simplified</a>
+  <a href="#decisions">Decisions</a>
+</nav>
+
+<div class="content">
+
+<!-- HOW IT WORKS -->
+<section id="plain">
+  <h2>How This Works, In Plain Language</h2>
+  <p>The app is a browser page talking to a small Python server running on your laptop. The server binds to 127.0.0.1 only, because it holds AI keys in memory.</p>
+  <p>When you paste a plan, the server sends it to an AI (Groq first, Gemini as a fallback). The AI reads messy text and returns a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. The AI returns an <code>AIPlanReading</code>. The server wraps it into a <code>PlanMap</code>, adding its own metadata. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.</p>
+  <p>That description comes back as JSON and the server runs it through a strict format check before it touches anything else. This is the core learning goal made concrete: <strong>the AI produces output, the gate decides whether it is usable, and nothing downstream ever sees an unchecked map.</strong></p>
+  <p>The browser calls <code>POST /api/validate-map</code> on every correction (debounced, fast, same Python code that runs at Confirm). Rules are implemented once, in Python. No TypeScript reimplementation.</p>
+  <p>The checker is a constraint solver (CP-SAT). Singles run first. Any pair that contains a broken single is marked dimmed without solving. For remaining pairs, the solver finds the best possible schedule using only the people and vehicles the plan names. Zero lateness proved = tick. Minimum above zero proved = cross, with that minimum as the human cost. Some scenarios leave a route with no driver or the loading area with no key holder; rather than failing with no number, every route may be "not delivered," carrying a penalty larger than any possible lateness (households times the full horizon). The solver always returns a number. Deterministic time limit hit = question mark, never a pass.</p>
+  <p>After the format gate, the server normalises all entity ids to stable slugs from type and name (<code>person-ravi</code>, <code>vehicle-van</code>, <code>route-c</code>) and updates every reference. Two runs of the same plan always produce the same ids and the same fingerprint.</p>
+  <p>Clicking a cross triggers one AI call that returns both a plain explanation sentence and up to three fix suggestions. The server caches the result per fingerprint and scenario, so reopening a cross never calls the AI again. The checker's facts are always shown; the AI sentence sits next to them, labelled. Turned-down reasons come from the checker. Preview draws from stored fix results without re-solving.</p>
+</section>
+
+<!-- CORE JOURNEY -->
+<section id="journey">
+  <h2>The Core Journey Through the System <span class="prd-ref">prd.md &rsaquo; The Core Journey</span></h2>
+
+  <div class="arch">
+    <svg viewBox="0 0 780 210" width="100%" style="max-width:780px;display:block;margin:0 auto;" role="img" aria-label="System architecture diagram">
+      <defs>
+        <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#C0BDB5"/></marker>
+        <marker id="arrd" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#C0BDB5"/></marker>
+      </defs>
+      <!-- Browser -->
+      <rect x="8" y="75" width="130" height="56" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5"/>
+      <text x="73" y="100" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">Browser</text>
+      <text x="73" y="117" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">React + Vite + TS</text>
+      <!-- Arrow browser to server -->
+      <line x1="138" y1="103" x2="198" y2="103" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="168" y="96" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8A8A85">REST / SSE</text>
+      <!-- Server -->
+      <rect x="198" y="45" width="152" height="116" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5"/>
+      <text x="274" y="73" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">FastAPI server</text>
+      <text x="274" y="90" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">127.0.0.1 only</text>
+      <text x="274" y="107" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">validation gate</text>
+      <text x="274" y="123" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">rules engine (Python)</text>
+      <text x="274" y="139" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">session store</text>
+      <!-- Arrow server to Groq -->
+      <line x1="350" y1="78" x2="445" y2="52" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="445" y1="64" x2="350" y2="92" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Groq -->
+      <rect x="445" y="18" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5"/>
+      <text x="519" y="40" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">Groq (primary)</text>
+      <text x="519" y="57" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gpt-oss-120b</text>
+      <!-- Arrow server to Gemini -->
+      <line x1="350" y1="110" x2="445" y2="100" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrd)"/>
+      <line x1="445" y1="112" x2="350" y2="122" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrd)"/>
+      <!-- Gemini -->
+      <rect x="445" y="80" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="519" y="101" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" fill="#1A1A18">Gemini (fallback)</text>
+      <text x="519" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gemini-3.8-flash</text>
+      <!-- Arrow server to CP-SAT -->
+      <line x1="350" y1="138" x2="445" y2="158" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="445" y1="168" x2="350" y2="148" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- CP-SAT -->
+      <rect x="445" y="145" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5"/>
+      <text x="519" y="167" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">CP-SAT</text>
+      <text x="519" y="184" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">OR-Tools 9.15</text>
+      <!-- Fixtures -->
+      <rect x="607" y="80" width="162" height="50" rx="6" fill="#F8F6F1" stroke="#D8D5CD" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="688" y="101" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="12" fill="#8A8A85">fixtures/</text>
+      <text x="688" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8A8A85">example-reading.json</text>
+      <line x1="607" y1="105" x2="593" y2="105" stroke="#D8D5CD" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arrd)"/>
+    </svg>
+  </div>
+
+  <ol class="journey">
+    <li><div class="jnum">1</div><div class="jbody"><strong>Paste plan or load example</strong>Browser sends text to <code>POST /api/read-plan</code>. Example mode returns <code>fixtures/example-reading.json</code>; zero AI calls.</div></li>
+    <li><div class="jnum">2</div><div class="jbody"><strong>Server calls the AI</strong>Groq gets one attempt (strict structured output against <code>AIPlanReading</code>). On failure, Gemini gets one attempt. On both failing, the PRD error state is returned.</div></li>
+    <li><div class="jnum">3</div><div class="jbody"><strong>Format gate runs</strong>Pydantic validates <code>AIPlanReading</code>; duplicate ids rejected; reference integrity check by id. All failures return a <code>422</code> with the specific reason.</div></li>
+    <li><div class="jnum">4</div><div class="jbody"><strong>Id normalisation and PlanMap construction</strong>Server rewrites all ids to stable slugs (<code>person-ravi</code>, <code>vehicle-van</code>, <code>route-c</code>), updates every reference, then wraps the reading into a <code>PlanMap</code> with every item's status set to <code>unconfirmed</code>.</div></li>
+    <li><div class="jnum">5</div><div class="jbody"><strong>Plan map screen renders</strong>Checklist view, structured reading with source lines, "What we'll test" list.</div></li>
+    <li><div class="jnum">6</div><div class="jbody"><strong>User confirms or corrects</strong>Every correction triggers <code>POST /api/validate-map</code> (debounced 150 ms, same Python rules). Affected items lose their confirmed mark. Confirm button computed from live state.</div></li>
+    <li><div class="jnum">7</div><div class="jbody"><strong>Confirm</strong>Browser sends the map to <code>POST /api/confirm-map</code>. Server re-validates and returns the fingerprint (SHA-256 of canonical checker inputs). Map is frozen.</div></li>
+    <li><div class="jnum">8</div><div class="jbody"><strong>Crash test via SSE</strong><code>GET /api/run-tests?map={fingerprint}</code>. Singles first; dimmed pairs skipped; remaining pairs solved. "Not delivered" routes use the horizon penalty so every scenario yields a number. Each result streams as it finishes.</div></li>
+    <li><div class="jnum">9</div><div class="jbody"><strong>Broken case detail</strong>Clicking a cross triggers <code>POST /api/suggest-fixes</code>. One AI call; result cached by fingerprint and scenario - reopening a cross never calls the AI again. Response includes explanation sentence and up to three fix suggestions with full per-scenario results.</div></li>
+    <li><div class="jnum">10</div><div class="jbody"><strong>Preview</strong>Browser draws the projected grid from stored fix results. No re-solve.</div></li>
+    <li><div class="jnum">11</div><div class="jbody"><strong>Accept a fix</strong><code>POST /api/apply-fix</code> validates, applies, records <code>from_fingerprint</code> and <code>to_fingerprint</code> in <code>AppliedFix</code>, produces a new fingerprint, starts a new SSE run. Changed cells replay from cache.</div></li>
+    <li><div class="jnum">12</div><div class="jbody"><strong>Report</strong><code>GET /api/report?map={fingerprint}</code>. Before/After toggle and report chain reconstructed from <code>fix_history</code>. Browser print produces the PDF.</div></li>
+  </ol>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+  <h2>Stack</h2>
+
+  <h3>Backend</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Choice</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td>Language</td><td><code>Python 3.12</code></td><td>Solver and AI SDK support; learner's preference.</td></tr>
+      <tr><td>Package manager</td><td><code>uv</code></td><td>Lockfile installs; identical across Windows, macOS, Linux.</td></tr>
+      <tr><td>Web framework</td><td><code>FastAPI</code></td><td>Native SSE, async, OpenAPI schema for type-sync.</td></tr>
+      <tr><td>Solver</td><td><code>OR-Tools 9.15 CP-SAT</code></td><td>Wheels for all platforms; proves lateness minimums.</td></tr>
+      <tr><td>Validation</td><td><code>Pydantic v2</code> (<code>extra="forbid"</code>)</td><td>Single source of truth; strict-mode compatible.</td></tr>
+      <tr><td>Linter</td><td><code>ruff</code></td><td>Fast; configured in <code>pyproject.toml</code>.</td></tr>
+      <tr><td>Tests</td><td><code>pytest</code></td><td>Locked example, format gate, rules, monotone, determinism.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>AI Layer</h3>
+  <div class="provider-row">
+    <div class="pcard">
+      <span class="role">Primary</span>
+      <span class="name">Groq</span>
+      <span class="model">openai/gpt-oss-120b</span>
+      <dl>
+        <dt>SDK</dt><dd><code>groq</code> (official)</dd>
+        <dt>Output</dt><dd>strict structured JSON against <code>AIPlanReading</code></dd>
+        <dt>Limits</dt><dd>30 req/min &middot; 1,000/day &middot; 8k tok/min</dd>
+        <dt>Docs</dt><dd><a href="https://console.groq.com/docs/openai">console.groq.com</a></dd>
+      </dl>
+    </div>
+    <div class="pcard">
+      <span class="role">Fallback</span>
+      <span class="name">Gemini</span>
+      <span class="model">gemini-3.8-flash</span>
+      <dl>
+        <dt>SDK</dt><dd><code>google-genai</code> (official)</dd>
+        <dt>Output</dt><dd>Interactions API structured output (verify param at build)</dd>
+        <dt>Note</dt><dd>Free tier content used by Google; Screen 1 discloses</dd>
+        <dt>Docs</dt><dd><a href="https://googleapis.github.io/python-genai/">googleapis.github.io</a></dd>
+      </dl>
+    </div>
+  </div>
+  <p style="font-size:13px;color:var(--ink-mid);">Model names in <code>server/config.py</code>. Fallback triggers: rate limit, server error, timeout, or format-check failure. One attempt per provider.</p>
+
+  <h3>Frontend</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Choice</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td>Framework</td><td><code>React + Vite + TypeScript (strict)</code></td><td>Learner's preference; one-command start.</td></tr>
+      <tr><td>State</td><td><code>useReducer</code> + context</td><td>Sufficient; no external library.</td></tr>
+      <tr><td>Styling</td><td>Plain CSS + custom properties</td><td>Full control over grid and timeline visuals.</td></tr>
+      <tr><td>Fonts</td><td><code>@fontsource/ibm-plex-*</code></td><td>Self-hosted; no runtime call to Google Fonts.</td></tr>
+      <tr><td>Grid / timeline</td><td>CSS grid + SVG, hand-built</td><td>Exact visual control over all four cell states.</td></tr>
+      <tr><td>Type sync</td><td><code>openapi-typescript</code></td><td>Types from FastAPI schema; drift is a compile error.</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--ink-mid);">Rules are implemented only in Python (<code>server/validation/rules.py</code>). The browser never reimplements them; it calls <code>POST /api/validate-map</code>.</p>
+</section>
+
+<!-- WHERE IT RUNS -->
+<section id="runs">
+  <h2>Where It Runs and How Someone Tries It</h2>
+  <div class="card">
+    <p><strong>Start command</strong> (after <code>uv sync</code> and <code>npm install</code>):</p>
+    <pre><code>python scripts/dev.py</code></pre>
+    <p>Starts <code>uvicorn server.main:app --host 127.0.0.1 --port 8000</code> and <code>vite --port 5173</code> in parallel. Cross-platform; no <code>make</code>. Server binds to 127.0.0.1 only.</p>
+    <p style="margin-top:10px;"><strong>Open:</strong> <code>http://localhost:5173</code></p>
+    <p style="margin-top:6px;"><strong>Keys:</strong> <code>GROQ_API_KEY</code> and/or <code>GEMINI_API_KEY</code> in <code>.env</code>. Not needed for example mode. <code>.env.example</code> ships with placeholders; <code>.env</code> is gitignored.</p>
+    <p style="margin-top:6px;"><strong>Demo recording:</strong> load example, walk the full flow, record screen. Submission = video + public GitHub repo. Deployment is optional and post-PoC.</p>
+  </div>
+</section>
+
+<!-- LOOK AND FEEL -->
+<section id="look">
+  <h2>Look and Feel <span class="prd-ref">prd.md &rsaquo; Look and Feel</span></h2>
+  <p>Warm off-white background (<code>#F8F6F1</code>), near-black ink (<code>#1A1A18</code>). Colour carries meaning only; no decoration that is not doing work.</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-dot" style="background:#1A6B3C;"></div><strong>Deep green</strong> - ticks, action</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#B23A2A;"></div><strong>Brick red</strong> - crosses, broken</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#C47A00;"></div><strong>Amber</strong> - question marks</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#8A8A85;border:1px solid #ccc;"></div><strong>Grey</strong> - dimmed marks</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#F8F6F1;border:1px solid #D8D5CD;"></div><strong>Off-white</strong> - background</div>
+  </div>
+  <p style="margin-top:12px;"><strong>Typography:</strong> IBM Plex Sans for all body, labels, UI. IBM Plex Mono for times, counts, numbers. Self-hosted via <code>@fontsource</code>.</p>
+  <p><strong>Grid marks:</strong> SVG stroke marks, not emoji. Colour plus shape so the grid is readable without colour.</p>
+  <p><strong>Timeline:</strong> SVG bars; finish-time deadline is a solid red vertical line labelled "Noon: families waiting." Late segments extend past it in brick red.</p>
+  <p><strong>Motion:</strong> cells fill as SSE results arrive. Accepted-fix cells flip with a short CSS transition. Both effects check <code>prefers-reduced-motion</code>.</p>
+
+  <div class="card" style="margin-top:16px;">
+    <h4>Grid Cell States</h4>
+    <div class="cell-demo">
+      <div class="cell-item">
+        <svg width="44" height="44" viewBox="0 0 44 44"><polyline points="10,24 19,33 34,13" stroke="#1A6B3C" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><span class="badge badge-tick">tick</span></div>
+        <div class="cell-label">Plan survives</div>
+      </div>
+      <div class="cell-item">
+        <svg width="44" height="44" viewBox="0 0 44 44"><line x1="13" y1="13" x2="31" y2="31" stroke="#B23A2A" stroke-width="2.5" stroke-linecap="round"/><line x1="31" y1="13" x2="13" y2="31" stroke="#B23A2A" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div><span class="badge badge-cross">cross</span></div>
+        <div class="cell-label">Plan breaks</div>
+      </div>
+      <div class="cell-item">
+        <svg width="44" height="44" viewBox="0 0 44 44"><line x1="13" y1="13" x2="31" y2="31" stroke="#8A8A85" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 2"/><line x1="31" y1="13" x2="13" y2="31" stroke="#8A8A85" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 2"/></svg>
+        <div><span class="badge badge-dim">dimmed</span></div>
+        <div class="cell-label">Already broken by a single</div>
+      </div>
+      <div class="cell-item">
+        <svg width="44" height="44" viewBox="0 0 44 44"><text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="22" font-weight="600" fill="#C47A00">?</text></svg>
+        <div><span class="badge badge-amber">qmark</span></div>
+        <div class="cell-label">Unknown; never a pass</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM TYPES -->
+<section id="problems">
+  <h2>Problem Type Taxonomy</h2>
+  <p>Fixed list. Each type applied to every matching entity in the confirmed map, producing one concrete label per entity. Sizes from preset choices only: 15, 30, 45, 60, 90 minutes.</p>
+  <div class="problem-grid">
+    <div class="prob-card">
+      <span class="type">Volunteer absent</span>
+      <span class="meta">Each volunteer &middot; No size</span>
+      <p>Person unavailable for the whole run. E.g. "Ravi absent."</p>
+    </div>
+    <div class="prob-card">
+      <span class="type">Volunteer leaves early</span>
+      <span class="meta">Each volunteer &middot; Default 90 min</span>
+      <p><code>available_until</code> reduced by size. E.g. "Sam leaves 90 min early."</p>
+    </div>
+    <div class="prob-card">
+      <span class="type">Vehicle returns late</span>
+      <span class="meta">Each vehicle &middot; Default 30 min</span>
+      <p><code>available_from</code> pushed back by size. E.g. "Van returns 30 min late."</p>
+    </div>
+    <div class="prob-card">
+      <span class="type">Supply delivery arrives late</span>
+      <span class="meta">Each delivery &middot; Default 45 min</span>
+      <p>Loading blocked until delivery + size. E.g. "Supply truck 45 min late."</p>
+    </div>
+    <div class="prob-card">
+      <span class="type">Place blocked</span>
+      <span class="meta">Each place &middot; Default 30 min</span>
+      <p>Place unavailable for first size minutes. E.g. "Loading area blocked 30 min."</p>
+    </div>
+  </div>
+  <div class="card" style="font-size:13.5px;">
+    <p><strong>Example plan:</strong> 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = <strong>14 problems</strong>. 14 singles + 91 pairs = <strong>105 tests</strong>.</p>
+    <p style="margin-top:8px;"><strong>Hall key:</strong> modelled as <code>holds_key: true</code> on Joel. "Joel absent (only key holder)" is the single weak spot. The loading area rule checks <code>holds_key</code>.</p>
+    <p style="margin-top:8px;"><strong>Cap:</strong> 24 problems (300 tests). Exceeding the cap shows a rule message before Confirm.</p>
+    <p style="margin-top:8px;"><strong>Deliberately out of scope:</strong> volunteer arrives late. Listed under "What was NOT tested" in every report.</p>
+  </div>
+</section>
+
+<!-- VALIDATION GATE -->
+<section id="gate">
+  <h2>The Validation Gate <span class="prd-ref">prd.md &rsaquo; Plain Rules Validation</span></h2>
+  <p>The learning goal made concrete: <strong>AI produces output &rarr; gate checks it &rarr; human confirms &rarr; checker acts.</strong> Every AI output passes through the same gate.</p>
+  <div class="pipeline">
+    <div class="pipe-step"><div class="pipe-n">1</div><div class="pipe-body"><strong>Parse JSON</strong><span>Malformed JSON rejected immediately with the parse error.</span></div></div>
+    <div class="pipe-step"><div class="pipe-n">2</div><div class="pipe-body"><strong>Pydantic validation</strong><span><code>extra="forbid"</code>, all fields required. Missing field, extra field, wrong type: rejected with the field name.</span></div></div>
+    <div class="pipe-step"><div class="pipe-n">3</div><div class="pipe-body"><strong>Reference integrity</strong><span>Every person, vehicle, place id used in routes and jobs must exist in the entity lists. Unknown id rejected with the offending value.</span></div></div>
+    <div class="pipe-step"><div class="pipe-n">4</div><div class="pipe-body"><strong>Plain rules</strong><span>Every route has a driver id and a vehicle id. Every time is coherent. Finish time is explicit. Problem count within cap. Failures surface as questions on Screen 2; never silent.</span></div></div>
+    <div class="pipe-step"><div class="pipe-n">5</div><div class="pipe-body"><strong>Human confirms</strong><span>Constrained inputs only. Every correction triggers <code>POST /api/validate-map</code> (debounced 150 ms, same Python rules). Affected items lose their confirmed mark. Confirm button computed from live state.</span></div></div>
+    <div class="pipe-step"><div class="pipe-n">6</div><div class="pipe-body"><strong>Server re-validates on Confirm</strong><span>Browser call is for speed; server is the authority. Checker endpoint refuses any map that fails.</span></div></div>
+  </div>
+  <div class="card" style="font-size:13.5px;">
+    <p><strong>Rules re-run on every change, not only at Confirm.</strong> Entities are referenced by internal <code>id</code>. If a correction changes something other items depend on (e.g. Ravi corrected to "can't drive"), those items lose their confirmed mark and show "check this, Ravi changed." The whole map is re-validated from scratch each time.</p>
+    <p style="margin-top:8px;"><strong>Fixes go through the same gate.</strong> A fix that fails shows as "Couldn't apply" with the specific reason. Never scored, never acceptable.</p>
+    <p style="margin-top:8px;"><strong>Fingerprint:</strong> SHA-256 of canonical sorted checker inputs (people, vehicles, places, deliveries, routes, finish time, problem sizes). Timestamps and status marks excluded. Two identical plans get the same fingerprint; changing a problem size changes it.</p>
+  </div>
+</section>
+
+<!-- CHECKER -->
+<section id="checker">
+  <h2>Checker: What It Models and How It Decides</h2>
+
+  <h3>What the checker models</h3>
+  <ul>
+    <li><strong>People:</strong> available from / until. Can drive or not. Holds the key or not. Cannot be in two places at once.</li>
+    <li><strong>Vehicles:</strong> available from a time. One route at a time.</li>
+    <li><strong>Places:</strong> one vehicle loading at a time. Each place has an <code>opens_at</code> time (planned loading start). The loading area can only be used from the later of <code>opens_at</code> and the earliest time a key holder is present (if <code>needs_key</code>). "Place blocked" means blocked from <code>opens_at</code> for the chosen minutes.</li>
+    <li><strong>Deliveries:</strong> loading cannot start before the delivery arrives.</li>
+    <li><strong>Routes:</strong> households, <code>load_minutes</code> (needs a loader), <code>drive_minutes</code> (needs a driver and a vehicle). Jobs are filled <em>only</em> from <code>driver_ids</code> and <code>loader_ids</code> listed on the route - primary first, then listed backups. No one else may fill those jobs.</li>
+    <li><strong>Start times</strong> can move freely within people's and vehicles' availability windows.</li>
+    <li>Finish time is a soft deadline; the solver minimises total households-times-minutes-late.</li>
+  </ul>
+  <p style="font-size:13px;color:var(--ink-mid);">This is what makes "add another backup driver" a real fix the checker can evaluate and turn down: if the van is still the bottleneck, no driver swap changes that.</p>
+
+  <h3>How the checker decides</h3>
+  <div class="card" style="font-size:13.5px;">
+    <p><span class="badge badge-tick">tick</span> <strong>Proven zero lateness.</strong> Zero is the floor; finding zero proves the plan genuinely survives.</p>
+    <p style="margin-top:8px;"><span class="badge badge-cross">cross</span> <strong>Proven minimum above zero.</strong> That minimum is the human cost, proved optimal. E.g. "Route C: 10 households, 40 minutes late." Routes that cannot run (no driver, loading area cannot open) use a "not delivered" penalty of households times the full horizon (finish time + 180 min), keeping every scenario feasible. Human cost reads "Routes A, B: 20 households not delivered. Nobody can open the loading area."</p>
+    <p style="margin-top:8px;"><span class="badge badge-amber">qmark</span> <strong>Deterministic time limit hit</strong> before either is proved. Uses <code>max_deterministic_time</code>, not wall clock, so results are the same on every machine. Never a pass. Listed by name under "What was NOT tested."</p>
+  </div>
+
+  <h3>Run order</h3>
+  <p>Singles run first, in problem-id order. Any pair containing a single already marked cross is marked <span class="badge badge-dim">dimmed</span> without solving. Valid because every problem type only removes options; a pair can never do better than its worst single. Remaining pairs are solved. One solver worker, fixed seed.</p>
+  <p style="font-size:13px;color:var(--ink-mid);margin-top:6px;"><code>test_checker_monotone.py</code> asserts on the example map that every pair's lateness is at least each of its singles'. The locked test also asserts the example produces no question marks.</p>
+</section>
+
+<!-- EXPLAIN AND FIX -->
+<section id="fixes">
+  <h2>Explain and Fix <span class="prd-ref">prd.md &rsaquo; Fix Cards and Scoring</span></h2>
+
+  <p>One AI call per broken case. <code>POST /api/suggest-fixes</code> sends the confirmed map plus the checker's facts (failing problem ids, timeline, late routes, lateness in minutes, or "not delivered" if applicable). The AI returns one plain explanation sentence and up to three fix suggestions in one response. The server caches the result keyed by fingerprint and scenario id - reopening a cross never calls the AI again.</p>
+
+  <p>The checker's facts are always shown in the panel. The AI sentence sits next to them, labelled "AI's explanation." Turned-down reasons come from the checker: which resource the late route was waiting on in the best schedule. Example: "Route C still waits for the van until 11:20, 40 minutes late."</p>
+
+  <h3>Fix operations (fixed list, always gateable)</h3>
+  <p>Fixes are composed of one or more of these operations. No new people or vehicles may be invented; references always resolve.</p>
+  <table class="op-table">
+    <thead><tr><th>Operation</th><th>What it changes</th></tr></thead>
+    <tbody>
+      <tr><td>Add or replace a driver on a route</td><td><code>driver_ids</code> on a <code>Route</code>, from existing <code>Person</code> ids</td></tr>
+      <tr><td>Add or replace a loader on a route</td><td><code>loader_ids</code> on a <code>Route</code>, from existing <code>Person</code> ids</td></tr>
+      <tr><td>Move a route to another vehicle</td><td><code>vehicle_id</code> on a <code>Route</code>, from existing <code>Vehicle</code> ids</td></tr>
+      <tr><td>Change a person's availability</td><td><code>available_from</code> or <code>available_until</code> on a <code>Person</code></td></tr>
+      <tr><td>Change a vehicle's availability</td><td><code>available_from</code> on a <code>Vehicle</code></td></tr>
+      <tr><td>Give the key to another person</td><td><code>holds_key: true</code> on one <code>Person</code>, <code>false</code> on the current holder</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Scoring and preview</h3>
+  <p><code>suggest-fixes</code> returns each fix's full <code>list[ScenarioResult]</code>. The browser derives <code>fixes_n</code>, <code>still_broken_n</code>, <code>new_crosses_n</code> from those results. Preview draws the projected grid directly from the stored results - no re-solve in the browser. Accepting a previewed fix replays from the cached results with the flip animation; any cell not in the cache re-solves.</p>
+
+  <h3>Example mode saved fixes</h3>
+  <p><code>fixtures/example-fixes.json</code> stores the explanation and per-scenario results for each broken case. They still pass through the gate and are scored live. If a broken case appears with no saved suggestion, the panel says: "No saved suggestions for this case. Add a key to ask the AI."</p>
+</section>
+
+<!-- COMPONENTS -->
+<section id="components">
+  <h2>Components</h2>
+
+  <h3>Screen 1: Paste Plan <span class="prd-ref">prd.md &rsaquo; Screen 1</span></h3>
+  <p>Single <code>&lt;textarea&gt;</code> with a character counter (amber at 3,500, red at 4,000, submit disabled above). "Load example" button. AI key fields shown if no key is set. One-line Gemini data notice when a Gemini key is present. Connects to <code>POST /api/read-plan</code>.</p>
+
+  <h3>Screen 2: Plan Map <span class="prd-ref">prd.md &rsaquo; Screen 2</span></h3>
+  <p>Three stacked sections. <strong>Checklist view (top):</strong> computed from item status counts. Summary "AI read N items, M corrected by you, P added by you" derived from <code>status</code> fields. <strong>Structured reading (middle):</strong> one statement per item with <code>source_line</code>. Three visual states: unconfirmed, corrected (AI's <code>original_value</code> struck through), added. Constrained corrections only: <code>&lt;select&gt;</code> from entity ids, time picker. Every correction triggers <code>POST /api/validate-map</code> (debounced 150 ms). <strong>"What we'll test" (bottom):</strong> each problem with preset size picker.</p>
+  <p>Confirm button disabled until all items confirmed and all rules pass. Connects to <code>POST /api/confirm-map</code>.</p>
+
+  <h3>Screen 3: Crash Test Grid <span class="prd-ref">prd.md &rsaquo; Screen 3</span></h3>
+  <p>CSS grid. One triangle (diagonal + below). Cells update via SSE. Four SVG mark states. Count line updates live. Before/After toggle after first accepted fix. Preview banner during fix preview. Connects to <code>GET /api/run-tests</code> (SSE).</p>
+
+  <h3>Screen 4: Broken Case Detail Panel <span class="prd-ref">prd.md &rsaquo; Screen 4</span></h3>
+  <p>Right-side panel; grid stays interactive. Checker's facts, AI explanation (labelled), fix cards with checker-derived turned-down reasons. Preview draws from stored results; accept sends to <code>POST /api/apply-fix</code> and opens new SSE stream.</p>
+
+  <h3>Screen 5: Report <span class="prd-ref">prd.md &rsaquo; Screen 5</span></h3>
+  <p>Six sections as in the PRD. <code>window.print()</code> with <code>@media print</code> stylesheet. "Read by" attribution. Fingerprint in footer. Connects to <code>GET /api/report</code>.</p>
+</section>
+
+<!-- DATA MODEL -->
+<section id="data">
+  <h2>Data Model</h2>
+  <p>All shapes in <code>server/models.py</code> as Pydantic v2 with <code>extra="forbid"</code>. TypeScript types generated via <code>openapi-typescript</code>. Neither side can drift.</p>
+
+  <div class="schema-split">
+    <div class="schema-box">
+      <span class="schema-label">AI output only</span>
+      <span class="schema-name">AIPlanReading</span>
+      <ul>
+        <li>people, vehicles, places, deliveries, routes</li>
+        <li>finish_time + source_line + guessed</li>
+        <li>questions: list of {item_id, question_text}</li>
+        <li>is_distribution_plan + reason</li>
+        <li>Each entity: id, name, timing fields, source_line, guessed</li>
+        <li>Routes: driver_ids (primary first), loader_ids</li>
+      </ul>
+      <p style="font-size:12px;color:var(--ink-mid);margin-top:8px;">Never contains fingerprint, fix history, or server metadata.</p>
+    </div>
+    <div class="schema-box">
+      <span class="schema-label">Server-owned</span>
+      <span class="schema-name">PlanMap</span>
+      <ul>
+        <li>fingerprint (SHA-256 after confirm)</li>
+        <li>ai_meta: provider, model, timestamp</li>
+        <li>Wraps reading entities as Map* types</li>
+        <li>Each Map* adds: status, original_value</li>
+        <li>problem_sizes: dict[type_id, minutes]</li>
+        <li>fix_history: list[AppliedFix]</li>
+      </ul>
+      <p style="font-size:12px;color:var(--ink-mid);margin-top:8px;">Never sent to the AI.</p>
+    </div>
+  </div>
+  <div class="card" style="font-size:13px;margin-top:8px;background:var(--bg);border:1px solid var(--rule);">
+    <strong>AppliedFix</strong> records <code>from_fingerprint</code> and <code>to_fingerprint</code> so the report and Before/After toggle can reconstruct the full chain from the original plan to the current state by following fix_history.
+  </div>
+
+  <h3>Provenance on every item</h3>
+  <pre><code>MapPerson (wraps AIPerson, adds):
+  status:         "unconfirmed" | "confirmed" | "corrected" | "added"
+  original_value: AIPerson | None   <span class="comment"># AI's original reading, for the strikethrough</span>
+
+<span class="comment"># "added" = created by a rule question, not the AI
+# Summary "AI read 24 items, 2 corrected, 1 added" computed from status counts</span></code></pre>
+
+  <h3>Checker entity shapes</h3>
+  <pre><code>Person          id, name, available_from, available_until, holds_key
+Vehicle         id, name, available_from
+Place           id, name, opens_at (planned loading start, minutes), one_vehicle_at_a_time (always true), needs_key
+Delivery        id, name, arrives_at (minutes), place_id
+Route           id, name, households, load_minutes, drive_minutes,
+                vehicle_id, driver_ids (primary first), loader_ids (primary first)</code></pre>
+  <p style="font-size:13px;color:var(--ink-mid);">Derived from <code>PlanMap</code> at run time. The checker may only assign jobs from <code>driver_ids</code> and <code>loader_ids</code> on each route.</p>
+
+  <h3>ScenarioResult</h3>
+  <pre><code>scenario_id:           str
+failures:              list[str]        <span class="comment"># Problem ids</span>
+state:                 "tick" | "cross" | "dim" | "qmark"
+dim_cause:             str | None       <span class="comment"># Problem id of the single that causes dimming</span>
+lateness_minutes:      int | None       <span class="comment"># Minutes, not seconds</span>
+lower_bound_minutes:   int | None
+timeline:              list[TimelineEvent]
+human_cost:            str | None       <span class="comment"># "Route C: 10 households, 40 minutes late"</span>
+map_fingerprint:       str</code></pre>
+
+  <h3>FixSuggestion</h3>
+  <pre><code>id, description
+operations:          list[FixOperation]       <span class="comment"># From the fixed operations list</span>
+scenario_results:    list[ScenarioResult]     <span class="comment"># Full results; browser derives counts</span>
+fixes_n, still_broken_n, new_crosses_n       <span class="comment"># Derived by server before sending</span>
+eligible:            bool
+rejection_reason:    str | None              <span class="comment"># Checker-derived, not AI-written</span>
+gate_status:         "passed" | "format_error" | "rules_error" | "couldnt_apply"
+gate_reason:         str | None</code></pre>
+
+  <div class="card" style="font-size:13.5px;"><strong>State storage:</strong> no database. Confirmed maps, test results, and fix results held in server memory keyed by fingerprint. Closing the tab loses the session - by design.</div>
+</section>
+
+<!-- FIXTURES AND TESTS -->
+<section id="fixtures">
+  <h2>Fixtures and the Locked Test</h2>
+
+  <table>
+    <thead><tr><th>File</th><th>Contents</th><th>Who writes it</th></tr></thead>
+    <tbody>
+      <tr><td><code>fixtures/example-truth.json</code></td><td>Correct confirmed map for the Saturday plan</td><td>Hand-authored by you</td></tr>
+      <tr><td><code>fixtures/example-reading.json</code></td><td>Chosen provider's real output, saved as-is</td><td>Captured from bakeoff</td></tr>
+      <tr><td><code>fixtures/example-fixes.json</code></td><td>Explanation and per-scenario fix results for each broken case</td><td>Captured from one real AI call</td></tr>
+      <tr><td><code>fixtures/expected-results.json</code></td><td>Hand-checked verdict and human cost for all 105 cells</td><td>Hand-authored by you</td></tr>
+    </tbody>
+  </table>
+
+  <table style="margin-top:16px;">
+    <thead><tr><th>Test</th><th>What it asserts</th><th>AI required?</th></tr></thead>
+    <tbody>
+      <tr><td><code>test_example_locked.py</code></td><td>Checker on truth map vs expected-results.json; no question marks</td><td>No</td></tr>
+      <tr><td><code>test_checker_monotone.py</code></td><td>Every pair's lateness &ge; each of its singles'</td><td>No</td></tr>
+      <tr><td><code>test_reading_matches_truth.py</code></td><td>Reading + scripted corrections == truth map</td><td>No (uses fixture)</td></tr>
+      <tr><td><code>test_format_gate.py</code></td><td>Bad JSON, extra fields, unknown names all rejected with specific reasons</td><td>No</td></tr>
+      <tr><td><code>test_rules.py</code></td><td>Rules engine including the cascade test</td><td>No</td></tr>
+      <tr><td><code>test_determinism.py</code></td><td>Same truth map run twice; identical results</td><td>No</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card" style="font-size:13.5px;margin-top:12px;">
+    <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. For each, normalises the ids, then compares the raw reading against <code>example-truth.json</code> field by field - reporting the percentage that match and a list of mismatches. Scores the raw reading quality; does not apply scripted corrections. The more accurate provider becomes primary. Result recorded as a comment in <code>server/config.py</code>.</p>
+    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py</strong> is separate: it loads <code>example-reading.json</code>, applies the scripted demo corrections, and asserts the result equals <code>example-truth.json</code>. This validates that the chosen provider's saved reading plus the demo's known corrections produce the truth map.</p>
+  </div>
+</section>
+
+<!-- FILE STRUCTURE -->
+<section id="files">
+  <h2>File Structure</h2>
+  <div class="file-tree">
+<pre>failure-compiler/
+├── server/
+│   ├── main.py                   <span class="comment"># FastAPI app; all API routes</span>
+│   ├── models.py                 <span class="comment"># AIPlanReading, PlanMap, ScenarioResult, FixSuggestion</span>
+│   ├── config.py                 <span class="comment"># AI model names, size presets, problem type defs, cap</span>
+│   ├── ai/
+│   │   ├── adapter.py            <span class="comment"># Public interface: read_plan(), suggest_fixes()</span>
+│   │   ├── groq_provider.py      <span class="comment"># Groq call (AIPlanReading schema, strict mode)</span>
+│   │   ├── gemini_provider.py    <span class="comment"># Gemini call (verify structured output param at build)</span>
+│   │   └── prompts.py            <span class="comment"># Prompt templates; reasoning at lowest setting</span>
+│   ├── validation/
+│   │   ├── gate.py               <span class="comment"># Full gate: parse, Pydantic, references, rules</span>
+│   │   └── rules.py              <span class="comment"># The only implementation of rules</span>
+│   ├── checker/
+│   │   ├── runner.py             <span class="comment"># Singles then pairs; dimmed skipped; SSE stream</span>
+│   │   ├── solver.py             <span class="comment"># One CP-SAT run; max_deterministic_time; fixed seed</span>
+│   │   └── scenarios.py          <span class="comment"># Generates singles + pairs from problem list</span>
+│   └── session.py                <span class="comment"># In-memory: fingerprint -&gt; {map, results, fix_results}</span>
+├── web/
+│   ├── src/
+│   │   ├── main.tsx
+│   │   ├── App.tsx
+│   │   ├── api/
+│   │   │   └── client.ts         <span class="comment"># Typed fetch + SSE; types from generated schema</span>
+│   │   ├── components/
+│   │   │   ├── PastePlan/
+│   │   │   ├── PlanMap/
+│   │   │   │   ├── ChecklistView.tsx
+│   │   │   │   ├── StructuredReading.tsx
+│   │   │   │   ├── CorrectionInput.tsx   <span class="comment"># select + time picker only</span>
+│   │   │   │   └── WhatWeTest.tsx
+│   │   │   ├── CrashTest/
+│   │   │   │   ├── Grid.tsx
+│   │   │   │   ├── GridCell.tsx          <span class="comment"># SVG marks</span>
+│   │   │   │   └── CountLine.tsx
+│   │   │   ├── BrokenCase/
+│   │   │   │   ├── DetailPanel.tsx
+│   │   │   │   ├── Timeline.tsx          <span class="comment"># SVG; finish line in red</span>
+│   │   │   │   └── FixCard.tsx           <span class="comment"># Preview draws from stored results</span>
+│   │   │   └── Report/
+│   │   │       └── ReportPage.tsx
+│   │   ├── state/
+│   │   │   ├── reducer.ts         <span class="comment"># All map mutations; preview state</span>
+│   │   │   └── types.ts
+│   │   └── styles/
+│   │       ├── tokens.css
+│   │       └── *.css
+│   ├── scripts/
+│   │   └── gen-types.ts
+│   ├── index.html
+│   ├── vite.config.ts
+│   └── tsconfig.json
+├── fixtures/
+│   ├── example-plan.txt          <span class="comment"># Saturday food distribution plan (messy text)</span>
+│   ├── example-truth.json        <span class="comment"># Correct confirmed map, hand-authored</span>
+│   ├── example-reading.json      <span class="comment"># Chosen provider's real output, saved as-is</span>
+│   ├── example-fixes.json        <span class="comment"># Saved suggestions for each broken case</span>
+│   └── expected-results.json     <span class="comment"># Hand-checked verdicts for all 105 cells</span>
+├── scripts/
+│   ├── dev.py                    <span class="comment"># Starts both servers; 127.0.0.1 only</span>
+│   └── bakeoff.py                <span class="comment"># Compares providers against example-truth.json</span>
+├── tests/
+│   ├── test_example_locked.py
+│   ├── test_checker_monotone.py
+│   ├── test_reading_matches_truth.py
+│   ├── test_format_gate.py
+│   ├── test_rules.py
+│   └── test_determinism.py
+├── devpost/
+├── pyproject.toml
+├── package.json
+├── .env.example
+├── .gitignore
+├── LICENSE                       <span class="comment"># MIT</span>
+└── README.md</pre>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <h2>External Services and Dependencies</h2>
+
+  <h3>Groq - Primary AI provider</h3>
+  <div class="card" style="font-size:13.5px;">
+    Endpoint: <code>POST https://api.groq.com/openai/v1/chat/completions</code><br>
+    Auth: <code>Authorization: Bearer $GROQ_API_KEY</code><br>
+    Structured output: <code>response_format: { type: "json_schema", json_schema: { strict: true, schema: &lt;AIPlanReading JSON schema&gt; } }</code><br>
+    Free limits: 30 req/min &middot; 1,000/day &middot; 8k tok/min &middot; 200k tok/day<br>
+    Docs: <a href="https://console.groq.com/docs/openai">console.groq.com/docs/openai</a>
+  </div>
+
+  <h3>Gemini - Fallback AI provider</h3>
+  <div class="card" style="font-size:13.5px;">
+    SDK: <code>google-genai</code> (official) &middot; Model: <code>gemini-3.8-flash</code><br>
+    Structured output: follows current <code>google-genai</code> Interactions API. Verify the exact parameter name against the installed SDK version at build time.<br>
+    Free tier note: content may be used by Google. Screen 1 discloses this.<br>
+    Docs: <a href="https://googleapis.github.io/python-genai/">googleapis.github.io/python-genai</a>
+  </div>
+
+  <h3>OR-Tools 9.15</h3>
+  <div class="card" style="font-size:13.5px;">
+    Install: <code>uv add ortools==9.15.*</code> - wheels for Windows, macOS (Intel + Apple Silicon), Linux.<br>
+    No API key. Runs locally.<br>
+    Docs: <a href="https://developers.google.com/optimization/reference/python/sat/python/cp_model">developers.google.com/optimization</a>
+  </div>
+</section>
+
+<!-- FAILURE MODES -->
+<section id="failures">
+  <h2>Important Failure Modes <span class="prd-ref">prd.md &rsaquo; States and Boundaries</span></h2>
+  <ul class="flist">
+    <li><div class="ficon">x</div><div><strong>Both AI providers fail.</strong> Clear error message, retry button, "try the example plan instead." Applies to both read-plan and suggest-fixes paths.</div></li>
+    <li><div class="ficon">x</div><div><strong>AI output fails the format gate.</strong> Specific rejection reason (e.g. "Unknown person id 'dave' in route_a driver_ids"), retry button. Nothing unchecked reaches the plan map.</div></li>
+    <li><div class="ficon">x</div><div><strong>A fix suggestion fails the gate.</strong> Card shows "Couldn't apply" with specific reason. Never scored, never acceptable.</div></li>
+    <li><div class="ficon">x</div><div><strong><code>is_distribution_plan</code> is false.</strong> Shows the AI's reason. Offers to load the example.</div></li>
+    <li><div class="ficon">?</div><div><strong>Solver hits the deterministic time limit.</strong> Question mark cell. Listed under "What was NOT tested." Never a pass.</div></li>
+    <li><div class="ficon">!</div><div><strong>Plan exceeds 24 problems.</strong> Rule message on Screen 2 before Confirm: "This version supports up to 24 problems. This plan has N."</div></li>
+    <li><div class="ficon">!</div><div><strong>Plan text exceeds ~4,000 characters.</strong> Counter turns amber at 3,500, red at 4,000, submit disabled above.</div></li>
+  </ul>
+</section>
+
+<!-- SIMPLIFIED -->
+<section id="simplified">
+  <h2>What Was Simplified and Why</h2>
+  <ul class="slist">
+    <li><strong>No persistence.</strong><span>Fingerprint makes a single session reproducible within itself. Persistence is post-PoC.</span></li>
+    <li><strong>In-memory session store.</strong><span>Same shape of data, zero infrastructure. Server restart loses the session; acceptable for a demo.</span></li>
+    <li><strong>Browser print for the report.</strong><span>Covers the submission requirement. Nicer download is in scope.md Later.</span></li>
+    <li><strong>Fixed failure-type taxonomy.</strong><span>Keeps all results reproducible and the example story reliable. AI-suggested types deferred in scope.md.</span></li>
+    <li><strong>No deployment.</strong><span>Local recording satisfies submission. Live public link is in scope.md Later.</span></li>
+    <li><strong>Volunteer arrives late out of scope.</strong><span>Listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's two hidden pairs.</span></li>
+    <li><strong>Hall key as a person attribute.</strong><span>"Joel absent (only key holder)" is the single weak spot. Keeps the taxonomy clean without losing the story.</span></li>
+    <li><strong>Preview draws from stored fix results.</strong><span>No re-solve in the browser. One fewer round trip; one fewer failure mode during the demo.</span></li>
+  </ul>
+</section>
+
+<!-- DECISIONS -->
+<section id="decisions">
+  <h2>Decisions and Open Issues</h2>
+
+  <div class="decision">
+    <h4>CP-SAT for the checker</h4>
+    <p>Lateness is a proved minimum, not a found example. CP-SAT's optimality proof is what makes the three honest answers possible. A heuristic solver could find a good schedule but not prove it is optimal. Tradeoff: heavier dependency than a hand-written scheduler.</p>
+  </div>
+  <div class="decision">
+    <h4>Every scenario kept feasible with a "not delivered" penalty</h4>
+    <p>Routes that cannot run carry a penalty lateness of households times the full horizon (finish time + 180 min). The solver always returns a number. Human cost is always statable. Tick, cross, and question mark keep their meaning - there is no fourth state.</p>
+  </div>
+  <div class="decision">
+    <h4>Id normalisation after the gate</h4>
+    <p>AI-assigned ids are rewritten to stable type-and-name slugs after validation. Two runs of the same plan always produce the same ids and the same fingerprint. Duplicate ids are rejected by the gate.</p>
+  </div>
+  <div class="decision">
+    <h4>AIPlanReading and PlanMap are separate schemas</h4>
+    <p>The AI never sees the server's fingerprint, fix history, or status marks. Groq strict mode is workable because the AI schema contains only what the AI knows. The boundary between AI output and server state is explicit in code.</p>
+  </div>
+  <div class="decision">
+    <h4>Pydantic <code>extra="forbid"</code> with nullable fields</h4>
+    <p>Satisfies Groq strict mode (all fields required, no extra properties) while working identically for Gemini. One schema serves both providers.</p>
+  </div>
+  <div class="decision">
+    <h4>Rules implemented only in Python</h4>
+    <p>One implementation, tested in pytest. The browser calls <code>POST /api/validate-map</code>. No drift possible.</p>
+  </div>
+  <div class="decision">
+    <h4>Fingerprint hashes only checker inputs</h4>
+    <p>People, vehicles, places, deliveries, routes, finish time, problem sizes - sorted canonically. Excludes timestamps and status marks. Two identical plans get the same fingerprint; changing a problem size changes it.</p>
+  </div>
+  <div class="decision">
+    <h4>Singles before pairs; dimmed pairs skipped without solving</h4>
+    <p>Every problem type only removes options. Skipping is correct; <code>test_checker_monotone.py</code> asserts it on the example. The locked test asserts the example has no question marks.</p>
+  </div>
+  <div class="decision">
+    <h4>Deterministic time limit (<code>max_deterministic_time</code>) not wall clock</h4>
+    <p>Results are machine-independent. A slower machine cannot turn a result into a question mark.</p>
+  </div>
+  <div class="decision">
+    <h4>One AI call returns both explanation and fix suggestions</h4>
+    <p>Fewer round trips. The explanation and fixes are consistent because they came from the same context. Checker facts are always shown regardless.</p>
+  </div>
+  <div class="decision">
+    <h4>Turned-down reasons from the checker, not the AI</h4>
+    <p>The checker knows which resource the late route was waiting on. A machine-derived reason is more honest and more useful than a generated one.</p>
+  </div>
+  <div class="decision">
+    <h4>Preview draws from stored fix results</h4>
+    <p><code>suggest-fixes</code> returns full per-scenario results. Preview is a render operation, not a solve operation. Accepting a previewed fix replays from the cache.</p>
+  </div>
+  <div class="decision">
+    <h4>example-truth.json is hand-authored; locked test runs against it</h4>
+    <p>The locked test does not depend on the AI. Checker and locked test can be built and pass before any AI work. bakeoff compares providers against the truth map, not against each other, avoiding circularity.</p>
+  </div>
+
+  <div class="uncertainty">
+    <span class="ulabel">One Genuine Uncertainty - Discussed and Resolved</span>
+    <strong>Correction cascades in the validation gate</strong>
+    <p style="margin-top:6px;">When a user corrects Ravi's role to "can't drive," any route with Ravi as driver should lose its confirmed mark. The question was how the rules handle this without re-running the AI.</p>
+    <p style="margin-top:8px;">Agreed answer: entities are referenced by internal <code>id</code>. The rules engine walks the whole map on every change and flags any item whose constraints are no longer satisfied. No partial re-run; the whole map from scratch, every time.</p>
+    <p style="margin-top:8px;"><strong>Verified by:</strong> <code>test_rules.py</code> flips a person's <code>can_drive</code> to false after their route is confirmed, and asserts the route loses its confirmed mark and a rule fires reporting a missing driver.</p>
+  </div>
+
+  <h3>Open Issues</h3>
+  <ul>
+    <li><strong>Gemini structured output parameter name.</strong> Verify the exact parameter against the installed <code>google-genai</code> SDK version at build time. Record the finding as a comment in <code>gemini_provider.py</code>.</li>
+    <li><strong><code>openapi-typescript</code> generation step</strong> is manual for the PoC.</li>
+    <li><strong>Bakeoff result</strong> (primary provider) not yet determined. Run <code>scripts/bakeoff.py</code> early in the build; record in <code>server/config.py</code>.</li>
+  </ul>
+</section>
+
+</div>
+
+<script>
+  const secs = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('nav a');
+  const obs = new IntersectionObserver(e => {
+    e.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id));
+      }
+    });
+  }, { rootMargin: '-25% 0px -65% 0px' });
+  secs.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
