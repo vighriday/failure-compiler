@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Failure Compiler: Product Requirements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:            #f7f5f0;
+    --surface:       #ffffff;
+    --border:        #dedad3;
+    --border-light:  #eceae4;
+    --text:          #1c1b18;
+    --text-muted:    #5c5a54;
+    --text-faint:    #9c9a94;
+    --green:         #1f6645;   /* ticks, primary action */
+    --green-light:   #eaf3ee;
+    --red:           #aa2f20;   /* crosses, broken */
+    --red-light:     #fdf1ef;
+    --amber:         #9a5a10;   /* question marks */
+    --amber-light:   #fef7ec;
+    --grey:          #7a7870;   /* dimmed */
+    --grey-light:    #f2f1ee;
+    --mono:          'IBM Plex Mono', monospace;
+    --sans:          'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 48px 24px 80px;
+  }
+
+  .doc-wrap { max-width: 860px; margin: 0 auto; }
+
+  /* ---- Header ---- */
+  .doc-header {
+    border-bottom: 2px solid var(--text);
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+  }
+  .doc-header .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-family: var(--mono);
+  }
+  .doc-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.2;
+  }
+  .doc-header .subtitle {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 640px;
+  }
+  .status-badge {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    background: var(--amber-light);
+    color: var(--amber);
+    border: 1px solid #e8c07a;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: var(--mono);
+  }
+
+  /* ---- TOC ---- */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+  .toc h2 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    font-family: var(--mono);
+  }
+  .toc ol {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 32px;
+  }
+  .toc a { color: var(--green); text-decoration: none; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ---- Sections ---- */
+  section { margin-bottom: 52px; }
+  section > h2 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    font-family: var(--mono);
+  }
+  h3 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; margin: 24px 0 10px; }
+  h3:first-child { margin-top: 0; }
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ---- Journey ---- */
+  .journey { display: flex; flex-direction: column; }
+  .journey-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    cursor: pointer;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+    transition: background .1s;
+  }
+  .journey-step:first-child { border-radius: 8px 8px 0 0; }
+  .journey-step:last-child { border-radius: 0 0 8px 8px; border-bottom: 1px solid var(--border); }
+  .journey-step:hover { background: #f2f0eb; }
+  .journey-step.open { background: var(--green-light); border-color: #a0ccb4; }
+  .journey-step.open + .journey-step { border-top-color: #a0ccb4; }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: var(--text);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    font-family: var(--mono);
+  }
+  .journey-step.open .step-num { background: var(--green); }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; }
+  .step-detail {
+    display: none;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .journey-step.open .step-detail { display: block; }
+  .step-arrow {
+    flex-shrink: 0;
+    font-size: 13px;
+    color: var(--text-faint);
+    margin-top: 5px;
+    transition: transform .15s;
+    font-family: var(--mono);
+  }
+  .journey-step.open .step-arrow { transform: rotate(90deg); }
+
+  /* ---- Grid diagram ---- */
+  .grid-demo {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .grid-demo table { border-collapse: collapse; font-size: 13px; font-family: var(--sans); }
+  .grid-demo th, .grid-demo td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: center;
+    min-width: 64px;
+    white-space: nowrap;
+  }
+  .grid-demo th {
+    background: var(--grey-light);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+  .grid-demo td.tick  { color: var(--green); font-weight: 700; font-size: 16px; }
+  .grid-demo td.cross { color: var(--red); font-weight: 700; font-size: 16px; background: var(--red-light); }
+  .grid-demo td.cross.pair { background: #fce8e5; }
+  .grid-demo td.dimmed { color: var(--grey); font-size: 13px; font-family: var(--mono); }
+  .grid-demo td.diag  { background: #f5f4f0; }
+  .grid-demo td:empty { background: var(--bg); border-color: var(--border-light); }
+  .grid-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-sym { font-weight: 700; font-size: 15px; font-family: var(--mono); }
+  .legend-sym.tick   { color: var(--green); }
+  .legend-sym.cross  { color: var(--red); }
+  .legend-sym.dimmed { color: var(--grey); }
+
+  /* ---- Fix cards ---- */
+  .fix-cards { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+  .fix-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: var(--surface);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .fix-card.turned-down { background: #fafaf7; opacity: .9; }
+  .fix-card-body { flex: 1; }
+  .fix-card-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .fix-card-desc  { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+  .fix-scores {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .score-fix    { color: var(--green); }
+  .score-broken { color: var(--red); }
+  .score-new    { color: var(--amber); }
+  .turned-down-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid #dcb0aa;
+    background: var(--red-light);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+    font-family: var(--mono);
+  }
+  .reason { font-size: 13px; color: var(--text-muted); font-style: italic; }
+  .fix-card-action { flex-shrink: 0; }
+  .btn {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    color: var(--text);
+    font-family: var(--sans);
+  }
+  .btn:hover { background: var(--grey-light); }
+  .btn.primary {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .btn.primary:hover { background: #195636; }
+  .btn.ghost { color: var(--text-muted); }
+
+  /* ---- Screen cards ---- */
+  .screen-cards { display: flex; flex-direction: column; gap: 10px; }
+  .screen-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .screen-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: background .1s;
+  }
+  .screen-card-header:hover { background: #f2f0eb; }
+  .screen-card.open .screen-card-header { background: var(--green-light); }
+  .screen-num {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    width: 64px;
+    font-family: var(--mono);
+  }
+  .screen-card.open .screen-num { color: var(--green); }
+  .screen-name { flex: 1; font-weight: 600; font-size: 15px; }
+  .screen-card-body {
+    display: none;
+    padding: 16px 18px 18px;
+    font-size: 14px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-light);
+    line-height: 1.65;
+  }
+  .screen-card.open .screen-card-body { display: block; }
+  .screen-card-body ul { padding-left: 18px; margin-top: 8px; }
+  .screen-card-body li { margin-bottom: 5px; }
+  .screen-card-body p  { margin-bottom: 8px; }
+  .screen-card-body strong { color: var(--text); }
+
+  /* ---- Decisions / States table ---- */
+  .decisions { display: flex; flex-direction: column; }
+  .decision {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px;
+  }
+  .decision:last-child { border-bottom: none; }
+  .decision-choice { font-weight: 600; color: var(--text); }
+  .decision-reason { color: var(--text-muted); }
+
+  /* ---- Report sections ---- */
+  .report-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .report-section summary {
+    padding: 12px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .report-section summary::-webkit-details-marker { display: none; }
+  .report-section[open] summary { border-bottom: 1px solid var(--border-light); }
+  .report-section summary::after {
+    content: '›';
+    color: var(--text-faint);
+    font-size: 18px;
+    transition: transform .15s;
+    font-family: var(--mono);
+  }
+  .report-section[open] summary::after { transform: rotate(90deg); }
+  .report-section-body {
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .report-section-body ul { padding-left: 18px; }
+  .report-section-body li { margin-bottom: 4px; }
+
+  /* ---- Pipeline ---- */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 16px 0;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .pipe-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    min-width: 118px;
+    font-size: 13px;
+    text-align: center;
+    background: var(--surface);
+  }
+  .pipe-step .pipe-icon  { font-size: 20px; margin-bottom: 6px; }
+  .pipe-step .pipe-label { font-weight: 600; font-size: 12px; color: var(--text); margin-bottom: 3px; }
+  .pipe-step .pipe-sub   { font-size: 11px; color: var(--text-muted); }
+  .pipe-arrow { font-size: 18px; color: var(--text-faint); padding: 0 6px; flex-shrink: 0; font-family: var(--mono); }
+  .pipe-step.ai      { border-color: #a0ccb4; background: var(--green-light); }
+  .pipe-step.rules   { border-color: #e8c07a; background: var(--amber-light); }
+  .pipe-step.human   { border-color: #b0acdc; background: #f0effe; }
+  .pipe-step.checker { background: var(--grey-light); }
+
+  /* ---- Three answers ---- */
+  .three-answers { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .answer-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: var(--surface);
+    font-size: 14px;
+  }
+  .answer-card .answer-label {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: var(--mono);
+  }
+  .answer-card.breaks  .answer-label { color: var(--red); }
+  .answer-card.survives .answer-label { color: var(--green); }
+  .answer-card.unknown  .answer-label { color: var(--amber); }
+  .answer-card .answer-text { color: var(--text-muted); }
+
+  /* ---- Timeline ---- */
+  .timeline-mock {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 14px 0;
+    font-size: 13px;
+    position: relative;
+  }
+  .timeline-header { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .timeline-subhead { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+  .timeline-track-wrap { position: relative; margin-bottom: 32px; padding-top: 28px; }
+  .deadline-line {
+    position: absolute;
+    left: 68%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--red);
+  }
+  .deadline-label {
+    position: absolute;
+    left: 68%;
+    top: 0;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red);
+    white-space: nowrap;
+    font-family: var(--mono);
+    background: var(--surface);
+    padding: 0 4px;
+  }
+  .timeline-track {
+    position: relative;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: visible;
+  }
+  .timeline-ok {
+    position: absolute;
+    left: 0; top: 0;
+    height: 8px;
+    background: var(--green);
+    border-radius: 4px 0 0 4px;
+    width: 68%;
+  }
+  .timeline-late {
+    position: absolute;
+    left: 68%; top: 0;
+    height: 8px;
+    background: var(--red);
+    width: 32%;
+    border-radius: 0 4px 4px 0;
+  }
+  .timeline-markers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 8px;
+    font-family: var(--mono);
+  }
+  .human-cost {
+    font-weight: 600;
+    color: var(--red);
+    font-size: 14px;
+    margin-top: 8px;
+    font-family: var(--mono);
+  }
+  .human-cost span { color: var(--text-muted); font-weight: 400; font-family: var(--sans); }
+
+  /* ---- Callout ---- */
+  .callout {
+    border-left: 3px solid var(--green);
+    background: var(--green-light);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 14px 0;
+  }
+  .callout strong { color: var(--text); }
+
+  /* ---- Tags ---- */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--grey-light);
+    margin-left: 8px;
+    vertical-align: middle;
+    font-family: var(--mono);
+  }
+  .tag.cut { color: var(--red); background: var(--red-light); border-color: #dcb0aa; }
+
+  /* ---- Misc ---- */
+  .source-ref { font-size: 12px; color: var(--text-faint); font-family: var(--mono); }
+  .mono { font-family: var(--mono); }
+
+  /* ---- Print ---- */
+  @media print {
+    body { padding: 20px; background: #fff; }
+    .toc { display: none; }
+    .journey-step .step-detail { display: block !important; }
+    .screen-card-body { display: block !important; }
+    .report-section-body { display: block !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="doc-wrap">
+
+  <!-- HEADER -->
+  <header class="doc-header">
+    <div class="label">Product Requirements Document</div>
+    <h1>Failure Compiler</h1>
+    <p class="subtitle">A crash-test tool for volunteer coordinators: paste a messy written plan, confirm what the AI read, and find which combinations of ordinary problems quietly break it before Saturday does.</p>
+    <div class="status-badge" style="background:#eaf3ee;color:var(--green);border-color:#a0ccb4;">Status: Approved</div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#journey">The Core Journey</a></li>
+      <li><a href="#screens">Screens and Layout</a></li>
+      <li><a href="#look">Look and Feel</a></li>
+      <li><a href="#pipeline">The Validation Pipeline</a></li>
+      <li><a href="#grid">The Crash Test Grid</a></li>
+      <li><a href="#fixes">Fix Cards and Flow</a></li>
+      <li><a href="#answers">The Checker's Three Answers</a></li>
+      <li><a href="#report">The Report</a></li>
+      <li><a href="#states">States and Boundaries</a></li>
+      <li><a href="#decisions">Product Decisions</a></li>
+      <li><a href="#scope">What We're Building</a></li>
+      <li><a href="#deferred">Deferred and Non-Goals</a></li>
+    </ol>
+  </nav>
+
+  <!-- JOURNEY -->
+  <section id="journey">
+    <h2>The Core Journey</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">Click any step to expand. <span class="source-ref">scope.md &gt; The Core Loop</span></p>
+    <div class="journey" id="journeySteps">
+
+      <div class="journey-step"
+        data-detail="A text area and a brief prompt. Paste a real plan, or hit <strong>Load example</strong> to run the Saturday food distribution plan without an AI key. Pasting a custom plan requires a key field on this screen.">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Paste the plan</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="The AI reads the plan into a structured map: people, vehicles, places, times, deadlines. Every statement is sourced to a line of the original. Ambiguities surface as questions. In example mode, a saved AI reading loads instead; a label reads &ldquo;Example mode: using a saved AI reading.&rdquo;">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">AI reads the plan</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="Three parts on one screen:<br><br><strong>Checklist view (top):</strong> every job ticked. It looks done. This is the before.<br><br><strong>Structured reading (middle):</strong> short plain statements with source lines. Corrections show the AI reading struck through, yours next to it, marked &ldquo;corrected by you.&rdquo; Rule-added items marked &ldquo;added by you.&rdquo;<br><br><strong>&ldquo;What we&rsquo;ll test&rdquo; (bottom):</strong> each failure type with its size. Preset picks only: 15, 30, 45, 60, or 90 minutes. Confirm locks everything in.">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Confirm the plan map</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="A grid fills in live: failure types across the top, failure types down the side. Cells flip to tick, cross, dimmed mark, or question mark as the checker runs. Count line updates in real time.">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Watch the grid fill in</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="Click a cross. A panel slides in on the right; the grid stays on the left. The panel shows the failures, a timeline of the broken morning with the hard deadline marked, the human cost, and up to three fix cards already scored by the checker.">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Open a broken case</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="Select a fix to preview it on the main grid in place. Banner reads &ldquo;Previewing: Fix N.&rdquo; Changed cells outlined; new crosses distinctly marked; count line shows projected numbers. Accept: grid re-tests in place, cells flip, panel updates to &ldquo;Now survives.&rdquo; Fixes stack.">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Preview and accept fixes</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="When no broken cases remain, the panel reads &ldquo;All 105 tested scenarios survive&rdquo; and offers &ldquo;See report.&rdquo; The coordinator can also stop fixing early and view the report at any time after the first run; it then shows what is still broken.">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="step-title">All cases survive (or stop here)</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+      <div class="journey-step"
+        data-detail="A full report page: the plan with its correction trail, what was tested and at what sizes, what broke and the human cost, every fix (accepted and turned down), the final count, and a specific &ldquo;What was NOT tested&rdquo; section. Print or save as PDF via browser print.">
+        <div class="step-num">8</div>
+        <div class="step-body">
+          <div class="step-title">Read the report</div>
+          <div class="step-detail"></div>
+        </div>
+        <div class="step-arrow">›</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SCREENS -->
+  <section id="screens">
+    <h2>Screens and Layout</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">Five screens, desktop-first. Click to expand.</p>
+    <div class="screen-cards" id="screenCards">
+
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <div class="screen-num">Screen 1</div>
+          <div class="screen-name">Paste Plan</div>
+          <div class="step-arrow">›</div>
+        </div>
+        <div class="screen-card-body">
+          <p>A text area. A brief prompt. No checklist yet.</p>
+          <ul>
+            <li><strong>Load example</strong> button: Saturday food distribution plan, no key needed.</li>
+            <li>AI key field: appears here when no key is set and the user wants to paste a custom plan.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <div class="screen-num">Screen 2</div>
+          <div class="screen-name">Plan Map</div>
+          <div class="step-arrow">›</div>
+        </div>
+        <div class="screen-card-body">
+          <p><strong>Top: checklist view.</strong> Every job with a person and a backup, all ticked. It looks done. This is the before.</p>
+          <p><strong>Middle: structured reading.</strong> Short plain statements, each sourced to a line of the original. Three provenance states per item:</p>
+          <ul>
+            <li>Default: AI reading plus source line.</li>
+            <li>Corrected: AI reading struck through, correction marked "corrected by you." Source line stays.</li>
+            <li>Added: marked "added by you," no source line. Created because a rule asked a question.</li>
+          </ul>
+          <p>Constrained choices only: pick from known people, vehicles, places; time picker; no free text. AI does not re-read after corrections.</p>
+          <p><strong>Bottom: "What we'll test."</strong> Each failure type with its size. Preset picks: 15, 30, 45, 60, 90 minutes only.</p>
+          <p><strong>Confirm button:</strong> active only when every item is confirmed and every plain rule passes.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <div class="screen-num">Screen 3</div>
+          <div class="screen-name">Crash Test</div>
+          <div class="step-arrow">›</div>
+        </div>
+        <div class="screen-card-body">
+          <p>A live-filling grid: 12 to 15 failure types across and down, around 100 tests. Cells fill in order as the checker runs. Accepted fixes flip changed cells with a short animation.</p>
+          <p><strong>Count line</strong> (live): <span class="mono" style="font-size:13px;">"105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived."</span></p>
+          <p><strong>Before/After toggle</strong> above the grid once any fix is accepted.</p>
+          <p><strong>Preview banner</strong> when a fix is selected: "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked, count line shows projected numbers. "Cancel preview" restores exactly.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <div class="screen-num">Screen 4</div>
+          <div class="screen-name">Broken Case Detail (panel)</div>
+          <div class="step-arrow">›</div>
+        </div>
+        <div class="screen-card-body">
+          <p>Opens on the right when a cross is clicked. Grid stays on the left. No page navigation.</p>
+          <ul>
+            <li>The failures, with a plain explanation of why the plan breaks.</li>
+            <li>For a hidden pair: note that each failure alone was fine.</li>
+            <li>Timeline of the broken morning. Hard deadline shown as a solid red vertical line labelled "Noon: families waiting."</li>
+            <li>Human cost: "Route C: 10 households, 40 minutes late."</li>
+            <li>Up to three fix cards, pre-scored. Turned-down fixes labelled with a one-line reason; previewable, not acceptable.</li>
+          </ul>
+          <p>After accepting: grid re-tests in place, panel shows "Now survives," button to next broken case. When nothing is left: "All 105 tested scenarios survive" and "See report."</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <div class="screen-num">Screen 5</div>
+          <div class="screen-name">Report</div>
+          <div class="step-arrow">›</div>
+        </div>
+        <div class="screen-card-body">
+          <p>Reached from "See report," available any time after the first run. One page in the app. Six sections plus an example-mode notice if applicable.</p>
+          <p>"Print or save as PDF" button uses browser print with a clean print layout.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LOOK AND FEEL -->
+  <section id="look">
+    <h2>Look and Feel</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;"><span class="source-ref">scope.md &gt; Inspiration and Identity</span></p>
+
+    <div class="callout" style="margin-bottom:16px;">
+      A coordinator's run sheet, not a tech dashboard. Warm off-white paper background, near-black ink text. Calm, honest, no decoration that is not doing work.
+    </div>
+
+    <div class="decisions">
+      <div class="decision">
+        <div class="decision-choice">Colour</div>
+        <div class="decision-reason">Colour carries meaning only. Deep green for ticks and the main action. Brick red for crosses and broken states. Amber for question marks. Grey for dimmed marks. Everything else neutral.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Typography</div>
+        <div class="decision-reason">IBM Plex Sans for all body text and UI. IBM Plex Mono for times, counts, and numbers so they line up. Clean and legible; nothing decorative.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Marks</div>
+        <div class="decision-reason">Ticks and crosses are clean stroke marks, like a pen on a checklist. No emoji anywhere in the app. Colour and mark together so the grid is readable by everyone.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Timeline deadline</div>
+        <div class="decision-reason">A solid red vertical line labelled "Noon: families waiting." Not a colour band or gradient.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Motion</div>
+        <div class="decision-reason">Cells fill in order over a few seconds as the checker runs. Accepted fixes flip changed cells with a short animation. Both effects respect <span class="mono">prefers-reduced-motion</span>.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text-muted);">
+      <strong style="color:var(--text);">Colour palette (this document):</strong>
+      &nbsp;<span style="color:var(--green);font-weight:700;">Deep green</span> ticks &nbsp;
+      <span style="color:var(--red);font-weight:700;">Brick red</span> crosses &nbsp;
+      <span style="color:var(--amber);font-weight:700;">Amber</span> question marks &nbsp;
+      <span style="color:var(--grey);font-weight:700;">Grey</span> dimmed
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline">
+    <h2>The Validation Pipeline</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">The core learning goal made concrete. <span class="source-ref">scope.md &gt; The POC Boundary</span></p>
+    <div class="pipeline">
+      <div class="pipe-step ai">
+        <div class="pipe-icon">&#x1F4C4;</div>
+        <div class="pipe-label">AI reads</div>
+        <div class="pipe-sub">Messy plan into structured map</div>
+      </div>
+      <div class="pipe-arrow">&#x2192;</div>
+      <div class="pipe-step rules">
+        <div class="pipe-icon">&#x2713;</div>
+        <div class="pipe-label">Rules check</div>
+        <div class="pipe-sub">Failures become questions, not errors</div>
+      </div>
+      <div class="pipe-arrow">&#x2192;</div>
+      <div class="pipe-step human">
+        <div class="pipe-icon">&#x270D;</div>
+        <div class="pipe-label">Human confirms</div>
+        <div class="pipe-sub">Constrained choices only</div>
+      </div>
+      <div class="pipe-arrow">&#x2192;</div>
+      <div class="pipe-step checker">
+        <div class="pipe-icon">&#x2699;</div>
+        <div class="pipe-label">Checker acts</div>
+        <div class="pipe-sub">Only on confirmed, rule-passed map</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRID -->
+  <section id="grid">
+    <h2>The Crash Test Grid</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">Illustration using 5 of the 14 problem types. The real grid has 14 types across and down (105 tests). Each scenario appears once: the diagonal plus the cells below it. Key holder absent is the single weak spot. Supply truck late + Ravi absent and Van late + Anita leaves early are the two hidden pairs. Every pair that includes Key holder absent is dimmed because that single failure already breaks the plan alone.</p>
+    <div class="grid-demo">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Supply truck late</th>
+            <th>Ravi absent</th>
+            <th>Van late</th>
+            <th>Anita leaves early</th>
+            <th>Key holder absent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Supply truck late</th>
+            <td class="tick diag">&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Ravi absent</th>
+            <td class="cross pair">&#x2717;</td>
+            <td class="tick diag">&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Van late</th>
+            <td class="tick">&#x2713;</td>
+            <td class="tick">&#x2713;</td>
+            <td class="tick diag">&#x2713;</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Anita leaves early</th>
+            <td class="tick">&#x2713;</td>
+            <td class="tick">&#x2713;</td>
+            <td class="cross pair">&#x2717;</td>
+            <td class="tick diag">&#x2713;</td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Key holder absent</th>
+            <td class="dimmed">&#x2013; key</td>
+            <td class="dimmed">&#x2013; key</td>
+            <td class="dimmed">&#x2013; key</td>
+            <td class="dimmed">&#x2013; key</td>
+            <td class="cross diag">&#x2717;</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="grid-legend">
+        <div class="legend-item"><span class="legend-sym tick">&#x2713;</span> Survives</div>
+        <div class="legend-item"><span class="legend-sym cross">&#x2717;</span> Breaks (diagonal = single weak spot; off-diagonal = hidden pair)</div>
+        <div class="legend-item"><span class="legend-sym dimmed">&#x2013;</span> Dimmed: already broken by Key holder absent alone</div>
+        <div class="legend-item"><span class="legend-sym" style="color:var(--amber);">?</span> Could not determine: never counted as survived</div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);">Count line: <span class="mono">"105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived."</span></p>
+  </section>
+
+  <!-- FIX FLOW -->
+  <section id="fixes">
+    <h2>Fix Cards and Flow</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px;">Each fix is pre-scored by the checker before the user sees the card. The obvious fix being turned down is a visible outcome, not a claim.</p>
+
+    <div class="fix-cards">
+      <div class="fix-card turned-down">
+        <div class="fix-card-body">
+          <div class="turned-down-label">Turned down</div>
+          <div class="fix-card-title">Fix 1: Add another backup driver for the van</div>
+          <div class="reason">"Still only one van, and it's late."</div>
+          <div class="fix-scores" style="margin-top:10px;">
+            <span class="score-fix">Fixes 0</span>
+            <span class="score-broken">Still broken 2</span>
+            <span class="score-new">New crosses 0</span>
+          </div>
+        </div>
+        <div class="fix-card-action">
+          <button class="btn ghost" style="font-size:12px;">Preview</button>
+        </div>
+      </div>
+
+      <div class="fix-card">
+        <div class="fix-card-body">
+          <div class="fix-card-title">Fix 2: Move Route C to the car + assign van backup</div>
+          <div class="fix-card-desc">Two changes: move Route C from the van to the car, and assign a volunteer not running the loading area as van backup. Exact names lock in when the example is built.</div>
+          <div class="fix-scores">
+            <span class="score-fix">Fixes 2</span>
+            <span class="score-broken">Still broken 0</span>
+            <span class="score-new">New crosses 0</span>
+          </div>
+        </div>
+        <div class="fix-card-action">
+          <button class="btn primary">Accept</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;font-family:var(--mono);">Note: exact fix wording locks in when the example plan is built.</p>
+
+    <div class="callout" style="margin-top:16px;">
+      <strong>Preview:</strong> Selecting a fix previews it on the main grid in place. No navigation, no second grid. A banner reads "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked. "Cancel preview" restores exactly. One preview at a time.
+    </div>
+
+    <h3 style="margin-top:28px;">Timeline: Van late + Anita leaves early</h3>
+    <div class="timeline-mock">
+      <div class="timeline-header">Route C: Van late + Anita leaves early</div>
+      <div class="timeline-subhead">Each failure alone: fine. Together: Route C cannot finish before the hard deadline.</div>
+      <div class="timeline-track-wrap">
+        <div class="deadline-label">Noon: families waiting</div>
+        <div class="deadline-line"></div>
+        <div class="timeline-track">
+          <div class="timeline-ok"></div>
+          <div class="timeline-late"></div>
+        </div>
+      </div>
+      <div class="timeline-markers">
+        <span>9:00</span>
+        <span>10:00</span>
+        <span>11:00</span>
+        <span>Noon</span>
+        <span>12:40</span>
+      </div>
+      <div class="human-cost">Route C: 10 households, <span>40 minutes late.</span></div>
+    </div>
+  </section>
+
+  <!-- THREE ANSWERS -->
+  <section id="answers">
+    <h2>The Checker's Three Honest Answers</h2>
+    <div class="three-answers">
+      <div class="answer-card breaks">
+        <div class="answer-label">Breaks</div>
+        <div class="answer-text">"This breaks your plan, and here is exactly how."</div>
+      </div>
+      <div class="answer-card survives">
+        <div class="answer-label">Survives</div>
+        <div class="answer-text">"Your plan survived everything we tested. That is not the same as 'your plan is safe.' It only covers what we tested."</div>
+      </div>
+      <div class="answer-card unknown">
+        <div class="answer-label">Unknown</div>
+        <div class="answer-text">"I could not tell, because something is missing or unclear." Never treated as a pass.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section id="report">
+    <h2>The Report</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px;">Screen 5. Available any time after the first run. Six sections plus an example-mode notice. Browser print to PDF.</p>
+
+    <details class="report-section">
+      <summary>1. The plan <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Confirmed map and correction trail</span></summary>
+      <div class="report-section-body">
+        Confirmed map with: <span class="mono">"AI read 24 items, 2 corrected by you, 1 added by you."</span>
+      </div>
+    </details>
+
+    <details class="report-section">
+      <summary>2. What was tested <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Problem list, sizes, total</span></summary>
+      <div class="report-section-body">
+        Each failure type with the size used, e.g. <span class="mono">"Supply truck 45 minutes late."</span> Total: <span class="mono">"105 tests: every single problem and every pair."</span>
+      </div>
+    </details>
+
+    <details class="report-section">
+      <summary>3. What broke (before fixes) <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Weak spots, hidden pairs, dimmed results</span></summary>
+      <div class="report-section-body">
+        <p>Single weak spots and hidden pairs, each with its human cost. Dimmed results grouped: <span class="mono">"13 pairs already broken by the key holder alone."</span></p>
+        <p>If removing a weak spot via a fix caused dimmed pairs to resolve or revealed a new hidden pair, the report shows that honestly.</p>
+      </div>
+    </details>
+
+    <details class="report-section">
+      <summary>4. Fixes <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Accepted and turned down</span></summary>
+      <div class="report-section-body">
+        Every accepted fix: what changed and its result. Every turned-down fix: its one-line reason. Showing what did not work is part of the honesty.
+      </div>
+    </details>
+
+    <details class="report-section">
+      <summary>5. After fixes <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Final count, or what is still broken</span></summary>
+      <div class="report-section-body">
+        <span class="mono">"All 105 tested scenarios survive."</span> Or, if the coordinator stopped early, the remaining broken cases are listed here.
+      </div>
+    </details>
+
+    <details class="report-section">
+      <summary>6. What was NOT tested <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Specific, not a disclaimer</span></summary>
+      <div class="report-section-body">
+        <ul>
+          <li>Three or more problems at once.</li>
+          <li>Problem types outside the fixed list: bad weather, a volunteer getting sick halfway through, wrong addresses, running short on food.</li>
+          <li>Other sizes of the same problems: "the truck was tested 45 minutes late, not 90."</li>
+          <li>Anything the plan did not mention.</li>
+          <li>Any question-mark results, listed by name.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="report-section">
+      <summary>Example mode notice <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">If applicable</span></summary>
+      <div class="report-section-body">
+        "This report used a saved AI reading of the example plan."
+      </div>
+    </details>
+  </section>
+
+  <!-- STATES -->
+  <section id="states">
+    <h2>States and Boundaries</h2>
+    <div class="decisions">
+      <div class="decision">
+        <div class="decision-choice">First use / example mode</div>
+        <div class="decision-reason">"Load example" available immediately, no key needed. Full flow runs on saved AI reading. Checker runs live.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Plan survives on first run</div>
+        <div class="decision-reason">Count line reads "Your plan survived all 105 tested scenarios." Report offered directly. No broken cases to open.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">No AI key</div>
+        <div class="decision-reason">Paste area active; key field shown on Screen 1. Cannot submit a custom plan without a key.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">AI key invalid or call fails</div>
+        <div class="decision-reason">Clear error message, a retry button, and a suggestion to try the example plan instead.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">AI reading fails format check</div>
+        <div class="decision-reason">"The AI's reading did not pass the format check." Retry offered. Nothing reaches the plan map unchecked; the format check is part of the validation pipeline.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Pasted text is not a distribution plan</div>
+        <div class="decision-reason">"This version only supports community distribution plans." Option to load the example plan.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Plan map: unconfirmed items</div>
+        <div class="decision-reason">Confirm button inactive. Cannot proceed to the crash test.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Plan map: rule failure</div>
+        <div class="decision-reason">Surfaces as a question. Confirm button inactive until resolved.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Grid: question mark cell</div>
+        <div class="decision-reason">Never counted as survived. Listed by name in the report under "What was NOT tested."</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Fix: turned down</div>
+        <div class="decision-reason">Card visible and previewable; accept button absent.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">None of the fixes pass</div>
+        <div class="decision-reason">"None of these fixes worked." Option to ask for a new set of suggestions, once.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">See report</div>
+        <div class="decision-reason">Available any time after the first run. If cases are still broken, the report shows them.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Persistence</div>
+        <div class="decision-reason">None. No accounts, no saved sessions. Closing the tab loses the run.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISIONS -->
+  <section id="decisions">
+    <h2>Product Decisions</h2>
+    <div class="decisions">
+      <div class="decision">
+        <div class="decision-choice">Finish time is strict</div>
+        <div class="decision-reason">One minute late is broken. The human cost display shows exactly how late; the coordinator decides what that means. Keeps the checker honest and results comparable.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Problem sizes: presets only</div>
+        <div class="decision-reason">15, 30, 45, 60, 90 minutes. No free typing. Keeps results reproducible and the example story reliable.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Corrections do not re-trigger AI</div>
+        <div class="decision-reason">Correction goes directly into the map. Preserves the pipeline: AI reads once, human confirms, checker acts on the confirmed map.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Turned-down fixes are visible</div>
+        <div class="decision-reason">"Still only one van, and it's late" is a stated outcome. The emotional beat of the obvious fix being turned down is a feature.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Dimmed pairs re-test after a fix</div>
+        <div class="decision-reason">A fix removing a weak spot re-tests formerly-dimmed pairs. They may become ticks or reveal a hidden pair the weak spot was covering. Report shows this honestly.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Report after first run</div>
+        <div class="decision-reason">"See report" is available any time after the checker has run at least once. A coordinator who stops fixing early gets a report showing what is still broken.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Report: browser print only</div>
+        <div class="decision-reason">No custom export for the PoC. Nicer download is in Later.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Desktop-first</div>
+        <div class="decision-reason">Side-by-side grid and panel layout requires screen width. Mobile is post-PoC.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-choice">Panel, not a separate screen</div>
+        <div class="decision-reason">Grid stays visible throughout the fix flow. The user never loses sight of the full picture.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCOPE -->
+  <section id="scope">
+    <h2>What We're Building</h2>
+    <ul style="padding-left:20px;font-size:14px;color:var(--text-muted);line-height:2.1;">
+      <li>Screen 1: paste plan or load example; AI key field.</li>
+      <li>Screen 2: plan map with checklist view, sourced AI reading with correction trail, "What we'll test" with preset size pickers, plain rules validation, confirm button.</li>
+      <li>Screen 3: live-filling crash test grid with four cell states, count line, Before/After toggle, preview banner. Cells fill in order; accepted fix cells animate.</li>
+      <li>Screen 4: broken case detail panel beside the grid, with timeline, hard deadline line, human cost, scored fix cards, preview and accept flow, re-test in place.</li>
+      <li>Screen 5: report page with six sections plus example-mode notice, and browser print.</li>
+      <li>Example mode: saved AI reading ships with the app; full flow runs without a key.</li>
+      <li>Checker runs live in all modes.</li>
+      <li>A locked test confirms the example plan's two hidden pairs and one single weak spot never change.</li>
+    </ul>
+  </section>
+
+  <!-- DEFERRED -->
+  <section id="deferred">
+    <h2>Deferred and Non-Goals</h2>
+    <ul style="padding-left:20px;font-size:14px;color:var(--text-muted);line-height:2.2;">
+      <li>Mobile layout <span class="tag">deferred</span></li>
+      <li>Custom file export / nicer report download <span class="tag">deferred</span></li>
+      <li>AI-suggested plan-specific failure types <span class="tag">deferred</span></li>
+      <li>Live public link <span class="tag">deferred</span></li>
+      <li>Accounts and saved sessions <span class="tag">deferred</span></li>
+      <li>A second example type (event setup) <span class="tag">deferred</span></li>
+      <li>File upload <span class="tag cut">cut</span></li>
+      <li>Plans for any industry beyond community distribution <span class="tag cut">cut</span></li>
+      <li>Three or more simultaneous failures <span class="tag cut">cut</span></li>
+      <li>Connecting to other apps or messaging volunteers <span class="tag cut">cut</span></li>
+      <li>AI having the final word on pass or fail <span class="tag cut">cut</span></li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+  // Journey steps
+  document.querySelectorAll('#journeySteps .journey-step').forEach(function(step) {
+    var detail = step.querySelector('.step-detail');
+    detail.innerHTML = step.dataset.detail;
+    step.addEventListener('click', function() {
+      var isOpen = step.classList.contains('open');
+      document.querySelectorAll('#journeySteps .journey-step').forEach(function(s) { s.classList.remove('open'); });
+      if (!isOpen) step.classList.add('open');
+    });
+  });
+
+  // Screen cards
+  document.querySelectorAll('#screenCards .screen-card-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      var card = header.parentElement;
+      var isOpen = card.classList.contains('open');
+      document.querySelectorAll('#screenCards .screen-card').forEach(function(c) { c.classList.remove('open'); });
+      if (!isOpen) card.classList.add('open');
+    });
+  });
+</script>
+</body>
+</html>
