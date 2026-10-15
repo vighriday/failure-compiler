@@ -29,13 +29,13 @@ Build mode: fast
   Learner check: Run the tests and read one rejection message.
   Commit: `Add validation gate, rules engine, fingerprint, and tests`
 
-- [ ] **3. Plan map in example mode**
+- [x] **3. Plan map in example mode**
   Becomes usable: Load the example plan, see Screen 1, then Screen 2 with the AI's structured reading, correct an item, watch dependent items lose confirmation, and press Confirm. The full validation pipeline runs end to end in example mode using a hand-made reading fixture.
   Why now: This is the first time the app runs in a browser. Example mode means no AI-provider dependency, so the demo path works with zero keys.
   PRD ref: `prd.md > Screen 1: Paste Plan`, `prd.md > Screen 2: Plan Map`, `prd.md > Look and Feel`
   Spec ref: `spec.md > Components`, `spec.md > Look and Feel`
-  Build: FastAPI app on 127.0.0.1 (`server/main.py`): `POST /api/read-plan` (example mode returns the fixture), `POST /api/validate-map`, `POST /api/confirm-map`. React + Vite + TypeScript app (`web/`), `styles/tokens.css`, self-hosted IBM Plex Sans and Mono via `@fontsource`, `scripts/dev.py` (starts both servers). Screen 1: `<textarea>` with character counter (amber 3500, red 4000, disabled above), "Load example" button, AI key fields if none set. Screen 2: checklist view (computed from item status counts), sourced statements with three visual states (default, corrected with strikethrough, added), constrained correction inputs (`<select>` + time picker), "What we'll test" with preset size pickers, Confirm button (disabled until all confirmed and rules pass), "Read by" label. `fixtures/example-reading.json` as a hand-made fixture for example mode.
-  Verify (mechanical): `python scripts/dev.py` starts both servers; load example -> Screen 2 renders the reading; correct one item -> dependent items lose marks; fix all rules -> Confirm enabled; Confirm -> fingerprint returned.
+  Build: FastAPI app on 127.0.0.1 (`server/main.py`): `POST /api/read-plan` returns the saved hand-made example reading, initially 0 of 24 confirmed, one guess and one individual question; `POST /api/validate-map` and `POST /api/confirm-map`. React + Vite + TypeScript (`web/`), IBM Plex fonts, `scripts/dev.py`. Screen 1: paper textarea, line numbers, counter, “Read plan” and a secondary “Load the example plan” that only fills the textarea; collapsed key field and data notice. Screen 2: sticky source plan with source-line highlights; checklist naming each route driver and backups; sourced People, Vehicles, Routes, Times; constrained correction/guess inputs; rule questions; 14 problems with preset sizes. All items start unconfirmed; bulk confirm skips guesses and questions; dependency changes show “Check this: <name> changed”; confirm disabled until all items, questions, and rules pass.
+  Verify (mechanical): `uv run -- python -m pytest -q` passes; `npm run build` passes; Playwright at 1440x900 verifies Screen 1 empty and example-loaded, Screen 2 load, bulk-confirm, correction cascade, and ready-to-confirm states with full-page screenshots in `devpost/screens/`, then confirms the map and checks for page errors.
   Learner check: Load the example, correct one item, watch dependent items lose confirmation, confirm.
   Commit: `Add example-mode plan map with Screen 1, Screen 2, and dev server`
 
@@ -101,6 +101,7 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+- Slice 3 example reading is explicitly a hand-made PLACEHOLDER fixture, not real AI output; the UI labels it as such.
 
 - Spare-key fix operation corrected in `spec.md`: "Give the key to another person" (which just moved the weak spot) replaced with "Give a spare key to a person" (`holds_key` becomes true, existing holders keep theirs).
 - The original target was impossible: absent is strictly worse than leaving early, and a route can only be late if someone becomes free later. The example was redesigned; the three hidden pairs now end as “not delivered.”

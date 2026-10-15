@@ -9,3 +9,8 @@ devpost/learner-profile.md
 # Python build and test artifacts
 __pycache__/
 *.py[cod]
+
+# Front-end build and browser review artifacts
+/node_modules/
+/web/dist/
+/devpost/screens/
