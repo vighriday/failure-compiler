@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Failure Compiler - Scope</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3045;
+    --text: #e2e8f0;
+    --muted: #7c8ba1;
+    --accent: #4f8ef7;
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --dimmed: #4a5568;
+    --radius: 8px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 2rem 1rem 4rem;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+
+  .header { margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+  .header .tagline { color: var(--muted); font-size: 1rem; }
+  .status-badge {
+    display: inline-block; margin-top: 0.8rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 0.2rem 0.75rem;
+    font-size: 0.75rem; font-weight: 600; color: var(--yellow);
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  section { margin-bottom: 2.5rem; }
+  h2 {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  p { color: var(--text); margin-bottom: 0.5rem; }
+
+  .kernel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Core loop */
+  .loop-diagram { display: flex; flex-direction: column; gap: 0; margin: 0.5rem 0; }
+  .loop-step {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 0.7rem 0; position: relative;
+  }
+  .loop-step:not(:last-child)::after {
+    content: '';
+    position: absolute; left: 18px;
+    top: calc(0.7rem + 36px);
+    width: 2px; height: calc(100% - 36px);
+    background: var(--border);
+  }
+  .step-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700; color: var(--accent);
+  }
+  .step-body { padding-top: 0.4rem; }
+  .step-label { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+  .step-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.1rem; }
+
+  /* Screens */
+  .screens { display: flex; flex-direction: column; gap: 0.75rem; }
+  .screen-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.9rem 1.1rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .screen-num {
+    font-size: 1.1rem; font-weight: 800; color: var(--accent);
+    min-width: 24px; margin-top: 1px;
+  }
+  .screen-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .screen-desc { font-size: 0.82rem; color: var(--muted); }
+
+  /* Grid legend */
+  .grid-demo {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+  }
+  .grid-demo-title {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem;
+  }
+  .grid-legend { display: flex; flex-direction: column; gap: 0.55rem; }
+  .legend-row { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .legend-symbol {
+    font-size: 1rem; font-weight: 700; min-width: 22px;
+    text-align: center; margin-top: 1px;
+  }
+  .sym-pass { color: var(--green); }
+  .sym-single { color: var(--red); }
+  .sym-pair { color: var(--red); }
+  .sym-dimmed { color: var(--dimmed); }
+  .legend-text { font-size: 0.83rem; color: var(--text); }
+  .legend-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+  .count-example {
+    margin-top: 0.9rem; padding-top: 0.75rem; border-top: 1px solid var(--border);
+    font-size: 0.83rem; color: var(--muted);
+  }
+  .count-example strong { color: var(--text); }
+
+  /* Pipeline */
+  .pipeline {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .pipeline-row {
+    display: flex; align-items: stretch;
+    border-bottom: 1px solid var(--border);
+  }
+  .pipeline-row:last-child { border-bottom: none; }
+  .pipeline-actor {
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; min-width: 90px;
+    display: flex; align-items: center;
+    border-right: 1px solid var(--border);
+  }
+  .actor-ai { color: var(--accent); background: rgba(79,142,247,0.06); }
+  .actor-rules { color: var(--yellow); background: rgba(251,191,36,0.06); }
+  .actor-human { color: var(--green); background: rgba(52,211,153,0.06); }
+  .actor-checker { color: var(--red); background: rgba(248,113,113,0.06); }
+  .pipeline-action {
+    padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--text);
+    flex: 1; display: flex; align-items: center;
+  }
+
+  /* Verdicts */
+  .verdicts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .verdict {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.8rem 1rem;
+  }
+  .verdict-icon { font-size: 1.1rem; margin-top: 1px; }
+  .verdict-text { font-size: 0.85rem; color: var(--text); }
+  .verdict-text strong { display: block; margin-bottom: 0.15rem; }
+
+  /* Fix-stack callout */
+  .callout {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    border-radius: var(--radius); padding: 0.85rem 1.1rem;
+    font-size: 0.85rem; color: var(--text); margin-top: 0.6rem;
+  }
+  .callout strong { color: var(--yellow); }
+
+  /* Example fixture callout */
+  .fixture-callout {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 0.85rem 1.1rem;
+    font-size: 0.85rem; color: var(--text); margin-top: 0.6rem;
+  }
+  .fixture-label {
+    display: inline-block; background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.3); border-radius: 4px;
+    padding: 0.15rem 0.5rem; font-size: 0.72rem; font-weight: 600;
+    color: var(--accent); letter-spacing: 0.04em; margin-bottom: 0.4rem;
+  }
+
+  /* Tag lists */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+  .tag {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 0.25rem 0.65rem;
+    font-size: 0.78rem; color: var(--text);
+  }
+  .tag.in { border-color: rgba(52,211,153,0.3); color: var(--green); }
+  .tag.out { border-color: rgba(248,113,113,0.25); color: var(--red); }
+  .tag.later { border-color: rgba(251,191,36,0.25); color: var(--yellow); }
+
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1.1rem;
+    background: var(--surface);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--muted); font-style: italic; font-size: 0.9rem;
+  }
+
+  details { margin-top: 0.5rem; }
+  details summary {
+    cursor: pointer; font-size: 0.82rem; color: var(--accent);
+    user-select: none; list-style: none; padding: 0.3rem 0;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: '\25B6  '; font-size: 0.65rem; }
+  details[open] summary::before { content: '\25BC  '; }
+  details .detail-body {
+    padding: 0.75rem 0 0.25rem 1rem;
+    font-size: 0.83rem; color: var(--muted); line-height: 1.6;
+  }
+  details .detail-body p { margin-bottom: 0.4rem; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Failure Compiler</h1>
+    <div class="tagline">A crash-test tool for plans: it tests every single failure and every pair from a fixed list, and shows you which ones break it before Saturday does.</div>
+    <span class="status-badge">Scope · Approved</span>
+  </div>
+
+  <!-- Kernel -->
+  <section>
+    <h2>The Unique Kernel</h2>
+    <div class="kernel-card">
+      Most risk tools give you a list of general warnings. Failure Compiler finds the specific combination of two ordinary problems that breaks your specific plan, where each one alone would have been fine, and then tests whether a proposed fix actually works against every scenario that was tested, not just the one that broke. Problems that are invisible alone. Fixes that get tested before you trust them.
+    </div>
+    <details>
+      <summary>Why this matters</summary>
+      <div class="detail-body">
+        <p>Plans look finished because every box is filled. Every task has a name. Every important job has a backup. So everyone relaxes.</p>
+        <p>But a backup only helps if it does not need the same thing as the person it is backing up. If your backup driver needs the same van, you do not really have a backup. And the worst problems usually are not the single obvious ones: they are two small things going wrong at once, where each alone would have been fine. Nobody checks those combinations, because there are too many to think through. That is exactly the kind of huge, boring job a computer is good at.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- Who -->
+  <section>
+    <h2>Who It's For</h2>
+    <p>A volunteer coordinator running a Saturday morning food distribution for a community kitchen or food bank. They plan in a group chat and a spreadsheet. A handful of volunteers, one van, one car, one loading area, a hard finish time, because families are waiting.</p>
+    <p style="color:var(--muted);font-size:0.85rem;margin-top:0.4rem;">Later: event organisers, small delivery teams, anyone whose plan depends on people, vehicles, places, and deadlines.</p>
+  </section>
+
+  <!-- Core loop -->
+  <section>
+    <h2>The Core Loop</h2>
+    <div class="loop-diagram">
+      <div class="loop-step">
+        <div class="step-icon">1</div>
+        <div class="step-body">
+          <div class="step-label">Paste plan</div>
+          <div class="step-desc">Messy text, written the way a real coordinator would write it</div>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="step-icon">2</div>
+        <div class="step-body">
+          <div class="step-label">AI reads it into a structured map</div>
+          <div class="step-desc">Asks 1 to 2 clarifying questions; flags guesses; plain rules validate before confirmation</div>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="step-icon">3</div>
+        <div class="step-body">
+          <div class="step-label">Confirm the map</div>
+          <div class="step-desc">Constrained corrections only: pick from known people, vehicles, places; time picker. No free text. AI does not re-read.</div>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="step-icon">4</div>
+        <div class="step-body">
+          <div class="step-label">Checker runs every single failure and every pair</div>
+          <div class="step-desc">Grid fills in live: tick, cross, dimmed mark, or question mark</div>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="step-icon">5</div>
+        <div class="step-body">
+          <div class="step-label">Open a cross</div>
+          <div class="step-desc">See the broken morning: timeline, household count, delay in minutes, one plain sentence</div>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="step-icon">6</div>
+        <div class="step-body">
+          <div class="step-label">Ask for fixes, accept in sequence</div>
+          <div class="step-desc">Each accepted fix becomes part of the plan; everything re-tests. Obvious fix gets turned down; real one passes.</div>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="step-icon">7</div>
+        <div class="step-body">
+          <div class="step-label">Grid reaches all ticks</div>
+          <div class="step-desc">That flip is the moment</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Four screens -->
+  <section>
+    <h2>Four Screens</h2>
+    <div class="screens">
+      <div class="screen-card">
+        <div class="screen-num">1</div>
+        <div>
+          <div class="screen-title">Paste Plan</div>
+          <div class="screen-desc">A text area. No checklist yet: the "looks complete" view is on the plan map screen, where the AI reading is available.</div>
+        </div>
+      </div>
+      <div class="screen-card">
+        <div class="screen-num">2</div>
+        <div>
+          <div class="screen-title">Plan Map</div>
+          <div class="screen-desc">At the top: the checklist showing what the plan looks like when every job has a person and a backup, all ticked. It looks done. Below: the AI's structured reading as short plain statements, each sourced to a line of the original. Guesses are marked and asked as questions. Constrained correction, rule validation, confirmation gate. AI does not re-read after a correction.</div>
+        </div>
+      </div>
+      <div class="screen-card">
+        <div class="screen-num">3</div>
+        <div>
+          <div class="screen-title">Crash Test</div>
+          <div class="screen-desc">Live-filling grid. Four cell states: tick (survived), cross (broken), dimmed mark (broken but only because a single failure already breaks it alone), question mark (checker could not determine the result). Running count at top distinguishes single weak spots from hidden pairs.</div>
+          <div class="grid-demo">
+            <div class="grid-demo-title">Grid cell legend</div>
+            <div class="grid-legend">
+              <div class="legend-row">
+                <div class="legend-symbol sym-pass">&#10003;</div>
+                <div>
+                  <div class="legend-text">Plan survives this scenario</div>
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-symbol sym-single">&#10005;</div>
+                <div>
+                  <div class="legend-text">Single weak spot (diagonal: one failure breaks the plan alone)</div>
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-symbol sym-pair">&#10005;</div>
+                <div>
+                  <div class="legend-text">Hidden pair (both failures pass alone; together they break it)</div>
+                  <div class="legend-sub">This is the difference that matters: invisible alone, serious together</div>
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-symbol sym-dimmed">&#8213;</div>
+                <div>
+                  <div class="legend-text" style="color:var(--dimmed);">Already broken by X alone</div>
+                  <div class="legend-sub">Not a new finding; shown dimmed so it does not bury hidden pairs</div>
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-symbol" style="color:var(--muted);">?</div>
+                <div>
+                  <div class="legend-text" style="color:var(--muted);">Checker could not determine the result (e.g. ran out of time)</div>
+                  <div class="legend-sub">Never counted as survived</div>
+                </div>
+              </div>
+            </div>
+            <div class="count-example">
+              Count adds up to total: <strong>105 tests: 1 single weak spot, 2 hidden pairs, 13 already broken by the weak spot, 89 survived</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-card">
+        <div class="screen-num">4</div>
+        <div>
+          <div class="screen-title">Broken Case Detail + Fixes</div>
+          <div class="screen-desc">For a hidden pair: shows the two failures and that each alone was fine. For a single weak spot: shows the one failure. Either way: a timeline of the morning with the late route in red past the finish line. Human cost: households affected and delay in minutes (e.g. "Route C: 10 households, 40 minutes late"). Plain one-sentence explanation.</div>
+          <div class="callout" style="margin-top:0.65rem;">
+            <strong>Fix suggestions (up to 3):</strong> each shows fixes-N / breaks-N / new-crosses before acceptance. Selecting a fix previews its grid with changed cells outlined. New crosses are marked distinctly so they cannot hide. Accepting a fix updates the main plan and re-tests everything. <strong>Fixes stack:</strong> accept one, then another; each becomes part of the plan. One fix can contain more than one change. Before/After toggle compares original plan to current fixed version.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- Example mode -->
+  <section>
+    <h2>Example Mode (No Key Required)</h2>
+    <div class="fixture-callout">
+      <div class="fixture-label">Example mode: using a saved AI reading</div>
+      <p>The example plan is run through the real AI once. The result (structured map, questions, explanations, fix suggestions) is saved and shipped with the app. In example mode, the app loads that saved reading; the full flow still runs: plan map screen, rules check, questions, confirmation gate. The checker always runs live and is never saved or faked. Pasting your own plan requires a key.</p>
+    </div>
+    <p style="font-size:0.83rem;color:var(--muted);margin-top:0.75rem;">The example is designed so the story is true: the obvious fix (add another backup driver) fails because there is still only one van; the real fix passes. A test locks in those results so they never change. Target: 12 to 15 failure types, around 100 tests, finished in a few seconds.</p>
+  </section>
+
+  <hr>
+
+  <!-- The pipeline -->
+  <section>
+    <h2>The Validation Pipeline (The Learning Goal)</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.9rem;">AI reads, rules check, human confirms, strict system acts. A repeatable pattern applicable to any "AI turns messy input into something a strict system acts on" pipeline.</p>
+    <div class="pipeline">
+      <div class="pipeline-row">
+        <div class="pipeline-actor actor-ai">AI</div>
+        <div class="pipeline-action">Parse messy plan into fixed-schema structured map; surface ambiguities as questions</div>
+      </div>
+      <div class="pipeline-row">
+        <div class="pipeline-actor actor-rules">Rules</div>
+        <div class="pipeline-action">Validate the map: every name exists, every route has a vehicle and driver, every time is coherent, nothing the checker needs is missing. Rule failures become questions, not silent errors.</div>
+      </div>
+      <div class="pipeline-row">
+        <div class="pipeline-actor actor-human">Human</div>
+        <div class="pipeline-action">Confirm or correct using constrained choices only. Corrections go straight into the map; AI does not re-read.</div>
+      </div>
+      <div class="pipeline-row">
+        <div class="pipeline-actor actor-checker">Checker</div>
+        <div class="pipeline-action">Runs only once every item is confirmed and every rule passes. Deterministic. AI never has the final word.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Checker verdicts -->
+  <section>
+    <h2>The Checker's Three Honest Answers</h2>
+    <div class="verdicts">
+      <div class="verdict">
+        <div class="verdict-icon" style="color:var(--red);">&#10005;</div>
+        <div class="verdict-text"><strong>This breaks your plan.</strong> Here is exactly how.</div>
+      </div>
+      <div class="verdict">
+        <div class="verdict-icon" style="color:var(--green);">&#10003;</div>
+        <div class="verdict-text"><strong>Your plan survived everything we tested.</strong> That is not the same as "your plan is safe." It only covers what we tested.</div>
+      </div>
+      <div class="verdict">
+        <div class="verdict-icon" style="color:var(--muted);">?</div>
+        <div class="verdict-text"><strong>I could not tell.</strong> Something is missing or unclear. Never treated as a pass.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- POC boundary -->
+  <section>
+    <h2>POC Boundary</h2>
+    <div class="tag-list">
+      <span class="tag in">Community food distribution plan</span>
+      <span class="tag in">Paste-in plan input</span>
+      <span class="tag in">AI map + 1 to 2 questions</span>
+      <span class="tag in">Constrained map correction</span>
+      <span class="tag in">Rule validation gate</span>
+      <span class="tag in">Singles and pairs only</span>
+      <span class="tag in">Live-filling grid (tick / cross / dimmed / question mark)</span>
+      <span class="tag in">Single weak spots vs hidden pairs distinguished</span>
+      <span class="tag in">Timeline with household count and delay</span>
+      <span class="tag in">Up to 3 fixes, each fully tested</span>
+      <span class="tag in">Stacking fixes, Before/After toggle</span>
+      <span class="tag in">End-of-run report (incl. what was NOT tested)</span>
+      <span class="tag in">Example fixture (full flow, checker always live)</span>
+    </div>
+  </section>
+
+  <!-- Later -->
+  <section>
+    <h2>Later</h2>
+    <div class="tag-list">
+      <span class="tag later">Second example type (event setup)</span>
+      <span class="tag later">AI-suggested plan-specific failure types (user-approved)</span>
+      <span class="tag later">Nicer report download</span>
+      <span class="tag later">Live public link</span>
+    </div>
+  </section>
+
+  <!-- Cut -->
+  <section>
+    <h2>Explicitly Cut</h2>
+    <div class="tag-list">
+      <span class="tag out">Any plan in any industry</span>
+      <span class="tag out">File upload</span>
+      <span class="tag out">Three or more simultaneous failures</span>
+      <span class="tag out">Accounts and logins</span>
+      <span class="tag out">Connecting to other apps / messaging volunteers</span>
+      <span class="tag out">AI-suggested failure types (this version)</span>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>The One Thing to Remember</h2>
+    <blockquote>Every job had a backup, and the plan still broke. Failure Compiler shows you that before Saturday does.</blockquote>
+  </section>
+
+</div>
+</body>
+</html>

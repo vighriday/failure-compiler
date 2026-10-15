@@ -1,0 +1,7 @@
+# Personal learning context — kept out of commits by default
+devpost/learner-profile.md
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
