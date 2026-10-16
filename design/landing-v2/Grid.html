@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></helmet>
+<div ref="{{root}}" style="display:flex;flex-direction:column;gap:14px;font-family:'IBM Plex Sans',sans-serif;color:#1A1916;width:{{W}}px;max-width:100%">
+  <sc-if value="{{showCount}}" hint-placeholder-val="{{true}}">
+    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #1A1916;border-bottom:1px solid #DAD6CB;padding:10px 0 12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;font:400 12px 'IBM Plex Mono',monospace;color:#57544C">
+        <span style="letter-spacing:0.12em">SAMPLE PLAN · {{checked}} OF 100 TESTS</span>
+        <button onClick="{{replay}}" aria-label="Run the crash test again" style="all:unset;cursor:pointer;font:400 12px 'IBM Plex Mono',monospace;color:#1A1916;border:1px solid #DAD6CB;border-radius:2px;padding:3px 8px" style-hover="border-color:#1A1916">Rerun</button>
+      </div>
+      <div style="display:block;font:400 15px/1.4 'IBM Plex Sans',sans-serif;color:#1A1916;opacity:{{sentOp}};transition:opacity 400ms ease"><b style="font-weight:500;color:#B23A2E">{{cnt.w}} {{cnt.wl}}</b>, <b style="font-weight:500;color:#B23A2E">{{cnt.p}} {{cnt.pl}}</b>, <b style="font-weight:500;color:#1E6B47">{{cnt.o}} pass</b>.</div>
+    </div>
+  </sc-if>
+  <div style="position:relative;width:{{W}}px;height:{{H}}px;flex:none">
+    <div style="position:absolute;left:0;top:{{bandRowY}}px;width:{{bandRowW}}px;height:{{s}}px;background:#ECE9E0;opacity:{{bandOp}};transition:opacity 120ms"></div>
+    <div style="position:absolute;left:{{bandColX}}px;top:{{T}}px;width:{{s}}px;height:{{bandColH}}px;background:#ECE9E0;opacity:{{bandOp}};transition:opacity 120ms"></div>
+    <sc-for list="{{diag}}" as="d" hint-placeholder-count="14">
+      <div style="position:absolute;left:{{d.x}}px;top:{{d.y}}px;width:{{s}}px;height:{{s}}px;background:#E9E6DD"></div>
+    </sc-for>
+    <sc-for list="{{seps}}" as="g" hint-placeholder-count="5">
+      <div style="position:absolute;left:0;top:{{g.y}}px;width:{{g.w}}px;height:1px;background:{{g.c}}"></div>
+    </sc-for>
+    <div style="position:absolute;left:{{L}}px;top:{{T}}px;width:1px;height:{{gridH}}px;background:#DAD6CB"></div>
+    <sc-if value="{{names}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;left:0;top:{{diagLabelY}}px;font:400 12px/1.5 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#57544C">ONE PROBLEM<div style="font:400 12px 'IBM Plex Sans',sans-serif;letter-spacing:0;color:#77736A">on the diagonal</div></div>
+    </sc-if>
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="14">
+      <div style="position:absolute;left:0;top:{{r.y}}px;width:{{r.w}}px;height:{{s}}px;display:flex;align-items:center;justify-content:{{r.j}};font:{{r.font}};color:{{r.color}};white-space:nowrap;transition:color 120ms">{{r.label}}</div>
+    </sc-for>
+    <sc-for list="{{cols}}" as="k" hint-placeholder-count="14">
+      <div style="position:absolute;left:{{k.x}}px;top:{{k.y}}px;width:{{k.w}}px;text-align:{{k.a}};font:{{k.font}};color:{{k.color}};white-space:nowrap;transform:{{k.tf}};transform-origin:0 100%;transition:color 120ms">{{k.label}}</div>
+    </sc-for>
+    <sc-for list="{{cells}}" as="c" hint-placeholder-count="105">
+      <div role="button" tabindex="0" aria-label="{{c.aria}}" onMouseEnter="{{c.enter}}" onFocus="{{c.enter}}" onMouseLeave="{{leave}}" onClick="{{c.click}}" style="position:absolute;left:{{c.x}}px;top:{{c.y}}px;width:{{s}}px;height:{{s}}px;box-sizing:border-box;outline:{{c.ol}};outline-offset:-2px;cursor:pointer">
+        <svg width="{{s}}" height="{{s}}" style="display:block;overflow:visible;pointer-events:none">
+          <g transform="{{k32}}">
+            <sc-if value="{{c.isHatch}}"><g style="stroke:#D3CDBF;stroke-width:1.1;opacity:{{c.hop}};transition:{{c.htr}}"><line x1="0" y1="8" x2="8" y2="0"></line><line x1="0" y1="16" x2="16" y2="0"></line><line x1="0" y1="24" x2="24" y2="0"></line><line x1="0" y1="32" x2="32" y2="0"></line><line x1="8" y1="32" x2="32" y2="8"></line><line x1="16" y1="32" x2="32" y2="16"></line><line x1="24" y1="32" x2="32" y2="24"></line></g></sc-if>
+            <sc-if value="{{c.isTick}}"><path d="M9 16.5 L14 21.5 L23.5 10.5" style="fill:none;stroke:#1E6B47;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22;stroke-dashoffset:{{c.off22}};transition:{{c.tr}}"></path></sc-if>
+            <sc-if value="{{c.isCross}}"><path d="M10.5 10.5 L21.5 21.5 M21.5 10.5 L10.5 21.5" style="fill:none;stroke:#B23A2E;stroke-width:2;stroke-linecap:round;stroke-dasharray:32;stroke-dashoffset:{{c.off32}};transition:{{c.tr}}"></path></sc-if>
+            <sc-if value="{{c.isDash}}"><path d="M10 16 L22 16" style="fill:none;stroke:#8E8A80;stroke-width:1.6;stroke-linecap:round;stroke-dasharray:12;stroke-dashoffset:{{c.off12}};transition:{{c.tr}}"></path></sc-if>
+            <sc-if value="{{c.isRing}}"><circle cx="16" cy="16" r="12.5" transform="rotate(-110 16 16)" style="fill:none;stroke:#B23A2E;stroke-width:1.4;stroke-dasharray:79;stroke-dashoffset:{{c.off79}};transition:{{c.rtr}}"></circle></sc-if>
+            <sc-if value="{{c.isBox}}"><rect x="3" y="3" width="26" height="26" style="fill:none;stroke:#1E6B47;stroke-width:1.4;stroke-dasharray:104;stroke-dashoffset:{{c.off104}};transition:{{c.rtr}}"></rect></sc-if>
+          </g>
+        </svg>
+      </div>
+    </sc-for>
+    <sc-if value="{{showCallout}}" hint-placeholder-val="{{false}}">
+      <svg width="{{W}}" height="{{H}}" style="position:absolute;left:0;top:0;pointer-events:none;overflow:visible">
+        <line x1="{{co.x}}" y1="{{co.y1}}" x2="{{co.x}}" y2="{{co.y2}}" style="stroke:#1A1916;stroke-width:1;stroke-dasharray:{{co.len}};stroke-dashoffset:{{co.off}};transition:{{co.ltr}}"></line>
+        <circle cx="{{co.x}}" cy="{{co.y1}}" r="2.5" style="fill:#1A1916;opacity:{{co.op}};transition:{{co.dtr}}"></circle>
+      </svg>
+      <div style="position:absolute;left:{{co.bx}}px;top:{{co.by}}px;width:{{co.bw}}px;height:{{co.bh}}px;box-sizing:border-box;border:1px solid #1A1916;background:#FBFAF6;padding:12px 14px;display:flex;flex-direction:column;gap:6px;opacity:{{co.op}};transform:translateY({{co.ty}}px);transition:{{co.btr}}">
+        <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#57544C">HIDDEN PAIR</span>
+        <span style="font:400 13px/1.35 'IBM Plex Sans',sans-serif;color:#1A1916">Anita leaves early, and the van is back late.</span>
+        <span style="font:500 14px/1.3 'IBM Plex Sans',sans-serif;color:#B23A2E">8 households get no food.</span>
+      </div>
+    </sc-if>
+  </div>
+  <sc-if value="{{showReadout}}" hint-placeholder-val="{{true}}">
+    <div style="min-height:46px;box-sizing:border-box;background:#EFECE4;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;font-size:13px;line-height:1.45">
+      <span style="font-weight:500">{{ro.pair}}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:{{ro.color}}">{{ro.status}}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{showLegend}}" hint-placeholder-val="{{true}}">
+    <div style="display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:#57544C">
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg width="16" height="16"><g transform="scale(0.5)"><path d="M9 16.5 L14 21.5 L23.5 10.5" style="fill:none;stroke:#1E6B47;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round"></path></g></svg>survives</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg width="16" height="16"><g transform="scale(0.5)"><path d="M10.5 10.5 L21.5 21.5 M21.5 10.5 L10.5 21.5" style="fill:none;stroke:#B23A2E;stroke-width:3.4;stroke-linecap:round"></path></g></svg>breaks</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg width="16" height="16"><g transform="scale(0.5)"><path d="M8 16 L24 16" style="fill:none;stroke:#8E8A80;stroke-width:3;stroke-linecap:round"></path></g></svg>already broken</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg width="16" height="16"><g transform="scale(0.5)"><rect x="2" y="2" width="28" height="28" style="fill:none;stroke:#C9C3B4;stroke-width:2"></rect><line x1="2" y1="18" x2="18" y2="2" style="stroke:#C9C3B4;stroke-width:2"></line><line x1="2" y1="30" x2="30" y2="2" style="stroke:#C9C3B4;stroke-width:2"></line><line x1="14" y1="30" x2="30" y2="14" style="stroke:#C9C3B4;stroke-width:2"></line></g></svg>can't happen</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg width="16" height="16"><g transform="scale(0.5)"><circle cx="16" cy="16" r="13" style="fill:none;stroke:#B23A2E;stroke-width:2.6"></circle></g></svg>circled: hidden pair</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:620,&quot;height&quot;:720},&quot;cell&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:34,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:22,&quot;max&quot;:44},&quot;labels&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;numbers&quot;,&quot;names&quot;],&quot;default&quot;:&quot;numbers&quot;,&quot;tsType&quot;:&quot;'numbers'|'names'&quot;},&quot;callout&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;stage&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:3,&quot;tsType&quot;:&quot;number&quot;},&quot;animate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;count&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;legend&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;readout&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;selR&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;selC&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;onSelect&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(r:number,c:number)=&gt;void&quot;},&quot;runId&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+const NAMES=['Ravi absent','Joel absent','Anita absent','Maya absent','Sam absent','Ravi leaves 90 min early','Joel leaves 90 min early','Anita leaves 90 min early','Maya leaves 90 min early','Sam leaves 90 min early','Van back 30 min late','Car back 30 min late','Supply truck 45 min late','Loading area blocked 30 min'];
+const SENT=['Ravi is absent','Joel is absent','Anita is absent','Maya is absent','Sam is absent','Ravi leaves 90 min early','Joel leaves 90 min early','Anita leaves 90 min early','Maya leaves 90 min early','Sam leaves 90 min early','the van is back 30 min late','the car is back 30 min late','the supply truck is 45 min late','the loading area is blocked for 30 min'];
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const pairText=(a,b)=>cap(SENT[a-1])+', and '+SENT[b-1]+'.';
+const SEPS=[5,10,12,13];
+const COUNTS=[{w:1,wl:'weak spot',p:3,pl:'hidden pairs',o:84},{w:1,wl:'weak spot',p:1,pl:'hidden pair',o:86},{w:1,wl:'weak spot',p:0,pl:'hidden pairs',o:87},{w:0,wl:'weak spots',p:0,pl:'hidden pairs',o:100}];
+const pad=n=>String(n).padStart(2,'0');
+function cellType(r,c,st){const k=r+'-'+c;
+  if(r>=6&&r<=10&&c===r-5)return'hatch';
+  if(st>=3)return(r===2&&c===2)?'fixed':'ok';
+  if(r===2&&c===2)return'cross';
+  if(r===2||c===2)return'dash';
+  if(k==='11-3'||k==='11-8')return st>=1?'fixed':'ring';
+  if(k==='13-1')return st>=2?'fixed':'ring';
+  return'ok';}
+const STATUS={ok:['Survives. The checker found a schedule.','#1E6B47'],cross:['Weak spot. This alone breaks the plan.','#B23A2E'],ring:['Hidden pair. Each is fine alone, together they break the plan.','#B23A2E'],fixed:['Now survives.','#1E6B47'],dash:['Already broken, because Joel absent breaks it alone.','#77736A'],hatch:["Can't happen. The same person can't be absent and leave early.",'#77736A']};
+class Component extends DCLogic {
+  state={shown:false,instant:false,hov:null,checked:0};
+  root=React.createRef();
+  p(k,d){const v=this.props[k];if(v===undefined||v===null||v==='')return d;if(v==='true')return true;if(v==='false')return false;return v;}
+  componentDidMount(){
+    this._run=this.props.runId;
+    const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce||this.p('animate',true)===false){this.setState({shown:true,instant:true,checked:100});return;}
+    const el=this.root.current;
+    if(!el||!('IntersectionObserver' in window)){this.show();return;}
+    const r=el.getBoundingClientRect();
+    if(r.top<window.innerHeight&&r.bottom>0){this.show();return;}
+    this.io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){this.show();this.io.disconnect();}},{threshold:0.25});
+    this.io.observe(el);
+    this.fb=setTimeout(()=>{if(!this.state.shown){this.io&&this.io.disconnect();this.show();}},1500);
+  }
+  componentWillUnmount(){this.io&&this.io.disconnect();clearTimeout(this.t);clearTimeout(this.fb);clearInterval(this.iv);}
+  componentDidUpdate(){if(this.props.runId!==this._run){this._run=this.props.runId;if(this.props.runId)this.replay();}}
+  show=()=>{this.setState({shown:true,checked:0});clearInterval(this.iv);let n=0;this.iv=setInterval(()=>{n=Math.min(100,n+3);this.setState({checked:n});if(n>=100)clearInterval(this.iv);},30);};
+  replay=()=>{if(this.state.instant)return;clearInterval(this.iv);this.setState({shown:false,checked:0});clearTimeout(this.t);this.t=setTimeout(this.show,120);};
+  renderVals(){
+    const s=+this.p('cell',34),names=this.p('labels','numbers')==='names',st=+this.p('stage',0);
+    const L=names?176:30,T=names?168:0;
+    const {shown,instant,hov,checked}=this.state;
+    const sel=[+this.p('selR',0),+this.p('selC',0)];
+    const onSelect=this.props.onSelect;
+    const anim=shown&&!instant;
+    const cells=[],diag=[];let i=0;
+    for(let r=1;r<=14;r++){diag.push({x:L+(r-1)*s,y:T+(r-1)*s});
+      for(let c=1;c<=r;c++){
+        const t=cellType(r,c,st),isH=hov&&hov[0]===r&&hov[1]===c,isS=sel[0]===r&&sel[1]===c;
+        const ringIdx=['11-3','11-8','13-1'].indexOf(r+'-'+c);
+        const d=i*9,rd=1000+200+Math.max(0,ringIdx)*180;
+        const lbl=r===c?cap(SENT[r-1])+'.':pairText(c,r);
+        cells.push({x:L+(c-1)*s,y:T+(r-1)*s,aria:lbl+'. '+STATUS[t][0],
+          ol:isS?'2px solid #1A1916':isH?'1px solid #1A1916':'none',
+          isHatch:t==='hatch',isTick:t==='ok'||t==='fixed',isCross:t==='cross'||t==='ring',isDash:t==='dash',isRing:t==='ring',isBox:t==='fixed',
+          off22:shown?0:22,off32:shown?0:32,off12:shown?0:12,off79:shown?0:79,off104:shown?0:104,hop:shown?1:0,
+          tr:anim?`stroke-dashoffset 280ms cubic-bezier(.4,0,.2,1) ${d}ms`:'none',
+          htr:anim?`opacity 300ms ease ${d}ms`:'none',
+          rtr:anim?`stroke-dashoffset 620ms cubic-bezier(.6,0,.2,1) ${rd}ms`:'none',
+          enter:()=>this.setState({hov:[r,c]}),click:()=>onSelect&&onSelect(r,c)});
+        i++;}}
+    const act=n=>hov&&(hov[0]===n||hov[1]===n);
+    const rows=[],cols=[];
+    for(let n=1;n<=14;n++){
+      const a=act(n);
+      rows.push({y:T+(n-1)*s,w:names?L-14:22,j:names?'flex-start':'flex-end',label:names?NAMES[n-1]:pad(n),
+        font:names?`${a?500:400} 13px 'IBM Plex Sans',sans-serif`:`${a?500:400} 12px 'IBM Plex Mono',monospace`,color:a?'#1A1916':'#57544C'});
+      cols.push(names?{x:L+(n-1)*s+s*0.42,y:T-26,w:200,a:'left',tf:'rotate(-52deg)',label:NAMES[n-1],font:`${a?500:400} 12px 'IBM Plex Sans',sans-serif`,color:a?'#1A1916':'#57544C'}
+        :{x:L+(n-1)*s,y:14*s+6,w:s,a:'center',tf:'none',label:pad(n),font:`${a?500:400} 12px 'IBM Plex Mono',monospace`,color:a?'#1A1916':'#77736A'});}
+    const seps=[{y:T,w:L+s,c:'#1A1916'}].concat(SEPS.map(r=>({y:T+r*s,w:L+r*s,c:'#DAD6CB'})));
+    const tgt=hov||(sel[0]?sel:[11,8]),tt=cellType(tgt[0],tgt[1],st),stt=STATUS[tt];
+    const ro={pair:tgt[0]===tgt[1]?cap(SENT[tgt[0]-1])+'.':pairText(tgt[1],tgt[0]),status:stt[0],color:stt[1]};
+    const x=L+8*s-s/2,bw=Math.max(196,Math.round(6.4*s)),bh=124,bx=L+14*s-bw,by=0;
+    const y1=T+10*s+s/2,y2=by+bh,len=Math.max(1,y1-y2);
+    const cd=1000+200+3*180+300;
+    const co={x,y1,y2,len,off:shown?0:len,bx,by,bw,bh,op:shown?1:0,ty:shown?0:8,
+      ltr:anim?`stroke-dashoffset 500ms ease ${cd}ms`:'none',dtr:anim?`opacity 200ms ease ${cd}ms`:'none',btr:anim?`opacity 360ms ease ${cd+420}ms, transform 360ms ease ${cd+420}ms`:'none'};
+    const W=names?L+14*s+130:L+14*s,H=names?T+14*s:14*s+26;
+    return {root:this.root,cells,diag,rows,cols,seps,s,L,T,W,H,gridH:14*s,k32:`scale(${s/32})`,names,diagLabelY:T-52,
+      bandOp:hov?1:0,bandRowY:hov?T+(hov[0]-1)*s:T,bandRowW:hov?L+hov[0]*s:0,bandColX:hov?L+(hov[1]-1)*s:L,bandColH:hov?14*s:0,
+      showCount:this.p('count',true),showLegend:this.p('legend',true),showReadout:this.p('readout',true),showCallout:!!this.p('callout',false)&&st===0,
+      cnt:COUNTS[Math.min(3,Math.max(0,st))],checked,sentOp:checked>=100?1:0.25,ro,co,replay:this.replay,leave:()=>this.setState({hov:null})};
+  }
+}
+</script>
+</body>
+</html>

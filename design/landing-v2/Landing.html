@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"><style>html,body{margin:0;background:#F6F4EE}body{-webkit-font-smoothing:antialiased}a{color:#1A1916;text-underline-offset:3px}a:hover{color:#1E6B47}::selection{background:#1A1916;color:#F6F4EE}*{box-sizing:border-box}[data-nav]::-webkit-scrollbar{display:none}@media (max-width:1100px){[data-hcta]{display:none!important}}</style></helmet>
+<div ref="{{root}}" style="background:#F6F4EE;color:#1A1916;font-family:'IBM Plex Sans',sans-serif;min-height:100vh;overflow-x:clip">
+
+  <header data-header="1" style="position:sticky;top:0;z-index:40;background:#F6F4EE;border-bottom:1px solid #DAD6CB">
+    <div style="max-width:1440px;margin:0 auto;padding:0 clamp(20px,3.4vw,48px);height:64px;display:flex;align-items:center;gap:32px">
+      <button onClick="{{goTop}}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:none">
+        <svg width="22" height="22" viewBox="0 0 22 22" style="flex:none"><g style="fill:none;stroke:#1A1916;stroke-width:1.3"><rect x="1" y="1" width="6.5" height="6.5"></rect><rect x="1" y="7.5" width="6.5" height="6.5"></rect><rect x="7.5" y="7.5" width="6.5" height="6.5"></rect><rect x="1" y="14" width="6.5" height="6.5"></rect><rect x="7.5" y="14" width="6.5" height="6.5"></rect><rect x="14" y="14" width="6.5" height="6.5"></rect></g><path d="M9.6 16.1 L11.9 18.4 M11.9 16.1 L9.6 18.4" style="fill:none;stroke:#B23A2E;stroke-width:1.5;stroke-linecap:round"></path><circle cx="10.75" cy="17.25" r="3.6" style="fill:none;stroke:#B23A2E;stroke-width:1.1"></circle></svg>
+        <span style="display:flex;align-items:baseline;gap:5px;font:600 15px 'IBM Plex Sans',sans-serif;letter-spacing:-0.015em">Failure<span style="font:400 15px 'IBM Plex Mono',monospace;letter-spacing:-0.02em;color:#57544C">compiler</span></span>
+      </button>
+      <nav ref="{{navRef}}" data-nav="1" role="tablist" style="position:relative;display:flex;margin:0 auto;overflow-x:auto;scrollbar-width:none;min-width:0;height:64px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="6">
+          <button role="tab" aria-selected="{{t.sel}}" data-tabid="{{t.id}}" onClick="{{t.go}}" style="all:unset;cursor:pointer;height:64px;padding:0 16px;display:flex;align-items:center;font:400 14px 'IBM Plex Sans',sans-serif;color:{{t.color}};white-space:nowrap;transition:color 200ms" style-hover="color:#1A1916">{{t.label}}</button>
+        </sc-for>
+        <div ref="{{indRef}}" style="position:absolute;bottom:0;left:0;width:0;height:2px;background:#1A1916;transition:left 460ms cubic-bezier(.65,0,.2,1),width 460ms cubic-bezier(.65,0,.2,1)"></div>
+      </nav>
+      <button data-hcta="1" onClick="{{tryExample}}" style="all:unset;cursor:pointer;flex:none;background:#1E6B47;color:#F6F4EE;font:500 13px 'IBM Plex Sans',sans-serif;height:36px;padding:0 14px;display:flex;align-items:center;gap:10px;border-radius:2px;white-space:nowrap" style-hover="background:#185A3B">Try the example<span style="font-family:'IBM Plex Mono',monospace">→</span></button>
+    </div>
+    <div ref="{{progRef}}" style="position:absolute;left:0;bottom:-1px;height:1px;width:100%;background:#1A1916;transform-origin:0 50%;transform:scaleX(0)"></div>
+  </header>
+
+  <main ref="{{tabRef}}">
+
+  <sc-if value="{{tab_top}}" hint-placeholder-val="{{true}}">
+  <section data-screen-label="00 Overview">
+    <div ref="{{heroRef}}" style="position:relative;display:grid;background:#1A1916;overflow:hidden">
+      <div data-shard="0" style="grid-area:1/1;background:#F6F4EE">
+          <div style="max-width:1440px;margin:0 auto;padding:clamp(32px,4vw,56px) clamp(20px,3.4vw,48px) 0;min-height:max(640px, calc(100vh - 64px));display:flex;flex-direction:column">
+            <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(28px,4vw,64px);align-items:center">
+              <div style="max-width:720px;display:flex;flex-direction:column;gap:clamp(22px,2.6vw,36px)">
+                <h1 style="margin:0;font:500 clamp(38px,4.7vw,76px)/0.98 'IBM Plex Sans',sans-serif;letter-spacing:-0.045em">
+                  <span style="display:block;overflow:hidden;padding-bottom:0.16em;margin-bottom:-0.16em"><span style="display:block;transform:translateY({{heroT}});transition:transform 1100ms cubic-bezier(.2,.75,.1,1) 60ms">Your plan says</span></span>
+                  <span style="display:block;overflow:hidden;padding-bottom:0.16em;margin-bottom:-0.16em"><span style="display:block;transform:translateY({{heroT}});transition:transform 1100ms cubic-bezier(.2,.75,.1,1) 140ms">everything will work.</span></span>
+                  <span style="display:block;overflow:hidden;padding-bottom:0.16em;margin-bottom:-0.16em;font-weight:300;color:#57544C"><span style="display:block;transform:translateY({{heroT}});transition:transform 1100ms cubic-bezier(.2,.75,.1,1) 260ms">We prove where</span></span>
+                  <span style="display:block;overflow:hidden;padding:0 90px 0.4em 0;margin-bottom:-0.4em;font-weight:300;color:#57544C"><span style="display:block;transform:translateY({{heroT}});transition:transform 1100ms cubic-bezier(.2,.75,.1,1) 340ms">it <button onClick="{{shatter}}" aria-label="Break the page" style="all:unset;cursor:pointer;position:relative;display:inline-block;color:#B23A2E;font-weight:500" style-hover="color:#9C3227">breaks.<svg viewBox="0 0 250 18" preserveAspectRatio="none" style="position:absolute;left:0;bottom:-0.2em;width:100%;height:0.24em;overflow:visible"><path pathLength="260" d="M3 10 C 70 3, 160 3, 244 9" style="fill:none;stroke:#B23A2E;stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:260;stroke-dashoffset:{{penOff}};transition:stroke-dashoffset 800ms cubic-bezier(.6,0,.2,1) 1150ms"></path></svg><span style="position:absolute;left:calc(100% + 18px);top:50%;transform:translateY(-50%);font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0;color:#57544C;white-space:nowrap;opacity:{{hintOp}};transition:opacity 500ms ease 1800ms">← click</span></button></span></span>
+                </h1>
+                <p style="margin:0;max-width:460px;font:400 clamp(16px,1.35vw,19px)/1.55 'IBM Plex Sans',sans-serif;color:#57544C;text-wrap:pretty;opacity:{{heroOp}};transition:opacity 800ms ease 600ms">Paste your plan. We test what could go wrong, one problem at a time and two at once, and show you exactly where it fails.</p>
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;opacity:{{heroOp}};transition:opacity 800ms ease 720ms">
+                  <button onClick="{{tryExample}}" style="all:unset;cursor:pointer;background:#1E6B47;color:#F6F4EE;font:500 16px 'IBM Plex Sans',sans-serif;height:54px;padding:0 24px;display:flex;align-items:center;gap:16px;border-radius:2px" style-hover="background:#185A3B" style-focus="outline:2px solid #1A1916;outline-offset:3px">Try the example plan<span style="font-family:'IBM Plex Mono',monospace">→</span></button>
+                  <button onClick="{{goTest}}" style="all:unset;cursor:pointer;font:500 16px 'IBM Plex Sans',sans-serif;height:54px;padding:0 22px;display:flex;align-items:center;border:1px solid #1A1916;border-radius:2px" style-hover="background:#1A1916;color:#F6F4EE" style-focus="outline:2px solid #1A1916;outline-offset:3px">See what breaks</button>
+                </div>
+              </div>
+              <div>
+                <dc-import name="Grid" cell="{{heroCell}}" callout="true" labels="numbers" stage="0" readout="false" hint-size="478px,600px"></dc-import>
+              </div>
+            </div>
+            <div style="margin-top:48px;border-top:1px solid #DAD6CB;height:52px;display:flex;align-items:center;justify-content:space-between;gap:24px;font:400 12px 'IBM Plex Mono',monospace;color:#57544C">
+              <span>On the right: a sample Saturday food run, already tested.</span>
+              <span>Free to try. No sign-up, no AI key, and we never store your plan.</span>
+            </div>
+          </div>
+        </div>
+      <div ref="{{shardLayer}}" style="display:contents"></div>
+      <svg width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none;overflow:visible">
+        <sc-for list="{{cracks}}" as="c" hint-placeholder-count="0">
+          <line data-crack="1" x1="{{c.x1}}" y1="{{c.y1}}" x2="{{c.x2}}" y2="{{c.y2}}" style="stroke:#1A1916;stroke-width:{{c.w}};stroke-dasharray:{{c.len}};stroke-dashoffset:{{c.len}};stroke-linecap:round"></line>
+        </sc-for>
+      </svg>
+      <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+        <div data-toast="1" style="position:absolute;left:{{toast.x}}px;top:{{toast.y}}px;background:#1A1916;color:#F6F4EE;padding:12px 16px;display:flex;flex-direction:column;gap:4px;pointer-events:none;white-space:nowrap">
+          <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#C9C3B4">LIKE THE SAMPLE PLAN</span>
+          <span style="font:500 15px 'IBM Plex Sans',sans-serif">1 weak spot and 3 hidden pairs.</span>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{tab_plan}}" hint-placeholder-val="{{false}}">
+  <section data-screen-label="01 Plan" style="max-width:1440px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 24px">
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:760px">
+      <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.14em;color:#57544C">01 · THE PLAN</span>
+      <h2 style="margin:0;font:500 clamp(36px,4.4vw,64px)/1.02 'IBM Plex Sans',sans-serif;letter-spacing:-0.04em">It looks covered.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:clamp(32px,5vw,80px);margin-top:clamp(32px,4vw,56px);align-items:start">
+      <div style="max-width:600px;position:sticky;top:96px">
+        <div style="background:#FBFAF6;border:1px solid #DAD6CB">
+          <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #DAD6CB;font:400 12px 'IBM Plex Mono',monospace;color:#57544C"><span>saturday-food-run.txt</span><span>16 lines</span></div>
+          <div style="padding:10px 0">
+            <sc-for list="{{storyLines}}" as="l" hint-placeholder-count="16">
+              <div style="display:grid;grid-template-columns:52px minmax(0,1fr);background:{{l.bg}};box-shadow:inset 2px 0 0 {{l.bl}};transition:background 400ms,box-shadow 400ms">
+                <div style="display:flex;justify-content:flex-end;gap:6px;padding:4px 12px 4px 0;font:400 12px/20px 'IBM Plex Mono',monospace;color:#77736A">
+                  <sc-if value="{{l.tick}}"><svg width="14" height="20"><path d="M2 10.5 L5.5 14 L12 6.5" style="fill:none;stroke:#1E6B47;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"></path></svg></sc-if>
+                  <sc-if value="{{l.q}}"><span style="color:#8A6410;font-weight:500">?</span></sc-if>
+                  <span>{{l.n}}</span>
+                </div>
+                <div style="padding:4px 20px 4px 0;font:400 13px/20px 'IBM Plex Mono',monospace;color:{{l.color}};min-height:28px;transition:color 400ms;text-wrap:pretty">{{l.text}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="max-width:520px">
+        <sc-for list="{{story}}" as="s" hint-placeholder-count="5">
+          <div data-story-step="{{s.i}}" style="min-height:62vh;display:flex;flex-direction:column;justify-content:center;gap:16px;opacity:{{s.op}};transition:opacity 500ms ease">
+            <span style="font:400 12px 'IBM Plex Mono',monospace;color:#57544C">{{s.k}}</span>
+            <div style="font:500 clamp(28px,3vw,44px)/1.06 'IBM Plex Sans',sans-serif;letter-spacing:-0.03em;color:{{s.tc}};text-wrap:balance">{{s.t}}</div>
+            <p style="margin:0;font:400 18px/1.55 'IBM Plex Sans',sans-serif;color:#57544C;text-wrap:pretty">{{s.b}}</p>
+          </div>
+        </sc-for>
+        <div style="padding:0 0 120px"><button onClick="{{goRead}}" style="all:unset;cursor:pointer;font:500 16px 'IBM Plex Sans',sans-serif;height:52px;padding:0 22px;display:inline-flex;align-items:center;gap:14px;border:1px solid #1A1916;border-radius:2px" style-hover="background:#1A1916;color:#F6F4EE">Read the plan<span style="font-family:'IBM Plex Mono',monospace">→</span></button></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{tab_read}}" hint-placeholder-val="{{false}}">
+  <section data-screen-label="02 Read" style="max-width:1440px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 120px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.14em;color:#57544C">02 · READ</span>
+        <h2 style="margin:0;font:500 clamp(36px,4.4vw,64px)/1.02 'IBM Plex Sans',sans-serif;letter-spacing:-0.04em">Here’s what we understood.</h2>
+      </div>
+      <span style="font:400 13px 'IBM Plex Sans',sans-serif;color:#57544C;max-width:340px">This is a sample reading we wrote for the example. With your own key, AI writes it.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:clamp(28px,4vw,48px);margin-top:clamp(32px,4vw,56px);align-items:start">
+      <div style="max-width:560px;position:sticky;top:96px;background:#FBFAF6;border:1px solid #DAD6CB">
+        <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #DAD6CB;font:400 12px 'IBM Plex Mono',monospace;color:#57544C"><span>saturday-food-run.txt</span><span>{{mapHint}}</span></div>
+        <div style="padding:8px 0">
+          <sc-for list="{{mapLines}}" as="l" hint-placeholder-count="16">
+            <div style="display:grid;grid-template-columns:44px minmax(0,1fr);background:{{l.bg}};box-shadow:inset 2px 0 0 {{l.bl}};transition:background 180ms,box-shadow 180ms">
+              <div style="text-align:right;padding:3px 12px 3px 0;font:400 12px/19px 'IBM Plex Mono',monospace;color:{{l.nc}}">{{l.n}}</div>
+              <div style="padding:3px 18px 3px 0;font:400 12px/19px 'IBM Plex Mono',monospace;color:{{l.tc}};min-height:25px;text-wrap:pretty;transition:color 180ms">{{l.text}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="min-width:0;display:flex;flex-direction:column;gap:20px">
+        <div onMouseEnter="{{hoverQ}}" onMouseLeave="{{mapLeave}}" style="border:1px solid {{qBorder}};background:{{qBg}};padding:20px 22px;display:flex;flex-direction:column;gap:14px;transition:background 400ms,border-color 400ms">
+          <div style="display:flex;justify-content:space-between;font:400 12px 'IBM Plex Mono',monospace;color:{{qTag}}"><span>{{qKicker}}</span><span>line 13</span></div>
+          <div style="font:500 22px/1.3 'IBM Plex Sans',sans-serif;letter-spacing:-0.015em">Ravi can load his own car. Can he load the van too?</div>
+          <sc-if value="{{qOpen}}" hint-placeholder-val="{{true}}">
+            <div style="display:flex;gap:8px">
+              <button onClick="{{answerCar}}" style="all:unset;cursor:pointer;font:400 14px 'IBM Plex Sans',sans-serif;padding:9px 14px;border:1px solid #CFC9BB;background:#FBFAF6;border-radius:2px" style-hover="border-color:#1A1916">Only his car</button>
+              <button onClick="{{answerVan}}" style="all:unset;cursor:pointer;font:400 14px 'IBM Plex Sans',sans-serif;padding:9px 14px;border:1px solid #CFC9BB;background:#FBFAF6;border-radius:2px" style-hover="border-color:#1A1916">The van too</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{qDone}}" hint-placeholder-val="{{false}}">
+            <div style="display:flex;align-items:center;gap:8px;font:400 14px 'IBM Plex Sans',sans-serif;color:#1E6B47"><svg width="14" height="14"><path d="M2 7.5 L5.5 11 L12 3.5" style="fill:none;stroke:#1E6B47;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"></path></svg>{{answerText}}<button onClick="{{reopenQ}}" style="all:unset;cursor:pointer;margin-left:8px;color:#57544C;text-decoration:underline;text-underline-offset:3px">Change</button></div>
+          </sc-if>
+        </div>
+        <div style="border-top:1px solid #1A1916">
+          <sc-for list="{{stm}}" as="it" hint-placeholder-count="8">
+            <div onMouseEnter="{{it.enter}}" onMouseLeave="{{mapLeave}}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 12px;margin:0 -12px;border-bottom:1px solid #E6E2D8;background:{{it.bg}};transition:background 160ms;cursor:default">
+              <div style="display:flex;align-items:baseline;gap:14px;min-width:0">
+                <span style="font:400 12px 'IBM Plex Mono',monospace;color:#77736A;width:52px;flex:none">line {{it.l}}</span>
+                <sc-if value="{{it.isPlain}}"><span style="font:400 16px/1.4 'IBM Plex Sans',sans-serif">{{it.t}}</span></sc-if>
+                <sc-if value="{{it.isGuess}}"><span style="font:400 16px/1.4 'IBM Plex Sans',sans-serif">Route C’s drive takes about an hour.</span></sc-if>
+                <sc-if value="{{it.isEdit}}"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:400 16px 'IBM Plex Sans',sans-serif">Route C’s drive takes<input ref="{{minRef}}" value="{{minutes}}" onChange="{{onMinutes}}" onKeyDown="{{minKey}}" inputmode="numeric" aria-label="Minutes" style="width:58px;font:400 15px 'IBM Plex Mono',monospace;padding:4px 8px;border:1px solid #1A1916;background:#FFFFFF;border-radius:2px;outline:none"></input>min.</span></sc-if>
+                <sc-if value="{{it.isFixed}}"><span style="font:400 16px/1.4 'IBM Plex Sans',sans-serif">Route C’s drive takes {{minutes}} min.</span></sc-if>
+              </div>
+              <sc-if value="{{it.isPlain}}"><svg width="14" height="14"><path d="M2 7.5 L5.5 11 L12 3.5" style="fill:none;stroke:#1E6B47;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"></path></svg></sc-if>
+              <sc-if value="{{it.isGuess}}"><button onClick="{{startEdit}}" style="all:unset;cursor:pointer;font:400 12px 'IBM Plex Mono',monospace;color:#8A6410;border:1px solid #D9B45A;background:#F7EFD9;padding:4px 10px;border-radius:2px" style-hover="border-color:#8A6410">we guessed, check it</button></sc-if>
+              <sc-if value="{{it.isEdit}}"><button onClick="{{saveCorrection}}" style="all:unset;cursor:pointer;font:500 13px 'IBM Plex Sans',sans-serif;background:#1E6B47;color:#F6F4EE;padding:6px 12px;border-radius:2px">Save</button></sc-if>
+              <sc-if value="{{it.isFixed}}"><span style="font:400 12px 'IBM Plex Mono',monospace;color:#1E6B47">corrected</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:8px">
+          <span style="font:400 13px 'IBM Plex Mono',monospace;color:#57544C">{{confText}}</span>
+          <button onClick="{{confirmPlan}}" aria-disabled="{{notReadyS}}" style="all:unset;cursor:{{confCursor}};background:{{confBg}};color:{{confColor}};font:500 15px 'IBM Plex Sans',sans-serif;height:48px;padding:0 20px;display:flex;align-items:center;gap:12px;border-radius:2px;transition:background 300ms,color 300ms">{{confLabel}}<span style="font-family:'IBM Plex Mono',monospace">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{tab_test}}" hint-placeholder-val="{{false}}">
+  <section data-screen-label="03 Test" style="max-width:1440px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 120px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.14em;color:#57544C">03 · CRASH TEST</span>
+        <h2 style="margin:0;font:500 clamp(36px,4.4vw,64px)/1.02 'IBM Plex Sans',sans-serif;letter-spacing:-0.04em">What breaks the plan?</h2>
+      </div>
+      <span style="font:400 13px 'IBM Plex Sans',sans-serif;color:#57544C">Each square is one test. Click a square to see what happened.</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:clamp(28px,4vw,56px);margin-top:clamp(32px,4vw,56px);align-items:flex-start">
+      <div ref="{{gridWrap}}" style="flex:none;max-width:100%;position:relative;overflow:hidden">
+        <dc-import name="Grid" cell="{{testCell}}" labels="{{testLabels}}" callout="false" stage="{{stage}}" runId="{{runId}}" selR="{{selR}}" selC="{{selC}}" onSelect="{{selectCell}}" hint-size="698px,720px"></dc-import>
+        <div data-scan="1" style="position:absolute;left:0;right:0;top:0;height:64px;margin-top:-64px;pointer-events:none;opacity:0">
+          <div style="position:absolute;inset:0;background:#1E6B47;opacity:0.07"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:2px;background:#1E6B47"></div>
+        </div>
+      </div>
+      <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:20px">
+        <div data-case="1" style="background:#FBFAF6;border:1px solid #1A1916;padding:24px;display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;justify-content:space-between;font:400 12px 'IBM Plex Mono',monospace;color:#57544C"><span>{{cs.code}}</span><span>{{cs.kind}}</span></div>
+          <div style="font:400 17px/1.35 'IBM Plex Sans',sans-serif">{{cs.title}}</div>
+          <div style="display:flex;align-items:center;gap:12px;font:500 30px/1.12 'IBM Plex Sans',sans-serif;letter-spacing:-0.025em;color:{{cs.color}}">
+            <sc-if value="{{cs.good}}"><svg width="26" height="26" style="flex:none"><path d="M3 14 L10 21 L23 6" style="fill:none;stroke:#1E6B47;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"></path></svg></sc-if>
+            <sc-if value="{{cs.bad}}"><svg width="26" height="26" style="flex:none"><path d="M5 5 L21 21 M21 5 L5 21" style="fill:none;stroke:#B23A2E;stroke-width:2.4;stroke-linecap:round"></path></svg></sc-if>
+            <span>{{cs.headline}}</span>
+          </div>
+          <sc-if value="{{cs.isPair}}" hint-placeholder-val="{{true}}"><div style="font:400 14px/1.5 'IBM Plex Sans',sans-serif;color:#57544C">Each problem on its own is fine. Together, {{cs.together}}</div></sc-if>
+          <sc-if value="{{cs.hasWhy}}"><div style="font:400 14px/1.55 'IBM Plex Sans',sans-serif;color:#57544C;text-wrap:pretty">{{cs.why}}</div></sc-if>
+          <sc-if value="{{cs.hasTimeline}}" hint-placeholder-val="{{true}}">
+            <div style="border-top:1px solid #DAD6CB;padding-top:34px">
+              <div style="display:grid;grid-template-columns:70px minmax(0,1fr)">
+                <div style="padding-top:26px">
+                  <sc-for list="{{tl}}" as="ln" hint-placeholder-count="3">
+                    <div style="height:56px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid #E6E2D8"><span style="font:500 13px 'IBM Plex Sans',sans-serif">{{ln.route}}</span><span style="font:400 12px 'IBM Plex Mono',monospace;color:#57544C">{{ln.veh}}</span></div>
+                  </sc-for>
+                </div>
+                <div style="position:relative;border-left:1px solid #DAD6CB">
+                  <div style="position:relative;height:26px">
+                    <sc-for list="{{axis}}" as="ax" hint-placeholder-count="4"><span style="position:absolute;left:{{ax.x}};top:4px;transform:translateX(-50%);font:400 12px 'IBM Plex Mono',monospace;color:#57544C">{{ax.t}}</span></sc-for>
+                  </div>
+                  <sc-for list="{{tl}}" as="ln" hint-placeholder-count="3">
+                    <div style="position:relative;height:56px;border-bottom:1px solid #E6E2D8">
+                      <sc-for list="{{ln.bars}}" as="b" hint-placeholder-count="2">
+                        <div style="position:absolute;left:{{b.l}};width:{{b.w}};top:{{b.top}};height:{{b.h}};background:{{b.bg}};opacity:{{b.op}};transition:left 800ms cubic-bezier(.6,0,.2,1),width 800ms cubic-bezier(.6,0,.2,1),opacity 400ms"></div>
+                        <div style="position:absolute;left:{{b.l}};top:{{b.ltop}};font:400 12px 'IBM Plex Mono',monospace;color:{{b.lc}};white-space:nowrap;padding-left:{{b.pl}};opacity:{{b.op}};transition:left 800ms cubic-bezier(.6,0,.2,1),opacity 400ms">{{b.label}}</div>
+                      </sc-for>
+                      <div style="position:absolute;left:6px;top:20px;font:400 12px 'IBM Plex Sans',sans-serif;color:#B23A2E;opacity:{{ln.msgOp}};transition:opacity 400ms;white-space:nowrap">Never leaves. Loading team gone.</div>
+                    </div>
+                  </sc-for>
+                  <div style="position:absolute;top:0;bottom:0;left:81.8%;width:2px;background:#B23A2E"></div>
+                  <div style="position:absolute;top:-22px;left:81.8%;transform:translateX(-70%);font:400 12px 'IBM Plex Mono',monospace;color:#B23A2E;white-space:nowrap">12:00 noon</div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <sc-if value="{{hasFix}}" hint-placeholder-val="{{true}}">
+          <div style="border:1px solid #DAD6CB;padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+            <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#57544C;white-space:nowrap">SUGGESTED FIX {{fix.n}} OF 3</span>
+            <div style="display:flex;flex-direction:column;gap:4px"><span style="font:500 20px/1.25 'IBM Plex Sans',sans-serif;letter-spacing:-0.01em">{{fix.title}}</span><span style="font:400 13px 'IBM Plex Sans',sans-serif;color:#57544C">Suggested by AI, tested by the checker.</span></div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <button onClick="{{acceptFix}}" style="all:unset;cursor:pointer;background:#1E6B47;color:#F6F4EE;font:500 14px 'IBM Plex Sans',sans-serif;height:44px;padding:0 18px;display:flex;align-items:center;gap:12px;border-radius:2px" style-hover="background:#185A3B" style-focus="outline:2px solid #1A1916;outline-offset:3px">{{fixBtn}}</button>
+              <span style="font:400 12px 'IBM Plex Mono',monospace;color:#57544C">{{fix.stats}}</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{allClear}}" hint-placeholder-val="{{false}}">
+          <div style="border:1px solid #1E6B47;background:#EDF3EE;padding:22px;display:flex;flex-direction:column;gap:10px">
+            <div style="font:500 24px/1.2 'IBM Plex Sans',sans-serif;color:#1E6B47;letter-spacing:-0.015em">Your plan survived all 100 tested scenarios.</div>
+            <div style="font:400 14px 'IBM Plex Sans',sans-serif;color:#57544C">That covers the problems we listed. It can’t promise how the real day goes.</div>
+            <button onClick="{{resetFixes}}" style="all:unset;cursor:pointer;margin-top:4px;font:400 13px 'IBM Plex Sans',sans-serif;text-decoration:underline;text-underline-offset:3px">Start over</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{tab_trust}}" hint-placeholder-val="{{false}}">
+  <section data-screen-label="04 Trust" style="max-width:1440px;margin:0 auto;padding:clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 120px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.14em;color:#57544C">04 · TRUST</span>
+        <h2 style="margin:0;font:500 clamp(36px,4.4vw,64px)/1.02 'IBM Plex Sans',sans-serif;letter-spacing:-0.04em">AI reads.<span style="font-weight:300;color:#57544C"> The checker decides.</span></h2>
+      </div>
+      <button onClick="{{replayFlow}}" style="all:unset;cursor:pointer;font:400 12px 'IBM Plex Mono',monospace;color:#57544C;border:1px solid #DAD6CB;padding:6px 12px;border-radius:2px" style-hover="border-color:#1A1916;color:#1A1916">Replay</button>
+    </div>
+    <div style="position:relative;margin-top:72px">
+      <div style="position:absolute;left:0;right:0;top:9px;height:1px;background:#DAD6CB"></div>
+      <div style="position:absolute;left:0;top:9px;height:1px;width:{{flowW}};background:#1A1916;transition:width 600ms cubic-bezier(.6,0,.2,1)"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;position:relative">
+        <sc-for list="{{flow}}" as="f" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:14px;opacity:{{f.op}};transform:translateY({{f.ty}});transition:opacity 500ms,transform 600ms cubic-bezier(.2,.7,.2,1)">
+            <span style="width:19px;height:19px;border-radius:50%;border:1px solid #1A1916;background:{{f.dot}};transition:background 400ms"></span>
+            <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:{{f.tc}}">{{f.k}}</span>
+            <span style="font:500 clamp(19px,1.9vw,26px)/1.15 'IBM Plex Sans',sans-serif;letter-spacing:-0.02em">{{f.t}}</span>
+            <span style="font:400 15px/1.5 'IBM Plex Sans',sans-serif;color:#57544C;text-wrap:pretty">{{f.b}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:absolute;top:-28px;bottom:-12px;left:calc(50% - 12px);width:0;border-left:1px dashed #1A1916"></div>
+      <div style="position:absolute;top:-34px;left:calc(50% - 4px);font:400 12px 'IBM Plex Mono',monospace;color:#1A1916;white-space:nowrap">Only the checker decides pass or fail</div>
+    </div>
+    <div style="margin-top:96px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #1A1916">
+      <sc-for list="{{outcomes}}" as="o" hint-placeholder-count="3">
+        <div onMouseEnter="{{o.enter}}" style="padding:28px 28px 28px {{o.pl}};border-right:{{o.br}};display:flex;flex-direction:column;gap:14px;background:{{o.bg}};transition:background 300ms">
+          <div style="height:40px;display:flex;align-items:center">
+            <sc-if value="{{o.isBreak}}"><svg width="36" height="36"><path d="M8 8 L28 28 M28 8 L8 28" style="fill:none;stroke:#B23A2E;stroke-width:2.4;stroke-linecap:round"></path></svg></sc-if>
+            <sc-if value="{{o.isOk}}"><svg width="36" height="36"><path d="M6 19 L14 27 L30 9" style="fill:none;stroke:#1E6B47;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"></path></svg></sc-if>
+            <sc-if value="{{o.isQ}}"><span style="font:500 34px 'IBM Plex Mono',monospace;color:#8A6410">?</span></sc-if>
+          </div>
+          <span style="font:500 22px 'IBM Plex Sans',sans-serif;color:{{o.c}}">{{o.t}}</span>
+          <span style="font:400 15px/1.5 'IBM Plex Sans',sans-serif;color:#57544C;text-wrap:pretty">{{o.b}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:40px;font:400 13px 'IBM Plex Mono',monospace;color:#57544C">What we don’t claim: that your real day will go safely, or anything beyond the problems we tested.</div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{tab_start}}" hint-placeholder-val="{{false}}">
+  <section data-screen-label="05 Start" style="max-width:1440px;margin:0 auto;padding:clamp(56px,6vw,80px) clamp(20px,3.4vw,48px) 112px;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:clamp(32px,5vw,72px);align-items:start">
+    <div style="max-width:440px;display:flex;flex-direction:column;gap:20px;padding-top:12px">
+      <span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.14em;color:#57544C">05 · START</span>
+      <h2 style="margin:0;font:500 clamp(32px,3.6vw,56px)/1.04 'IBM Plex Sans',sans-serif;letter-spacing:-0.04em">What needs to go right on Saturday?</h2>
+      <p style="margin:0;font:400 18px/1.55 'IBM Plex Sans',sans-serif;color:#57544C">Paste your plan, or try ours.</p>
+      <div style="margin-top:12px;display:flex;flex-direction:column;border-top:1px solid #DAD6CB">
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #DAD6CB;font:400 14px/1.45 'IBM Plex Sans',sans-serif"><svg width="14" height="14" style="margin-top:4px;flex:none"><path d="M2 7.5 L5.5 11 L12 3.5" style="fill:none;stroke:#1E6B47;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"></path></svg>The example works without an AI key.</div>
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #DAD6CB;font:400 14px/1.45 'IBM Plex Sans',sans-serif"><svg width="14" height="14" style="margin-top:4px;flex:none"><path d="M2 7.5 L5.5 11 L12 3.5" style="fill:none;stroke:#1E6B47;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"></path></svg>We never store your plan. Close the tab and it’s gone.</div>
+      </div>
+    </div>
+    <div style="min-width:0;display:flex;flex-direction:column;gap:16px;grid-column:auto">
+      <div style="border:1px solid {{edBorder}};background:#FBFAF6;transition:border-color 200ms">
+        <div style="display:flex;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #DAD6CB;font:400 12px 'IBM Plex Mono',monospace;color:#57544C"><span>plan.txt</span><span style="white-space:nowrap">{{lineCount}} lines · {{charText}} / 4,000</span></div>
+        <div style="display:grid;grid-template-columns:52px minmax(0,1fr);height:456px;overflow:hidden">
+          <div style="overflow:hidden;border-right:1px solid #E6E2D8;background:#F6F4EE">
+            <div ref="{{gutRef}}" style="padding:16px 0">
+              <sc-for list="{{gutter}}" as="g" hint-placeholder-count="17">
+                <div style="height:24px;text-align:right;padding-right:12px;font:400 12px/24px 'IBM Plex Mono',monospace;color:{{g.c}}">{{g.n}}</div>
+              </sc-for>
+            </div>
+          </div>
+          <textarea value="{{text}}" onChange="{{onText}}" onScroll="{{onTaScroll}}" onFocus="{{edFocus}}" onBlur="{{edBlur}}" wrap="off" spellcheck="false" aria-label="Your plan" placeholder="Paste your plan here." style="width:100%;height:100%;resize:none;border:0;outline:none;background:transparent;padding:16px 18px;font:400 14px/24px 'IBM Plex Mono',monospace;color:#1A1916;white-space:pre;overflow:auto"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <button ref="{{readRef}}" onClick="{{readPlan}}" aria-disabled="{{noTextS}}" style="all:unset;cursor:{{readCursor}};background:{{readBg}};color:{{readColor}};font:500 16px 'IBM Plex Sans',sans-serif;height:54px;padding:0 24px;display:flex;align-items:center;gap:16px;border-radius:2px;outline:{{readOutline}};outline-offset:3px;transition:background 300ms,color 300ms">Read plan<span style="font-family:'IBM Plex Mono',monospace">→</span></button>
+        <button onClick="{{loadExample}}" style="all:unset;cursor:pointer;font:400 15px 'IBM Plex Sans',sans-serif;display:flex;align-items:center;gap:8px" style-hover="color:#1E6B47">
+          <sc-if value="{{exampleLoaded}}"><svg width="14" height="14"><path d="M2 7.5 L5.5 11 L12 3.5" style="fill:none;stroke:#1E6B47;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"></path></svg></sc-if>
+          <span style="text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px">{{exampleLabel}}</span>
+        </button>
+        <button onClick="{{toggleKey}}" style="all:unset;cursor:pointer;margin-left:auto;font:400 13px 'IBM Plex Sans',sans-serif;color:#57544C;display:flex;gap:8px;align-items:center" style-hover="color:#1A1916"><span style="display:inline-block;transform:rotate({{keyRot}});transition:transform 200ms;font-family:'IBM Plex Mono',monospace">›</span>Use your own AI key</button>
+      </div>
+      <sc-if value="{{keyOpen}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <input type="password" placeholder="Paste your key" aria-label="AI key" style="width:min(360px,100%);font:400 13px 'IBM Plex Mono',monospace;padding:10px 12px;border:1px solid #CFC9BB;background:#FBFAF6;border-radius:2px;outline:none"></input>
+          <span style="font:400 12px 'IBM Plex Sans',sans-serif;color:#57544C">Your plan goes to the AI company only to be read.</span>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+  </sc-if>
+
+  </main>
+
+  <sc-if value="{{hasNext}}" hint-placeholder-val="{{true}}">
+    <button onClick="{{goNext}}" style="all:unset;cursor:pointer;display:block;width:100%;border-top:1px solid #1A1916" style-hover="background:#EFECE4">
+      <div style="max-width:1440px;margin:0 auto;padding:40px 48px;display:flex;justify-content:space-between;align-items:center;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 12px 'IBM Plex Mono',monospace;letter-spacing:0.14em;color:#57544C">NEXT</span><span style="font:500 40px/1.05 'IBM Plex Sans',sans-serif;letter-spacing:-0.03em">{{nextTitle}}</span></div>
+        <span style="width:60px;height:60px;border:1px solid #1A1916;border-radius:50%;display:flex;align-items:center;justify-content:center;font:400 22px 'IBM Plex Mono',monospace;flex:none">→</span>
+      </div>
+    </button>
+  </sc-if>
+  <footer style="border-top:1px solid #DAD6CB">
+    <div style="max-width:1440px;margin:0 auto;padding:20px 48px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font:400 12px 'IBM Plex Mono',monospace;color:#57544C">
+      <span style="display:flex;align-items:center;gap:10px"><svg width="22" height="22" viewBox="0 0 22 22" style="flex:none"><g style="fill:none;stroke:#1A1916;stroke-width:1.3"><rect x="1" y="1" width="6.5" height="6.5"></rect><rect x="1" y="7.5" width="6.5" height="6.5"></rect><rect x="7.5" y="7.5" width="6.5" height="6.5"></rect><rect x="1" y="14" width="6.5" height="6.5"></rect><rect x="7.5" y="14" width="6.5" height="6.5"></rect><rect x="14" y="14" width="6.5" height="6.5"></rect></g><path d="M9.6 16.1 L11.9 18.4 M11.9 16.1 L9.6 18.4" style="fill:none;stroke:#B23A2E;stroke-width:1.5;stroke-linecap:round"></path><circle cx="10.75" cy="17.25" r="3.6" style="fill:none;stroke:#B23A2E;stroke-width:1.1"></circle></svg>Crash-test a plan before Saturday does.</span>
+      <span>Built for Build With AI: Basics</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;breakStrength&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0.4,&quot;max&quot;:2.5,&quot;step&quot;:0.1,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;startPrefilled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;}}">
+const PLAN=['SAT FOOD RUN - plan for this weekend (pls read!!)','','Hall opens 9am. Loading bay needs the hall key - Joel has the only key. Joel is here 9 till 10:30, then he has to go.','Supply truck drops at the bay at 9.','Van is out on the early bread pickup, back by 9:30. Car is free from 9.','Everything delivered by 12 noon latest, families are waiting.','','Route A - 10 households - car - Ravi driving, about an hour. Backup: Maya, then Joel','Route B - 12 households - van, first run - Sam driving, about 35 min. Backup: Anita or Ravi',"Route C - 8 households - van, second run once it's back - Anita driving, about an hour. Backup: Sam or Ravi",'','Loading takes about 10 min per vehicle, only one vehicle in the bay at a time.','Loading team: Joel, Anita, Maya. Ravi can load his own car. Sam is just driving, not on loading.','','Times: Ravi around till 1. Anita and Sam till 12. Maya has to leave at 10:45.','Everyone can drive.'];
+const EXAMPLE=PLAN.join('\n');
+const STORY=[
+ {k:'Lines 8 to 10',t:'Every job has a person and a backup.',b:'Three routes, 30 households, five volunteers, one car and one van.',hl:[8,9,10],tick:[8,9,10]},
+ {k:'Lines 5, 9 and 10',t:'Two routes share one van.',b:'The van gets back at 9:30. Route C can only leave after Route B is done with it.',hl:[5,9,10]},
+ {k:'Line 3',t:'One key opens the loading bay.',b:'Joel has the only key, and he leaves at 10:30.',hl:[3]},
+ {k:'Lines 13 and 15',t:'The loaders leave early.',b:'Maya leaves at 10:45. Sam drives but does not load.',hl:[13,15]},
+ {k:'Lines 8 to 10',t:'It looks done. Is it?',b:'You only find out by testing what happens when one thing, or two things, go wrong.',hl:[8,9,10],q:[8,9,10],red:true}];
+const STM=[['Joel has the only loading-bay key.',3],['Joel leaves at 10:30.',3],['The van is back at 9:30.',5],['Everything is delivered by 12:00.',6],['Only one vehicle loads at a time.',12],['Loading team: Joel, Anita, Maya.',13],['Maya leaves at 10:45.',15],['GUESS',10]];
+const NAMES=['Ravi absent','Joel absent','Anita absent','Maya absent','Sam absent','Ravi leaves 90 min early','Joel leaves 90 min early','Anita leaves 90 min early','Maya leaves 90 min early','Sam leaves 90 min early','Van back 30 min late','Car back 30 min late','Supply truck 45 min late','Loading area blocked 30 min'];
+const SENT=['Ravi is absent','Joel is absent','Anita is absent','Maya is absent','Sam is absent','Ravi leaves 90 min early','Joel leaves 90 min early','Anita leaves 90 min early','Maya leaves 90 min early','Sam leaves 90 min early','the van is back 30 min late','the car is back 30 min late','the supply truck is 45 min late','the loading area is blocked for 30 min'];
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const pairText=(a,b)=>cap(SENT[a-1])+', and '+SENT[b-1]+'.';
+const FIXES=[{n:1,title:'Sam loads Route C',stats:'Fixes 2 cases. Breaks nothing new.'},{n:2,title:'Sam backs up Route A',stats:'Fixes 1 case. Breaks nothing new.'},{n:3,title:'Spare keys for Maya and Sam',stats:'Fixes the last case. Breaks nothing new.'}];
+const TABS=[['top','Overview'],['plan','Plan'],['read','Read'],['test','Crash test'],['trust','Trust'],['start','Start']];
+const pct=m=>(m/220*100).toFixed(2)+'%';
+class Component extends DCLogic {
+  state={vw:typeof window!=='undefined'?window.innerWidth:1440,tab:'top',heroIn:false,step:0,flow:0,mapHover:null,answer:null,editing:false,corrected:false,minutes:'60',confirmed:false,stage:0,runId:0,sel:[11,8],running:false,
+    cracks:[],toast:null,broke:false,text:'',loaded:false,readFocus:false,edFocused:false,keyOpen:false};
+  root=React.createRef();progRef=React.createRef();navRef=React.createRef();indRef=React.createRef();tabRef=React.createRef();heroRef=React.createRef();gridWrap=React.createRef();readRef=React.createRef();gutRef=React.createRef();minRef=React.createRef();shardLayer=React.createRef();
+  p(k,d){const v=this.props[k];if(v===undefined||v===null||v==='')return d;if(v==='true')return true;if(v==='false')return false;return v;}
+  constructor(props){super(props);
+    if(this.p('startPrefilled',false))this.state={...this.state,tab:'start',text:EXAMPLE,loaded:true,readFocus:true};
+    else{try{const t=localStorage.getItem('fc2-tab');if(t&&TABS.some(x=>x[0]===t))this.state={...this.state,tab:t};}catch(e){}}}
+  get reduce(){return !this.p('motion',true)||(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);}
+  componentDidMount(){
+    this.t0=setTimeout(()=>this.setState({heroIn:true}),this.reduce?0:120);
+    window.addEventListener('scroll',this.onScroll,{passive:true});window.addEventListener('resize',this.onResize);
+    this.onScroll();this.ind();setTimeout(this.ind,400);if(document.fonts)document.fonts.ready.then(this.ind);
+    this._tab=this.state.tab;if(this.state.tab==='trust')this.runFlow();
+  }
+  componentWillUnmount(){window.removeEventListener('scroll',this.onScroll);window.removeEventListener('resize',this.onResize);[this.t0,this.tb,this.tf].forEach(clearTimeout);clearInterval(this.typer);clearInterval(this.fi);}
+  componentDidUpdate(){if(this.state.tab!==this._tab)this.afterTab();}
+  afterTab=()=>{if(this.state.tab===this._tab)return;this._tab=this.state.tab;this.ind();this.onScroll();
+    if(!this.reduce&&this.tabRef.current)this.tabRef.current.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'none'}],{duration:560,easing:'cubic-bezier(.2,.7,.2,1)'});
+    if(this.state.tab==='trust')this.runFlow();};
+  onResize=()=>{this.setState({vw:window.innerWidth},this.ind);this.onScroll();};
+  ind=()=>{const n=this.navRef.current,i=this.indRef.current;if(!n||!i)return;const b=n.querySelector('[data-tabid="'+this.state.tab+'"]');if(!b)return;i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px';};
+  onScroll=()=>{if(this.raf)return;this.raf=requestAnimationFrame(()=>{this.raf=0;const root=this.root.current;if(!root)return;
+    const vh=window.innerHeight,max=Math.max(1,document.documentElement.scrollHeight-vh);
+    if(this.progRef.current)this.progRef.current.style.transform=`scaleX(${Math.min(1,window.scrollY/max)})`;
+    let step=0;root.querySelectorAll('[data-story-step]').forEach(el=>{if(el.getBoundingClientRect().top<vh*0.5)step=+el.getAttribute('data-story-step');});
+    if(step!==this.state.step)this.setState({step});});};
+  go=(id)=>{try{localStorage.setItem('fc2-tab',id);}catch(e){}window.scrollTo({top:0,behavior:'auto'});if(id!==this.state.tab)this.setState({tab:id,step:0},()=>requestAnimationFrame(this.afterTab));};
+  runFlow=()=>{clearInterval(this.fi);if(this.reduce){this.setState({flow:4});return;}this.setState({flow:0});let n=0;this.fi=setInterval(()=>{n++;this.setState({flow:n});if(n>=4)clearInterval(this.fi);},520);};
+  shatter=(e)=>{
+    const host=this.heroRef.current;if(!host||this.breaking)return;
+    const R=host.getBoundingClientRect(),W=R.width,H=R.height;
+    const cx=e&&e.clientX?e.clientX-R.left:W*0.4,cy=e&&e.clientY?e.clientY-R.top:H*0.5;
+    const tx=Math.min(Math.max(16,cx+24),W-280),ty=Math.min(Math.max(16,cy+28),H-90);
+    if(this.reduce){this.setState({toast:{x:tx,y:ty},broke:true});clearTimeout(this.tb);this.tb=setTimeout(()=>this.setState({toast:null}),1800);return;}
+    const K=9,str=+this.p('breakStrength',1),base=Math.random()*Math.PI*2,step=Math.PI*2/K;
+    const A=Array.from({length:K},(_,i)=>base+i*step+(Math.random()-0.5)*step*0.6);
+    const hit=a=>{const dx=Math.cos(a),dy=Math.sin(a),ts=[];if(dx>1e-6)ts.push((W-cx)/dx);if(dx<-1e-6)ts.push(-cx/dx);if(dy>1e-6)ts.push((H-cy)/dy);if(dy<-1e-6)ts.push(-cy/dy);const t=Math.min(...ts);return[cx+dx*t,cy+dy*t];};
+    const corners=[[0,0],[W,0],[W,H],[0,H]];
+    const shards=A.map((a0,i)=>{const a1=i<K-1?A[i+1]:A[0]+Math.PI*2;const pts=[[cx,cy],hit(a0)];
+      corners.map(c=>{let t=Math.atan2(c[1]-cy,c[0]-cx);while(t<a0)t+=Math.PI*2;return[t,c];}).filter(x=>x[0]<a1).sort((p,q)=>p[0]-q[0]).forEach(x=>pts.push(x[1]));
+      pts.push(hit(a1));const m=(a0+a1)/2,d=(16+Math.random()*30)*str;
+      return{i,clip:'polygon('+pts.map(p=>p[0].toFixed(1)+'px '+p[1].toFixed(1)+'px').join(',')+')',
+        dx:Math.cos(m)*d,dy:Math.sin(m)*d,rot:(Math.random()-0.5)*5*str};});
+    const cracks=[];A.forEach(a=>{const [x2,y2]=hit(a);const len=Math.hypot(x2-cx,y2-cy);cracks.push({x1:cx,y1:cy,x2,y2,len,w:1.6});
+      const f=0.18+Math.random()*0.25,bx=cx+(x2-cx)*f,by=cy+(y2-cy)*f,ba=a+(Math.random()>0.5?0.7:-0.7),bl=30+Math.random()*60;cracks.push({x1:bx,y1:by,x2:bx+Math.cos(ba)*bl,y2:by+Math.sin(ba)*bl,len:bl,w:1});});
+    const prim=host.querySelector('[data-shard="0"]'),layer=this.shardLayer.current;if(!prim||!layer)return;
+    this.breaking=true;const origin=cx.toFixed(0)+'px '+cy.toFixed(0)+'px';
+    const els=shards.map((s,i)=>{const el=i===0?prim:prim.cloneNode(true);if(i>0){el.setAttribute('data-shard',String(i));el.setAttribute('aria-hidden','true');el.style.pointerEvents='none';el.removeAttribute('data-screen-label');layer.appendChild(el);}
+      el.style.clipPath=s.clip;el.style.transformOrigin=origin;el.style.willChange='transform';return el;});
+    this.setState({cracks,toast:{x:tx,y:ty},broke:true},()=>requestAnimationFrame(()=>{
+      const D=1900;
+      els.forEach((el,i)=>{const s=shards[i];const T=`translate(${s.dx.toFixed(1)}px,${s.dy.toFixed(1)}px) rotate(${s.rot.toFixed(2)}deg)`,T2=`translate(${(s.dx*1.12).toFixed(1)}px,${(s.dy*1.12).toFixed(1)}px) rotate(${(s.rot*1.1).toFixed(2)}deg)`;
+        el.animate([{transform:'none',easing:'steps(1,end)'},{transform:'none',offset:0.1,easing:'cubic-bezier(.15,.9,.25,1)'},{transform:T,offset:0.2},{transform:T2,offset:0.58,easing:'cubic-bezier(.55,0,.15,1.25)'},{transform:'none'}],{duration:D});});
+      host.querySelectorAll('[data-crack]').forEach((el,j)=>{const L=+el.getAttribute('stroke-dasharray')||cracks[j].len;el.animate([{strokeDashoffset:cracks[j].len,opacity:1},{strokeDashoffset:0,opacity:1,offset:0.1},{opacity:0.0,offset:0.24},{opacity:0}],{duration:D,fill:'forwards'});});
+      const t=host.querySelector('[data-toast]');t&&t.animate([{opacity:0,transform:'translateY(8px)'},{opacity:0,offset:0.2,transform:'translateY(8px)'},{opacity:1,offset:0.3,transform:'none'},{opacity:1,offset:0.8},{opacity:0}],{duration:D+300,fill:'forwards'});
+      const hd=this.root.current.querySelector('[data-header]');hd&&hd.animate([{transform:'none'},{transform:'translate(-5px,2px)',offset:0.03},{transform:'translate(4px,-2px)',offset:0.06},{transform:'translate(-2px,1px)',offset:0.09},{transform:'none',offset:0.12},{transform:'none'}],{duration:D});
+      clearTimeout(this.tb);this.tb=setTimeout(()=>{prim.style.clipPath='';prim.style.willChange='';layer.replaceChildren();this.breaking=false;this.setState({cracks:[],toast:null});},D+320);}));
+  };
+  loadExample=()=>{clearInterval(this.typer);let i=0;
+    const done=()=>{this.setState({text:EXAMPLE,loaded:true,readFocus:true});const b=this.readRef.current;b&&b.focus({preventScroll:true});};
+    if(this.reduce){done();return;}
+    this.setState({text:'',loaded:false});
+    this.typer=setInterval(()=>{i++;this.setState({text:PLAN.slice(0,i).join('\n')});if(i>=PLAN.length){clearInterval(this.typer);done();}},55);};
+  isRed(r,c,stage){const k=r+'-'+c;if(stage>=3)return false;if(k==='2-2')return true;if(k==='11-3'||k==='11-8')return stage<1;if(k==='13-1')return stage<2;return false;}
+  selectCell=(r,c)=>{this.setState({sel:[r,c]});const el=this.root.current&&this.root.current.querySelector('[data-case]');if(!el||this.reduce)return;
+    if(this.isRed(r,c,this.state.stage))el.animate([{transform:'none'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'none'}],{duration:380,easing:'ease-out'});
+    else el.animate([{opacity:0.5},{opacity:1}],{duration:260});};
+  acceptFix=()=>{if(this.state.running||this.state.stage>=3)return;
+    const next=()=>this.setState(s=>({stage:s.stage+1,runId:s.runId+1,running:false}));
+    if(this.reduce){next();return;}
+    this.setState({running:true});const w=this.gridWrap.current,sc=w&&w.querySelector('[data-scan]');
+    if(sc){const h=w.offsetHeight+64;sc.animate([{transform:'translateY(0)',opacity:1},{transform:`translateY(${h}px)`,opacity:1}],{duration:820,easing:'cubic-bezier(.5,0,.3,1)'});}
+    clearTimeout(this.tf);this.tf=setTimeout(next,780);};
+  caseFor(r,c,stage){
+    const k=r+'-'+c,isPair=r!==c,code=isPair?'Problems '+c+' and '+r+' together':'Problem '+r+' on its own';
+    const title=isPair?pairText(c,r):cap(SENT[r-1])+'.';
+    const B={code,title,isPair:false,good:false,bad:false,hasWhy:false,hasTimeline:false,together:'',kind:''};
+    if(r>=6&&r<=10&&c===r-5)return{...B,headline:"Can't happen.",color:'#57544C',hasWhy:true,why:'The same person cannot be absent and leave early, so this pair is never tested.'};
+    if(stage>=3)return{...B,headline:'Survives.',color:'#1E6B47',good:true};
+    if(k==='2-2')return{...B,headline:'Breaks on its own.',color:'#B23A2E',bad:true,hasWhy:true,why:'Joel has the only bay key. Without him, nothing loads.'};
+    if(r===2||c===2)return{...B,headline:'Already broken.',color:'#57544C',hasWhy:true,why:'Joel absent breaks the plan alone. The pair adds nothing new.'};
+    if(['11-3','11-8','13-1'].includes(k)){const fixed=k==='13-1'?stage>=2:stage>=1;
+      if(fixed)return{...B,headline:'Now survives.',color:'#1E6B47',good:true,hasTimeline:k==='11-8'};
+      return{...B,isPair:true,together:'the plan breaks.',headline:k==='11-8'?'8 households get no food.':'A hidden pair breaks it.',color:'#B23A2E',bad:true,hasTimeline:k==='11-8'};}
+    return{...B,headline:'Survives.',color:'#1E6B47',good:true};}
+  timeline(after){
+    const bar=(s,e,label,kind,show=true)=>{const load=kind==='load';return{l:pct(s),w:pct(Math.max(0,e-s)),top:load?'18px':'28px',h:load?'6px':'20px',bg:load?'#CFC9BB':'#4D4F45',op:show?1:0,label,ltop:load?'2px':'31px',lc:load?'#57544C':'#F6F4EE',pl:load?'0':'8px'};};
+    return after?[{route:'Route A',veh:'car',msgOp:0,bars:[bar(0,10,'Load','load'),bar(45,105,'Ravi','drive')]},{route:'Route B',veh:'van',msgOp:0,bars:[bar(60,70,'Load','load'),bar(70,105,'Sam','drive')]},{route:'Route C',veh:'van',msgOp:0,bars:[bar(105,115,'Load: Sam','load'),bar(120,175,'Ravi','drive')]}]
+      :[{route:'Route A',veh:'car',msgOp:0,bars:[bar(105,115,'Load','load'),bar(115,175,'Ravi','drive')]},{route:'Route B',veh:'van',msgOp:0,bars:[bar(60,70,'Load','load'),bar(70,105,'Sam','drive')]},{route:'Route C',veh:'van',msgOp:1,bars:[bar(105,105,'','load',false),bar(120,120,'','drive',false)]}];}
+  renderVals(){
+    const st=this.state,ti=TABS.findIndex(t=>t[0]===st.tab),nx=TABS[ti+1];
+    const tabFlags={};TABS.forEach(([id])=>tabFlags['tab_'+id]=st.tab===id);
+    const S=STORY[st.step]||STORY[0];
+    const storyLines=PLAN.map((t,i)=>{const n=i+1,hl=S.hl.includes(n);return{n,text:t,bg:hl?'#ECE9E0':'transparent',bl:hl?(S.red?'#B23A2E':'#1A1916'):'transparent',color:hl?'#1A1916':'#9A958A',tick:!!(S.tick&&S.tick.includes(n)),q:!!(S.q&&S.q.includes(n))};});
+    const story=STORY.map((s,i)=>({i,k:s.k,t:s.t,b:s.b,tc:s.red?'#B23A2E':'#1A1916',op:i===st.step?1:0.22}));
+    const mh=st.mapHover,hs=Array.isArray(mh)?mh:mh?[mh]:[];
+    const mapLines=PLAN.map((t,i)=>{const n=i+1,on=hs.includes(n);return{n,text:t,bg:on?'#E9E5D9':'transparent',bl:on?'#1A1916':'transparent',tc:hs.length&&!on?'#9A958A':'#1A1916',nc:on?'#1A1916':'#9A958A'};});
+    const stm=STM.map(([t,l])=>{const g=t==='GUESS';return{t,l,enter:()=>this.setState({mapHover:l}),bg:mh===l?'#EFECE4':'transparent',isPlain:!g,isGuess:g&&!st.editing&&!st.corrected,isEdit:g&&st.editing,isFixed:g&&st.corrected};});
+    const ready=st.corrected&&!!st.answer;
+    const save=()=>this.setState({editing:false,corrected:!!this.state.minutes});
+    const cs=this.caseFor(st.sel[0],st.sel[1],st.stage);
+    const fl=st.flow;
+    const FLOW=[['YOU','Write the plan','In plain words, the way you’d text your team.'],['AI','Reads it','Finds the people, vehicles, routes and times. Asks you when unsure.'],['CHECKER','Tests it','Runs 100 tests. No AI here, just rules and maths.'],['CHECKER','Shows the proof','Every result comes with the exact case behind it.']];
+    const lineCount=st.text?st.text.split('\n').length:0,noText=!st.text.trim();
+    const vw=st.vw;
+    return {...tabFlags,heroCell:vw>=1380?32:vw>=1120?28:26,testCell:vw>=1360?28:26,testLabels:vw>=1360?'names':'numbers',root:this.root,progRef:this.progRef,navRef:this.navRef,indRef:this.indRef,tabRef:this.tabRef,heroRef:this.heroRef,gridWrap:this.gridWrap,readRef:this.readRef,gutRef:this.gutRef,minRef:this.minRef,
+      tabs:TABS.map(([id,label])=>({id,label,sel:st.tab===id?'true':'false',color:st.tab===id?'#1A1916':'#77736A',go:()=>this.go(id)})),
+      goTop:()=>this.go('top'),goTest:()=>this.go('test'),goRead:()=>this.go('read'),
+      tryExample:()=>{this.go('start');setTimeout(this.loadExample,this.reduce?0:400);},
+      hasNext:!!nx,nextTitle:nx?nx[1]:'',goNext:()=>nx&&this.go(nx[0]),
+      heroT:st.heroIn?'0%':'110%',heroOp:st.heroIn?1:0,penOff:st.heroIn?0:260,hintOp:st.heroIn&&!st.broke?1:0,
+      shardLayer:this.shardLayer,cracks:st.cracks,hasToast:!!st.toast,toast:st.toast||{x:0,y:0},shatter:this.shatter,
+      storyLines,story,mapLines,stm,mapHint:hs.length?'line '+hs.join(', '):'16 lines',mapLeave:()=>this.setState({mapHover:null}),
+      hoverQ:()=>this.setState({mapHover:[13]}),qOpen:!st.answer,qDone:!!st.answer,answerText:st.answer,
+      answerCar:()=>this.setState({answer:'Only his car'}),answerVan:()=>this.setState({answer:'The van too'}),reopenQ:()=>this.setState({answer:null}),
+      qBorder:st.answer?'#CFE0D3':'#D9B45A',qBg:st.answer?'#F4F8F4':'#FBF6E9',qTag:st.answer?'#1E6B47':'#8A6410',qKicker:st.answer?'ANSWERED':'WE NEED ONE ANSWER',
+      minutes:st.minutes,onMinutes:e=>this.setState({minutes:e.target.value.replace(/[^0-9]/g,'').slice(0,3)}),minKey:e=>{if(e.key==='Enter')save();},
+      startEdit:()=>this.setState({editing:true},()=>setTimeout(()=>this.minRef.current&&this.minRef.current.focus(),30)),saveCorrection:save,
+      confText:`${st.corrected?24:23} of 24 details checked, ${st.answer?'no questions left':'1 question left'}`,notReadyS:ready?'false':'true',
+      confBg:st.confirmed?'#1A1916':ready?'#1E6B47':'#E4E0D6',confColor:ready?'#F6F4EE':'#77736A',confCursor:ready?'pointer':'not-allowed',confLabel:st.confirmed?'Confirmed':'Confirm plan',
+      confirmPlan:()=>{if(!ready)return;this.setState({confirmed:true});setTimeout(()=>{this.go('test');this.setState(s=>({runId:s.runId+1}));},this.reduce?0:450);},
+      stage:st.stage,runId:st.runId,selR:st.sel[0],selC:st.sel[1],selectCell:this.selectCell,cs,
+      tl:this.timeline(st.stage>=1),axis:[['9:00',0],['10:00',60],['11:00',120],['12:30',210]].map(([t,m])=>({t,x:pct(m)})),
+      hasFix:st.stage<3,fix:FIXES[Math.min(2,st.stage)],fixBtn:st.running?'Running all 100 tests again…':'Apply fix and retest',acceptFix:this.acceptFix,
+      allClear:st.stage>=3,resetFixes:()=>this.setState(s=>({stage:0,runId:s.runId+1,sel:[11,8]})),
+      flow:FLOW.map(([k,t,b],i)=>({k,t,b,op:fl>i?1:0.18,ty:fl>i?'0px':'12px',dot:fl>i?(i>=2?'#1E6B47':'#1A1916'):'#F6F4EE',tc:i>=2?'#1E6B47':'#57544C'})),
+      flowW:['0%','12.5%','37.5%','62.5%','100%'][fl],replayFlow:this.runFlow,
+      outcomes:[{isBreak:true,t:'Breaks',c:'#B23A2E',b:'We show you the exact case, the timeline and why.',br:'1px solid #DAD6CB',pl:'0px'},
+        {isOk:true,t:'Survives',c:'#1E6B47',b:'Nothing failed in our tests. That’s not a promise about the real day.',br:'1px solid #DAD6CB',pl:'28px'},
+        {isQ:true,t:'Unknown',c:'#8A6410',b:'Something was unclear, so we say so. It never counts as a pass.',br:'none',pl:'28px'}].map(o=>({...o,bg:'transparent',enter:()=>{}})),
+      text:st.text,onText:e=>this.setState({text:e.target.value.slice(0,4000),loaded:false}),
+      onTaScroll:e=>{if(this.gutRef.current)this.gutRef.current.style.transform=`translateY(${-e.target.scrollTop}px)`;},
+      edFocus:()=>this.setState({edFocused:true}),edBlur:()=>this.setState({edFocused:false}),edBorder:st.edFocused?'#1A1916':'#CFC9BB',
+      lineCount,gutter:Array.from({length:Math.max(17,lineCount)},(_,i)=>({n:i+1,c:i<lineCount?'#57544C':'#C9C3B4'})),charText:st.text.length.toLocaleString('en-US'),noTextS:noText?'true':'false',
+      readBg:noText?'#E4E0D6':'#1E6B47',readColor:noText?'#77736A':'#F6F4EE',readCursor:noText?'not-allowed':'pointer',readOutline:st.readFocus&&!noText?'2px solid #1A1916':'none',
+      readPlan:()=>{if(noText)return;this.setState({readFocus:false});this.go('read');},
+      loadExample:this.loadExample,exampleLoaded:st.loaded,exampleLabel:st.loaded?'Example plan loaded':'Try the example plan',
+      toggleKey:()=>this.setState(s=>({keyOpen:!s.keyOpen})),keyOpen:st.keyOpen,keyRot:st.keyOpen?'90deg':'0deg'};
+  }
+}
+</script>
+</body>
+</html>

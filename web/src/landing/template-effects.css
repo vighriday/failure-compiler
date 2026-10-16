@@ -1,0 +1,19 @@
+/* Hover, active and focus states carried over from the supplied v2 design. */
+.landing-effect-0:hover { color:#1A1916 !important }
+.landing-effect-1:hover { background:#185A3B !important }
+.landing-effect-2:hover { color:#9C3227 !important }
+.landing-effect-3:hover { background:#185A3B !important }
+.landing-effect-4:focus-visible { outline:2px solid #1A1916 !important;outline-offset:3px !important }
+.landing-effect-5:hover { background:#1A1916 !important;color:#F6F4EE !important }
+.landing-effect-6:focus-visible { outline:2px solid #1A1916 !important;outline-offset:3px !important }
+.landing-effect-7:hover { background:#1A1916 !important;color:#F6F4EE !important }
+.landing-effect-8:hover { border-color:#1A1916 !important }
+.landing-effect-9:hover { border-color:#1A1916 !important }
+.landing-effect-10:hover { border-color:#8A6410 !important }
+.landing-effect-11:hover { background:#185A3B !important }
+.landing-effect-12:focus-visible { outline:2px solid #1A1916 !important;outline-offset:3px !important }
+.landing-effect-13:hover { border-color:#1A1916 !important;color:#1A1916 !important }
+.landing-effect-14:hover { color:#1E6B47 !important }
+.landing-effect-15:hover { color:#1A1916 !important }
+.landing-effect-16:hover { background:#EFECE4 !important }
+.landing-effect-17:hover { border-color:#1A1916 !important }

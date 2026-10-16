@@ -14,3 +14,6 @@ __pycache__/
 /node_modules/
 /web/dist/
 /devpost/screens/
+
+# Original design archive; editable templates are kept in design/landing-v2.
+/Landing page.zip

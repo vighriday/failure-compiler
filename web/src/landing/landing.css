@@ -1,0 +1,48 @@
+/* Layout and accessibility additions to the supplied v2 design. */
+html { scroll-padding-top: 88px; }
+body { -webkit-font-smoothing: antialiased; }
+::selection { background: #1a1916; color: #f6f4ee; }
+.landing-root { --paper: #fbfaf6; --line: #dad6cb; --line-light: #e6e2d8; --ink-soft: #57544c; --ink-faint: #57544c; --color-tick: #1e6b47; --color-cross: #b23a2e; --color-amber: #8a6410; --color-action: #1e6b47; }
+.landing-root button:focus-visible, .landing-root [role="button"]:focus-visible, .landing-root input:focus-visible, .landing-root select:focus-visible, .landing-root textarea:focus-visible { outline: 2px solid #1a1916 !important; outline-offset: 3px !important; }
+.landing-root button:disabled { cursor: not-allowed !important; }
+.landing-root button:not(:disabled):active { translate: 0 1px; }
+.landing-root [data-nav]::-webkit-scrollbar { display: none; }
+.landing-root [data-nav] { flex: 0 1 auto; }
+.landing-root main:focus { outline: none; }
+.skip-to-content { position: fixed; top: 8px; left: 16px; z-index: 100; padding: 12px 16px; background: #1a1916; color: #f6f4ee; transform: translateY(-180%); }
+.skip-to-content:focus { transform: none; }
+.sample-grid { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 3px; }
+.landing-error { grid-column: 1 / -1; padding: 14px 18px; border: 1px solid #b23a2e; color: #b23a2e; background: #fbfaf6; font-size: 14px; line-height: 1.5; }
+.sample-notice { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 16px; margin-bottom: 28px; background: #efece4; border: 1px solid #dad6cb; color: #57544c; font-size: 13px; line-height: 1.5; }
+.sample-notice button { border: 0; background: none; color: #1e6b47; text-decoration: underline; cursor: pointer; }
+.landing-root [data-crack] { animation: crack-draw 1.9s ease-out forwards; }
+.landing-root [data-toast] { z-index: 3; animation: break-toast 2.3s ease both; }
+@keyframes crack-draw { 0% { stroke-dashoffset: 900; opacity: 1; } 12% { stroke-dashoffset: 0; opacity: 1; } 26%, 100% { opacity: 0; } }
+@keyframes break-toast { 0%, 20% { opacity: 0; transform: translateY(8px); } 30%, 82% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@media (max-width: 1100px) { .landing-root [data-hcta] { display: none !important; } }
+@media (max-width: 860px) {
+  .landing-root [data-header] > div:first-child { gap: 16px !important; }
+  .landing-root [data-header] > div:first-child > button > span { display: none !important; }
+  .landing-root [data-nav] { flex: 1; margin: 0 !important; }
+  .landing-root [data-nav] button { padding-inline: 12px !important; }
+  .landing-root [data-shard="0"] > div > div:first-child { grid-template-columns: minmax(0, 1fr) !important; padding-block: 28px; }
+  .landing-root [data-shard="0"] > div > div:first-child > div:last-child { justify-self: center; }
+  .landing-root [data-shard="0"] > div > div:last-child { height: auto !important; min-height: 64px; padding-block: 12px; flex-wrap: wrap; gap: 8px !important; }
+  .landing-root [data-screen-label="05 Start"] { grid-template-columns: minmax(0, 1fr) !important; }
+  .landing-root [data-screen-label="04 Trust"] > div:nth-child(2) > div:nth-child(3) { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; row-gap: 44px !important; }
+  .landing-root [data-screen-label="04 Trust"] > div:nth-child(2) > div:nth-last-child(-n+2) { display: none; }
+  .landing-root [data-screen-label="04 Trust"] > div:nth-child(3) { grid-template-columns: minmax(0, 1fr) !important; }
+  .landing-root [data-screen-label="04 Trust"] > div:nth-child(3) > div { border-right: 0 !important; border-bottom: 1px solid #dad6cb; padding-left: 0 !important; }
+  .landing-root footer > div { padding-inline: 20px !important; }
+}
+@media (max-width: 720px) {
+  .landing-root [data-screen-label="01 Plan"] > div:nth-child(2) { grid-template-columns: minmax(0, 1fr) !important; }
+  .landing-root [data-screen-label="01 Plan"] > div:nth-child(2) > div:first-child { position: relative !important; top: auto !important; }
+  .landing-root [data-story-step] { min-height: 45vh !important; }
+  .landing-root [data-screen-label="02 Read"] > div:nth-child(2) > div:first-child { position: relative !important; top: auto !important; }
+  .landing-root [data-screen-label="03 Test"] [data-case] { padding: 18px !important; }
+  .landing-root > button > div { padding: 28px 20px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-root *, .landing-root *::before, .landing-root *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
