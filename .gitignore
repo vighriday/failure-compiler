@@ -17,3 +17,6 @@ __pycache__/
 
 # Original design archive; editable templates are kept in design/landing-v2.
 /Landing page.zip
+
+# Local agent memory; project notes belong in the docs, not the repository.
+/.oxcode-memory/
