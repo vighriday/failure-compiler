@@ -7,10 +7,10 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
   return <>
 
 <div ref={v.root} style={{"background": "#F6F4EE", "color": "#1A1916", "fontFamily": "'IBM Plex Sans',sans-serif", "minHeight": "100vh", "overflowX": "clip"} as CSSProperties} className="landing-root">
-<header data-header={"1"} style={{"position": "sticky", "top": "0", "zIndex": "40", "background": "#F6F4EE", "borderBottom": "1px solid #DAD6CB"} as CSSProperties}>
+<header data-header={"1"} style={{"position": "sticky", "top": "0", "zIndex": "40", "background": "#F6F4EE", "borderBottom": "1px solid #DAD6CB"} as CSSProperties} aria-label="Site header">
 <div style={{"maxWidth": "1440px", "margin": "0 auto", "padding": "0 clamp(20px,3.4vw,48px)", "height": "64px", "display": "flex", "alignItems": "center", "gap": "32px"} as CSSProperties}>
-<button onClick={v.goTop} style={{"all": "unset", "cursor": "pointer", "display": "flex", "alignItems": "center", "gap": "10px", "flex": "none"} as CSSProperties} type="button">
-<svg width={"22"} height={"22"} viewBox={"0 0 22 22"} style={{"flex": "none"} as CSSProperties}><g style={{"fill": "none", "stroke": "#1A1916", "strokeWidth": "1.3"} as CSSProperties}><rect x={"1"} y={"1"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"14"} y={"14"} width={"6.5"} height={"6.5"}></rect></g><path d={"M9.6 16.1 L11.9 18.4 M11.9 16.1 L9.6 18.4"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.5", "strokeLinecap": "round"} as CSSProperties}></path><circle cx={"10.75"} cy={"17.25"} r={"3.6"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.1"} as CSSProperties}></circle></svg>
+<button onClick={v.goTop} style={{"all": "unset", "cursor": "pointer", "display": "flex", "alignItems": "center", "gap": "10px", "flex": "none"} as CSSProperties} type="button" aria-label="Failure Compiler home">
+<svg width={"22"} height={"22"} viewBox={"0 0 22 22"} style={{"flex": "none"} as CSSProperties} aria-hidden="true"><g style={{"fill": "none", "stroke": "#1A1916", "strokeWidth": "1.3"} as CSSProperties}><rect x={"1"} y={"1"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"14"} y={"14"} width={"6.5"} height={"6.5"}></rect></g><path d={"M9.6 16.1 L11.9 18.4 M11.9 16.1 L9.6 18.4"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.5", "strokeLinecap": "round"} as CSSProperties}></path><circle cx={"10.75"} cy={"17.25"} r={"3.6"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.1"} as CSSProperties}></circle></svg>
 <span style={{"display": "flex", "alignItems": "baseline", "gap": "5px", "font": "600 15px 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.015em"} as CSSProperties}>{"Failure"}<span style={{"font": "400 15px 'IBM Plex Mono',monospace", "letterSpacing": "-0.02em", "color": "#57544C"} as CSSProperties}>{"compiler"}</span></span>
 </button>
 <nav ref={v.navRef} data-nav={"1"} role={"tablist"} style={{"position": "relative", "display": "flex", "margin": "0 auto", "overflowX": "auto", "scrollbarWidth": "none", "minWidth": "0", "height": "64px"} as CSSProperties} aria-label="Explore Failure Compiler" onKeyDown={v.onNavKeyDown}>
@@ -19,7 +19,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </Fragment>)}
 <div ref={v.indRef} style={{"position": "absolute", "bottom": "0", "left": "0", "width": "0", "height": "2px", "background": "#1A1916", "transition": "left 460ms cubic-bezier(.65,0,.2,1),width 460ms cubic-bezier(.65,0,.2,1)"} as CSSProperties}></div>
 </nav>
-<button data-hcta={"1"} onClick={v.tryExample} style={{"all": "unset", "cursor": "pointer", "flex": "none", "background": "#1E6B47", "color": "#F6F4EE", "font": "500 13px 'IBM Plex Sans',sans-serif", "height": "36px", "padding": "0 14px", "display": "flex", "alignItems": "center", "gap": "10px", "borderRadius": "2px", "whiteSpace": "nowrap"} as CSSProperties} type="button" className="landing-effect-1">{"Try the example"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties}>{"→"}</span></button>
+<button data-hcta={"1"} onClick={v.tryExample} style={{"all": "unset", "cursor": "pointer", "flex": "none", "background": "#1E6B47", "color": "#F6F4EE", "font": "500 13px 'IBM Plex Sans',sans-serif", "height": "36px", "padding": "0 14px", "display": "flex", "alignItems": "center", "gap": "10px", "borderRadius": "2px", "whiteSpace": "nowrap"} as CSSProperties} type="button" className="landing-effect-1">{"Try the example"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button>
 </div>
 <div ref={v.progRef} style={{"position": "absolute", "left": "0", "bottom": "-1px", "height": "1px", "width": "100%", "background": "#1A1916", "transformOrigin": "0 50%", "transform": "scaleX(0)"} as CSSProperties}></div>
 </header>
@@ -35,11 +35,11 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 <span style={{"display": "block", "overflow": "hidden", "paddingBottom": "0.16em", "marginBottom": "-0.16em"} as CSSProperties}><span style={{"display": "block", "transform": `translateY(${v.heroT})`, "transition": "transform 1100ms cubic-bezier(.2,.75,.1,1) 60ms"} as CSSProperties}>{"Your plan says"}</span></span>
 <span style={{"display": "block", "overflow": "hidden", "paddingBottom": "0.16em", "marginBottom": "-0.16em"} as CSSProperties}><span style={{"display": "block", "transform": `translateY(${v.heroT})`, "transition": "transform 1100ms cubic-bezier(.2,.75,.1,1) 140ms"} as CSSProperties}>{"everything will work."}</span></span>
 <span style={{"display": "block", "overflow": "hidden", "paddingBottom": "0.16em", "marginBottom": "-0.16em", "fontWeight": "300", "color": "#57544C"} as CSSProperties}><span style={{"display": "block", "transform": `translateY(${v.heroT})`, "transition": "transform 1100ms cubic-bezier(.2,.75,.1,1) 260ms"} as CSSProperties}>{"We prove where"}</span></span>
-<span style={{"display": "block", "overflow": "hidden", "padding": "0 90px 0.4em 0", "marginBottom": "-0.4em", "fontWeight": "300", "color": "#57544C"} as CSSProperties}><span style={{"display": "block", "transform": `translateY(${v.heroT})`, "transition": "transform 1100ms cubic-bezier(.2,.75,.1,1) 340ms"} as CSSProperties}>{"it "}<button onClick={v.shatter} aria-label={"Break the page"} style={{"all": "unset", "cursor": "pointer", "position": "relative", "display": "inline-block", "color": "#B23A2E", "fontWeight": "500"} as CSSProperties} type="button" className="landing-effect-2">{"breaks."}<svg viewBox={"0 0 250 18"} preserveAspectRatio={"none"} style={{"position": "absolute", "left": "0", "bottom": "-0.2em", "width": "100%", "height": "0.24em", "overflow": "visible"} as CSSProperties}><path pathLength={"260"} d={"M3 10 C 70 3, 160 3, 244 9"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "2.4", "vectorEffect": "non-scaling-stroke", "strokeLinecap": "round", "strokeDasharray": "260", "strokeDashoffset": v.penOff, "transition": "stroke-dashoffset 800ms cubic-bezier(.6,0,.2,1) 1150ms"} as CSSProperties}></path></svg><span style={{"position": "absolute", "left": "calc(100% + 18px)", "top": "50%", "transform": "translateY(-50%)", "font": "400 12px 'IBM Plex Mono',monospace", "letterSpacing": "0", "color": "#57544C", "whiteSpace": "nowrap", "opacity": v.hintOp, "transition": "opacity 500ms ease 1800ms"} as CSSProperties}>{"← click"}</span></button></span></span>
+<span style={{"display": "block", "overflow": "hidden", "padding": "0 90px 0.4em 0", "marginBottom": "-0.4em", "fontWeight": "300", "color": "#57544C"} as CSSProperties}><span style={{"display": "block", "transform": `translateY(${v.heroT})`, "transition": "transform 1100ms cubic-bezier(.2,.75,.1,1) 340ms"} as CSSProperties}>{"it "}<button onClick={v.shatter} aria-label={"Break the page"} style={{"all": "unset", "cursor": "pointer", "position": "relative", "display": "inline-block", "color": "#B23A2E", "fontWeight": "500"} as CSSProperties} type="button" className="landing-effect-2">{"breaks."}<svg viewBox={"0 0 250 18"} preserveAspectRatio={"none"} style={{"position": "absolute", "left": "0", "bottom": "-0.2em", "width": "100%", "height": "0.24em", "overflow": "visible"} as CSSProperties} aria-hidden="true"><path pathLength={"260"} d={"M3 10 C 70 3, 160 3, 244 9"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "2.4", "vectorEffect": "non-scaling-stroke", "strokeLinecap": "round", "strokeDasharray": "260", "strokeDashoffset": v.penOff, "transition": "stroke-dashoffset 800ms cubic-bezier(.6,0,.2,1) 1150ms"} as CSSProperties}></path></svg><span style={{"position": "absolute", "left": "calc(100% + 18px)", "top": "50%", "transform": "translateY(-50%)", "font": "400 12px 'IBM Plex Mono',monospace", "letterSpacing": "0", "color": "#57544C", "whiteSpace": "nowrap", "opacity": v.hintOp, "transition": "opacity 500ms ease 1800ms"} as CSSProperties}>{"← click"}</span></button></span></span>
 </h1>
 <p style={{"margin": "0", "maxWidth": "460px", "font": "400 clamp(16px,1.35vw,19px)/1.55 'IBM Plex Sans',sans-serif", "color": "#57544C", "textWrap": "pretty", "opacity": v.heroOp, "transition": "opacity 800ms ease 600ms"} as CSSProperties}>{"Paste your plan. We test what could go wrong, one problem at a time and two at once, and show you exactly where it fails."}</p>
 <div style={{"display": "flex", "flexWrap": "wrap", "alignItems": "center", "gap": "12px", "opacity": v.heroOp, "transition": "opacity 800ms ease 720ms"} as CSSProperties}>
-<button onClick={v.tryExample} style={{"all": "unset", "cursor": "pointer", "background": "#1E6B47", "color": "#F6F4EE", "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 24px", "display": "flex", "alignItems": "center", "gap": "16px", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-3 landing-effect-4">{"Try the example plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties}>{"→"}</span></button>
+<button onClick={v.tryExample} style={{"all": "unset", "cursor": "pointer", "background": "#1E6B47", "color": "#F6F4EE", "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 24px", "display": "flex", "alignItems": "center", "gap": "16px", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-3 landing-effect-4">{"Try the example plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button>
 <button onClick={v.goTest} style={{"all": "unset", "cursor": "pointer", "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 22px", "display": "flex", "alignItems": "center", "border": "1px solid #1A1916", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-5 landing-effect-6">{"See what breaks"}</button>
 </div>
 </div>
@@ -49,12 +49,12 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 <div style={{"marginTop": "48px", "borderTop": "1px solid #DAD6CB", "height": "52px", "display": "flex", "alignItems": "center", "justifyContent": "space-between", "gap": "24px", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}>
 <span >{"On the right: a sample Saturday food run, already tested."}</span>
-<span >{"Free to try. No sign-up, no AI key, and we never store your plan."}</span>
+<span >{"No sign-up. The example needs no AI key. No plan is saved to disk."}</span>
 </div>
 </div>
 </div>
 <div ref={v.shardLayer} style={{"display": "contents"} as CSSProperties}></div>
-<svg width={"100%"} height={"100%"} style={{"position": "absolute", "inset": "0", "pointerEvents": "none", "overflow": "visible"} as CSSProperties}>
+<svg width={"100%"} height={"100%"} style={{"position": "absolute", "inset": "0", "pointerEvents": "none", "overflow": "visible"} as CSSProperties} aria-hidden="true">
 {v.cracks.map((c, index) => <Fragment key={index}>
 <line data-crack={"1"} x1={c.x1} y1={c.y1} x2={c.x2} y2={c.y2} style={{"stroke": "#1A1916", "strokeWidth": c.w, "strokeDasharray": c.len, "strokeDashoffset": c.len, "strokeLinecap": "round"} as CSSProperties}></line>
 </Fragment>)}
@@ -82,7 +82,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 {v.storyLines.map((l, index) => <Fragment key={index}>
 <div style={{"display": "grid", "gridTemplateColumns": "52px minmax(0,1fr)", "background": l.bg, "boxShadow": `inset 2px 0 0 ${l.bl}`, "transition": "background 400ms,box-shadow 400ms"} as CSSProperties}>
 <div style={{"display": "flex", "justifyContent": "flex-end", "gap": "6px", "padding": "4px 12px 4px 0", "font": "400 12px/20px 'IBM Plex Mono',monospace", "color": "#77736A"} as CSSProperties}>
-{l.tick && <><svg width={"14"} height={"20"}><path d={"M2 10.5 L5.5 14 L12 6.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
+{l.tick && <><svg width={"14"} height={"20"} aria-hidden="true"><path d={"M2 10.5 L5.5 14 L12 6.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
 {l.q && <><span style={{"color": "#8A6410", "fontWeight": "500"} as CSSProperties}>{"?"}</span></>}
 <span >{l.n}</span>
 </div>
@@ -100,19 +100,19 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 <p style={{"margin": "0", "font": "400 18px/1.55 'IBM Plex Sans',sans-serif", "color": "#57544C", "textWrap": "pretty"} as CSSProperties}>{s.b}</p>
 </div>
 </Fragment>)}
-<div style={{"padding": "0 0 120px"} as CSSProperties}><button onClick={v.goRead} style={{"all": "unset", "cursor": "pointer", "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "52px", "padding": "0 22px", "display": "inline-flex", "alignItems": "center", "gap": "14px", "border": "1px solid #1A1916", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-7">{"Read the plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties}>{"→"}</span></button></div>
+<div style={{"padding": "0 0 120px"} as CSSProperties}><button onClick={v.goRead} style={{"all": "unset", "cursor": "pointer", "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "52px", "padding": "0 22px", "display": "inline-flex", "alignItems": "center", "gap": "14px", "border": "1px solid #1A1916", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-7">{"Read the plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button></div>
 </div>
 </div>
 </section>
 </>}
-{v.tab_read && (readContent ?? <>
+{v.tab_read && (readContent ?? <><div className="sample-notice"><span>Interactive design preview of the locked example. No live checker is running here.</span><button type="button" onClick={v.tryExample}>Start the live example →</button></div><>
 <section data-screen-label={"02 Read"} style={{"maxWidth": "1440px", "margin": "0 auto", "padding": "clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 120px"} as CSSProperties}>
 <div style={{"display": "flex", "flexWrap": "wrap", "justifyContent": "space-between", "alignItems": "flex-end", "gap": "24px"} as CSSProperties}>
 <div style={{"display": "flex", "flexDirection": "column", "gap": "16px"} as CSSProperties}>
 <span style={{"font": "400 12px 'IBM Plex Mono',monospace", "letterSpacing": "0.14em", "color": "#57544C"} as CSSProperties}>{"02 · READ"}</span>
 <h2 style={{"margin": "0", "font": "500 clamp(36px,4.4vw,64px)/1.02 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.04em"} as CSSProperties}>{"Here’s what we understood."}</h2>
 </div>
-<span style={{"font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "maxWidth": "340px"} as CSSProperties}>{"This is a sample reading we wrote for the example. With your own key, AI writes it."}</span>
+<span style={{"font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "maxWidth": "340px"} as CSSProperties}>{"Hand-written design preview. Start the example to review all 24 details and run the live checker."}</span>
 </div>
 <div style={{"display": "grid", "gridTemplateColumns": "repeat(auto-fit,minmax(min(100%,340px),1fr))", "gap": "clamp(28px,4vw,48px)", "marginTop": "clamp(32px,4vw,56px)", "alignItems": "start"} as CSSProperties}>
 <div style={{"maxWidth": "560px", "position": "sticky", "top": "96px", "background": "#FBFAF6", "border": "1px solid #DAD6CB"} as CSSProperties}>
@@ -127,7 +127,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 </div>
 <div style={{"minWidth": "0", "display": "flex", "flexDirection": "column", "gap": "20px"} as CSSProperties}>
-<div onMouseEnter={v.hoverQ} onMouseLeave={v.mapLeave} style={{"border": `1px solid ${v.qBorder}`, "background": v.qBg, "padding": "20px 22px", "display": "flex", "flexDirection": "column", "gap": "14px", "transition": "background 400ms,border-color 400ms"} as CSSProperties}>
+<div onMouseEnter={v.hoverQ} onMouseLeave={v.mapLeave} style={{"border": `1px solid ${v.qBorder}`, "background": v.qBg, "padding": "20px 22px", "display": "flex", "flexDirection": "column", "gap": "14px", "transition": "background 400ms,border-color 400ms"} as CSSProperties} onFocus={v.hoverQ} onBlur={v.mapLeave} tabIndex={0}>
 <div style={{"display": "flex", "justifyContent": "space-between", "font": "400 12px 'IBM Plex Mono',monospace", "color": v.qTag} as CSSProperties}><span >{v.qKicker}</span><span >{"line 13"}</span></div>
 <div style={{"font": "500 22px/1.3 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.015em"} as CSSProperties}>{"Ravi can load his own car. Can he load the van too?"}</div>
 {v.qOpen && <>
@@ -137,20 +137,20 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 </>}
 {v.qDone && <>
-<div style={{"display": "flex", "alignItems": "center", "gap": "8px", "font": "400 14px 'IBM Plex Sans',sans-serif", "color": "#1E6B47"} as CSSProperties}><svg width={"14"} height={"14"}><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg>{v.answerText}<button onClick={v.reopenQ} style={{"all": "unset", "cursor": "pointer", "marginLeft": "8px", "color": "#57544C", "textDecoration": "underline", "textUnderlineOffset": "3px"} as CSSProperties} type="button">{"Change"}</button></div>
+<div style={{"display": "flex", "alignItems": "center", "gap": "8px", "font": "400 14px 'IBM Plex Sans',sans-serif", "color": "#1E6B47"} as CSSProperties}><svg width={"14"} height={"14"} aria-hidden="true"><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg>{v.answerText}<button onClick={v.reopenQ} style={{"all": "unset", "cursor": "pointer", "marginLeft": "8px", "color": "#57544C", "textDecoration": "underline", "textUnderlineOffset": "3px"} as CSSProperties} type="button">{"Change"}</button></div>
 </>}
 </div>
 <div style={{"borderTop": "1px solid #1A1916"} as CSSProperties}>
 {v.stm.map((it, index) => <Fragment key={index}>
-<div onMouseEnter={it.enter} onMouseLeave={v.mapLeave} style={{"display": "grid", "gridTemplateColumns": "minmax(0,1fr) auto", "gap": "16px", "alignItems": "center", "padding": "14px 12px", "margin": "0 -12px", "borderBottom": "1px solid #E6E2D8", "background": it.bg, "transition": "background 160ms", "cursor": "default"} as CSSProperties}>
+<div onMouseEnter={it.enter} onMouseLeave={v.mapLeave} style={{"display": "grid", "gridTemplateColumns": "minmax(0,1fr) auto", "gap": "16px", "alignItems": "center", "padding": "14px 12px", "margin": "0 -12px", "borderBottom": "1px solid #E6E2D8", "background": it.bg, "transition": "background 160ms", "cursor": "default"} as CSSProperties} onFocus={it.enter} onBlur={v.mapLeave} tabIndex={0}>
 <div style={{"display": "flex", "alignItems": "baseline", "gap": "14px", "minWidth": "0"} as CSSProperties}>
 <span style={{"font": "400 12px 'IBM Plex Mono',monospace", "color": "#77736A", "width": "52px", "flex": "none"} as CSSProperties}>{`line ${it.l}`}</span>
 {it.isPlain && <><span style={{"font": "400 16px/1.4 'IBM Plex Sans',sans-serif"} as CSSProperties}>{it.t}</span></>}
 {it.isGuess && <><span style={{"font": "400 16px/1.4 'IBM Plex Sans',sans-serif"} as CSSProperties}>{"Route C’s drive takes about an hour."}</span></>}
-{it.isEdit && <><span style={{"display": "flex", "alignItems": "center", "gap": "8px", "flexWrap": "wrap", "font": "400 16px 'IBM Plex Sans',sans-serif"} as CSSProperties}>{"Route C’s drive takes"}<input ref={v.minRef} value={v.minutes} onChange={v.onMinutes} onKeyDown={v.minKey} inputMode={"numeric"} aria-label={"Minutes"} style={{"width": "58px", "font": "400 15px 'IBM Plex Mono',monospace", "padding": "4px 8px", "border": "1px solid #1A1916", "background": "#FFFFFF", "borderRadius": "2px", "outline": "none"} as CSSProperties} />{"min."}</span></>}
+{it.isEdit && <><span style={{"display": "flex", "alignItems": "center", "gap": "8px", "flexWrap": "wrap", "font": "400 16px 'IBM Plex Sans',sans-serif"} as CSSProperties}>{"Route C’s drive takes"}<select ref={v.minRef} value={v.minutes} onChange={v.onMinutes} onKeyDown={v.minKey} inputMode={"numeric"} aria-label={"Minutes"} style={{"width": "58px", "font": "400 15px 'IBM Plex Mono',monospace", "padding": "4px 8px", "border": "1px solid #1A1916", "background": "#FFFFFF", "borderRadius": "2px", "outline": "none"} as CSSProperties}><option value="45">45 minutes</option><option value="60">60 minutes</option><option value="90">90 minutes</option></select>{"min."}</span></>}
 {it.isFixed && <><span style={{"font": "400 16px/1.4 'IBM Plex Sans',sans-serif"} as CSSProperties}>{`Route C’s drive takes ${v.minutes} min.`}</span></>}
 </div>
-{it.isPlain && <><svg width={"14"} height={"14"}><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
+{it.isPlain && <><svg width={"14"} height={"14"} aria-hidden="true"><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
 {it.isGuess && <><button onClick={v.startEdit} style={{"all": "unset", "cursor": "pointer", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#8A6410", "border": "1px solid #D9B45A", "background": "#F7EFD9", "padding": "4px 10px", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-10">{"we guessed, check it"}</button></>}
 {it.isEdit && <><button onClick={v.saveCorrection} style={{"all": "unset", "cursor": "pointer", "font": "500 13px 'IBM Plex Sans',sans-serif", "background": "#1E6B47", "color": "#F6F4EE", "padding": "6px 12px", "borderRadius": "2px"} as CSSProperties} type="button">{"Save"}</button></>}
 {it.isFixed && <><span style={{"font": "400 12px 'IBM Plex Mono',monospace", "color": "#1E6B47"} as CSSProperties}>{"corrected"}</span></>}
@@ -159,13 +159,13 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 <div style={{"display": "flex", "justifyContent": "space-between", "alignItems": "center", "gap": "16px", "paddingTop": "8px"} as CSSProperties}>
 <span style={{"font": "400 13px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}>{v.confText}</span>
-<button onClick={v.confirmPlan} aria-disabled={v.notReadyS === "true"} style={{"all": "unset", "cursor": v.confCursor, "background": v.confBg, "color": v.confColor, "font": "500 15px 'IBM Plex Sans',sans-serif", "height": "48px", "padding": "0 20px", "display": "flex", "alignItems": "center", "gap": "12px", "borderRadius": "2px", "transition": "background 300ms,color 300ms"} as CSSProperties} type="button" disabled={v.notReadyS === "true"}>{v.confLabel}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties}>{"→"}</span></button>
+<button onClick={v.confirmPlan} aria-disabled={v.notReadyS === "true"} style={{"all": "unset", "cursor": v.confCursor, "background": v.confBg, "color": v.confColor, "font": "500 15px 'IBM Plex Sans',sans-serif", "height": "48px", "padding": "0 20px", "display": "flex", "alignItems": "center", "gap": "12px", "borderRadius": "2px", "transition": "background 300ms,color 300ms"} as CSSProperties} type="button" disabled={v.notReadyS === "true"}>{v.confLabel}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button>
 </div>
 </div>
 </div>
 </section>
-</>)}
-{v.tab_test && (testContent ?? <>
+</></>)}
+{v.tab_test && (testContent ?? <><div className="sample-notice"><span>Interactive design preview of the locked example. No live checker is running here.</span><button type="button" onClick={v.tryExample}>Start the live example →</button></div><>
 <section data-screen-label={"03 Test"} style={{"maxWidth": "1440px", "margin": "0 auto", "padding": "clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 120px"} as CSSProperties}>
 <div style={{"display": "flex", "flexWrap": "wrap", "justifyContent": "space-between", "alignItems": "flex-end", "gap": "24px"} as CSSProperties}>
 <div style={{"display": "flex", "flexDirection": "column", "gap": "16px"} as CSSProperties}>
@@ -187,8 +187,8 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 <div style={{"display": "flex", "justifyContent": "space-between", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}><span >{v.cs.code}</span><span >{v.cs.kind}</span></div>
 <div style={{"font": "400 17px/1.35 'IBM Plex Sans',sans-serif"} as CSSProperties}>{v.cs.title}</div>
 <div style={{"display": "flex", "alignItems": "center", "gap": "12px", "font": "500 30px/1.12 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.025em", "color": v.cs.color} as CSSProperties}>
-{v.cs.good && <><svg width={"26"} height={"26"} style={{"flex": "none"} as CSSProperties}><path d={"M3 14 L10 21 L23 6"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "2.4", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
-{v.cs.bad && <><svg width={"26"} height={"26"} style={{"flex": "none"} as CSSProperties}><path d={"M5 5 L21 21 M21 5 L5 21"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "2.4", "strokeLinecap": "round"} as CSSProperties}></path></svg></>}
+{v.cs.good && <><svg width={"26"} height={"26"} style={{"flex": "none"} as CSSProperties} aria-hidden="true"><path d={"M3 14 L10 21 L23 6"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "2.4", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
+{v.cs.bad && <><svg width={"26"} height={"26"} style={{"flex": "none"} as CSSProperties} aria-hidden="true"><path d={"M5 5 L21 21 M21 5 L5 21"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "2.4", "strokeLinecap": "round"} as CSSProperties}></path></svg></>}
 <span >{v.cs.headline}</span>
 </div>
 {v.cs.isPair && <><div style={{"font": "400 14px/1.5 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{`Each problem on its own is fine. Together, ${v.cs.together}`}</div></>}
@@ -215,7 +215,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 </Fragment>)}
 <div style={{"position": "absolute", "top": "0", "bottom": "0", "left": "81.8%", "width": "2px", "background": "#B23A2E"} as CSSProperties}></div>
-<div style={{"position": "absolute", "top": "-22px", "left": "81.8%", "transform": "translateX(-70%)", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#B23A2E", "whiteSpace": "nowrap"} as CSSProperties}>{"12:00 noon"}</div>
+<div style={{"position": "absolute", "top": "-22px", "left": "81.8%", "transform": "translateX(-70%)", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#B23A2E", "whiteSpace": "nowrap"} as CSSProperties}>{"Noon: families waiting."}</div>
 </div>
 </div>
 </div>
@@ -224,7 +224,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 {v.hasFix && <>
 <div style={{"border": "1px solid #DAD6CB", "padding": "20px 22px", "display": "flex", "flexDirection": "column", "gap": "14px"} as CSSProperties}>
 <span style={{"font": "400 12px 'IBM Plex Mono',monospace", "letterSpacing": "0.12em", "color": "#57544C", "whiteSpace": "nowrap"} as CSSProperties}>{`SUGGESTED FIX ${v.fix.n} OF 3`}</span>
-<div style={{"display": "flex", "flexDirection": "column", "gap": "4px"} as CSSProperties}><span style={{"font": "500 20px/1.25 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.01em"} as CSSProperties}>{v.fix.title}</span><span style={{"font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{"Suggested by AI, tested by the checker."}</span></div>
+<div style={{"display": "flex", "flexDirection": "column", "gap": "4px"} as CSSProperties}><span style={{"font": "500 20px/1.25 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.01em"} as CSSProperties}>{v.fix.title}</span><span style={{"font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{"Hand-written example suggestion. This preview does not run the checker."}</span></div>
 <div style={{"display": "flex", "alignItems": "center", "gap": "16px", "flexWrap": "wrap"} as CSSProperties}>
 <button onClick={v.acceptFix} style={{"all": "unset", "cursor": "pointer", "background": "#1E6B47", "color": "#F6F4EE", "font": "500 14px 'IBM Plex Sans',sans-serif", "height": "44px", "padding": "0 18px", "display": "flex", "alignItems": "center", "gap": "12px", "borderRadius": "2px"} as CSSProperties} type="button" className="landing-effect-11 landing-effect-12">{v.fixBtn}</button>
 <span style={{"font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}>{v.fix.stats}</span>
@@ -241,7 +241,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 </div>
 </section>
-</>)}
+</></>)}
 {v.tab_trust && <>
 <section data-screen-label={"04 Trust"} style={{"maxWidth": "1440px", "margin": "0 auto", "padding": "clamp(56px,7vw,96px) clamp(20px,3.4vw,48px) 120px"} as CSSProperties}>
 <div style={{"display": "flex", "flexWrap": "wrap", "justifyContent": "space-between", "alignItems": "flex-end", "gap": "24px"} as CSSProperties}>
@@ -269,10 +269,10 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 <div style={{"marginTop": "96px", "display": "grid", "gridTemplateColumns": "repeat(3,minmax(0,1fr))", "borderTop": "1px solid #1A1916"} as CSSProperties}>
 {v.outcomes.map((o, index) => <Fragment key={index}>
-<div onMouseEnter={o.enter} style={{"padding": `28px 28px 28px ${o.pl}`, "borderRight": o.br, "display": "flex", "flexDirection": "column", "gap": "14px", "background": o.bg, "transition": "background 300ms"} as CSSProperties}>
+<div onMouseEnter={o.enter} style={{"padding": `28px 28px 28px ${o.pl}`, "borderRight": o.br, "display": "flex", "flexDirection": "column", "gap": "14px", "background": o.bg, "transition": "background 300ms"} as CSSProperties} onFocus={o.enter} tabIndex={0}>
 <div style={{"height": "40px", "display": "flex", "alignItems": "center"} as CSSProperties}>
-{o.isBreak && <><svg width={"36"} height={"36"}><path d={"M8 8 L28 28 M28 8 L8 28"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "2.4", "strokeLinecap": "round"} as CSSProperties}></path></svg></>}
-{o.isOk && <><svg width={"36"} height={"36"}><path d={"M6 19 L14 27 L30 9"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "2.4", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
+{o.isBreak && <><svg width={"36"} height={"36"} aria-hidden="true"><path d={"M8 8 L28 28 M28 8 L8 28"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "2.4", "strokeLinecap": "round"} as CSSProperties}></path></svg></>}
+{o.isOk && <><svg width={"36"} height={"36"} aria-hidden="true"><path d={"M6 19 L14 27 L30 9"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "2.4", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
 {o.isQ && <><span style={{"font": "500 34px 'IBM Plex Mono',monospace", "color": "#8A6410"} as CSSProperties}>{"?"}</span></>}
 </div>
 <span style={{"font": "500 22px 'IBM Plex Sans',sans-serif", "color": o.c} as CSSProperties}>{o.t}</span>
@@ -290,8 +290,8 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 <h2 style={{"margin": "0", "font": "500 clamp(32px,3.6vw,56px)/1.04 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.04em"} as CSSProperties}>{"What needs to go right on Saturday?"}</h2>
 <p style={{"margin": "0", "font": "400 18px/1.55 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{"Paste your plan, or try ours."}</p>
 <div style={{"marginTop": "12px", "display": "flex", "flexDirection": "column", "borderTop": "1px solid #DAD6CB"} as CSSProperties}>
-<div style={{"display": "flex", "gap": "12px", "padding": "12px 0", "borderBottom": "1px solid #DAD6CB", "font": "400 14px/1.45 'IBM Plex Sans',sans-serif"} as CSSProperties}><svg width={"14"} height={"14"} style={{"marginTop": "4px", "flex": "none"} as CSSProperties}><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg>{"The example works without an AI key."}</div>
-<div style={{"display": "flex", "gap": "12px", "padding": "12px 0", "borderBottom": "1px solid #DAD6CB", "font": "400 14px/1.45 'IBM Plex Sans',sans-serif"} as CSSProperties}><svg width={"14"} height={"14"} style={{"marginTop": "4px", "flex": "none"} as CSSProperties}><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg>{"We never store your plan. Close the tab and it’s gone."}</div>
+<div style={{"display": "flex", "gap": "12px", "padding": "12px 0", "borderBottom": "1px solid #DAD6CB", "font": "400 14px/1.45 'IBM Plex Sans',sans-serif"} as CSSProperties}><svg width={"14"} height={"14"} style={{"marginTop": "4px", "flex": "none"} as CSSProperties} aria-hidden="true"><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg>{"The example works without an AI key."}</div>
+<div style={{"display": "flex", "gap": "12px", "padding": "12px 0", "borderBottom": "1px solid #DAD6CB", "font": "400 14px/1.45 'IBM Plex Sans',sans-serif"} as CSSProperties}><svg width={"14"} height={"14"} style={{"marginTop": "4px", "flex": "none"} as CSSProperties} aria-hidden="true"><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg>{"Plans stay in memory for this local session. Nothing is saved to disk."}</div>
 </div>
 </div>
 <div style={{"minWidth": "0", "display": "flex", "flexDirection": "column", "gap": "16px", "gridColumn": "auto"} as CSSProperties}>
@@ -309,34 +309,34 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 </div>
 <div style={{"display": "flex", "alignItems": "center", "gap": "24px", "flexWrap": "wrap"} as CSSProperties}>
-<button ref={v.readRef} onClick={v.readPlan} aria-disabled={v.noTextS === "true"} style={{"all": "unset", "cursor": v.readCursor, "background": v.readBg, "color": v.readColor, "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 24px", "display": "flex", "alignItems": "center", "gap": "16px", "borderRadius": "2px", "outline": v.readOutline, "outlineOffset": "3px", "transition": "background 300ms,color 300ms"} as CSSProperties} type="button" disabled={v.noTextS === "true"}>{"Read plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties}>{"→"}</span></button>
+<button ref={v.readRef} onClick={v.readPlan} aria-disabled={v.noTextS === "true"} style={{"all": "unset", "cursor": v.readCursor, "background": v.readBg, "color": v.readColor, "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 24px", "display": "flex", "alignItems": "center", "gap": "16px", "borderRadius": "2px", "outline": v.readOutline, "outlineOffset": "3px", "transition": "background 300ms,color 300ms"} as CSSProperties} type="button" disabled={v.noTextS === "true"}>{"Read plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button>
 <button onClick={v.loadExample} style={{"all": "unset", "cursor": "pointer", "font": "400 15px 'IBM Plex Sans',sans-serif", "display": "flex", "alignItems": "center", "gap": "8px"} as CSSProperties} type="button" className="landing-effect-14">
-{v.exampleLoaded && <><svg width={"14"} height={"14"}><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
+{v.exampleLoaded && <><svg width={"14"} height={"14"} aria-hidden="true"><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
 <span style={{"textDecoration": "underline", "textUnderlineOffset": "4px", "textDecorationThickness": "1px"} as CSSProperties}>{v.exampleLabel}</span>
 </button>
-<button onClick={v.toggleKey} style={{"all": "unset", "cursor": "pointer", "marginLeft": "auto", "font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "display": "flex", "gap": "8px", "alignItems": "center"} as CSSProperties} type="button" className="landing-effect-15"><span style={{"display": "inline-block", "transform": `rotate(${v.keyRot})`, "transition": "transform 200ms", "fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties}>{"›"}</span>{"Use your own AI key"}</button>
+<button onClick={v.toggleKey} style={{"all": "unset", "cursor": "pointer", "marginLeft": "auto", "font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "display": "flex", "gap": "8px", "alignItems": "center"} as CSSProperties} type="button" aria-expanded={v.keyOpen} aria-controls="landing-key" className="landing-effect-15"><span style={{"display": "inline-block", "transform": `rotate(${v.keyRot})`, "transition": "transform 200ms", "fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"›"}</span>{"Use your own AI key"}</button>
 </div>
 {v.keyOpen && <>
 <div style={{"display": "flex", "flexDirection": "column", "gap": "8px", "alignItems": "flex-end"} as CSSProperties}>
-<input type={"password"} placeholder={"Paste your key"} aria-label={"AI key"} style={{"width": "min(360px,100%)", "font": "400 13px 'IBM Plex Mono',monospace", "padding": "10px 12px", "border": "1px solid #CFC9BB", "background": "#FBFAF6", "borderRadius": "2px", "outline": "none"} as CSSProperties} value={v.apiKey} onChange={v.onKey} autoComplete="off" />
-<span style={{"font": "400 12px 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{"Your plan goes to the AI company only to be read."}</span>
+<input type={"password"} placeholder={"Paste your key"} aria-label={"AI key"} style={{"width": "min(360px,100%)", "font": "400 13px 'IBM Plex Mono',monospace", "padding": "10px 12px", "border": "1px solid #CFC9BB", "background": "#FBFAF6", "borderRadius": "2px", "outline": "none"} as CSSProperties} value={v.apiKey} onChange={v.onKey} autoComplete="off" id="landing-key" />
+<span style={{"font": "400 12px 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{"Live AI reading is planned. The example works without a key."}</span>
 </div>
 </>}
 </div>
-</section>
+{v.error && <p className="landing-error" role="alert">{v.error}</p>}{v.text.length > 4000 && <p className="landing-error" role="alert">Your plan has {v.charText} characters. Keep it under 4,000 before reading.</p>}</section>
 </>}
 </main>
 {v.hasNext && <>
 <button onClick={v.goNext} style={{"all": "unset", "cursor": "pointer", "display": "block", "width": "100%", "borderTop": "1px solid #1A1916"} as CSSProperties} type="button" className="landing-effect-16">
 <div style={{"maxWidth": "1440px", "margin": "0 auto", "padding": "40px 48px", "display": "flex", "justifyContent": "space-between", "alignItems": "center", "gap": "24px"} as CSSProperties}>
 <div style={{"display": "flex", "flexDirection": "column", "gap": "6px"} as CSSProperties}><span style={{"font": "400 12px 'IBM Plex Mono',monospace", "letterSpacing": "0.14em", "color": "#57544C"} as CSSProperties}>{"NEXT"}</span><span style={{"font": "500 40px/1.05 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.03em"} as CSSProperties}>{v.nextTitle}</span></div>
-<span style={{"width": "60px", "height": "60px", "border": "1px solid #1A1916", "borderRadius": "50%", "display": "flex", "alignItems": "center", "justifyContent": "center", "font": "400 22px 'IBM Plex Mono',monospace", "flex": "none"} as CSSProperties}>{"→"}</span>
+<span style={{"width": "60px", "height": "60px", "border": "1px solid #1A1916", "borderRadius": "50%", "display": "flex", "alignItems": "center", "justifyContent": "center", "font": "400 22px 'IBM Plex Mono',monospace", "flex": "none"} as CSSProperties} aria-hidden="true">{"→"}</span>
 </div>
 </button>
 </>}
 <footer style={{"borderTop": "1px solid #DAD6CB"} as CSSProperties}>
 <div style={{"maxWidth": "1440px", "margin": "0 auto", "padding": "20px 48px", "display": "flex", "justifyContent": "space-between", "gap": "16px", "flexWrap": "wrap", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}>
-<span style={{"display": "flex", "alignItems": "center", "gap": "10px"} as CSSProperties}><svg width={"22"} height={"22"} viewBox={"0 0 22 22"} style={{"flex": "none"} as CSSProperties}><g style={{"fill": "none", "stroke": "#1A1916", "strokeWidth": "1.3"} as CSSProperties}><rect x={"1"} y={"1"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"14"} y={"14"} width={"6.5"} height={"6.5"}></rect></g><path d={"M9.6 16.1 L11.9 18.4 M11.9 16.1 L9.6 18.4"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.5", "strokeLinecap": "round"} as CSSProperties}></path><circle cx={"10.75"} cy={"17.25"} r={"3.6"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.1"} as CSSProperties}></circle></svg>{"Crash-test a plan before Saturday does."}</span>
+<span style={{"display": "flex", "alignItems": "center", "gap": "10px"} as CSSProperties}><svg width={"22"} height={"22"} viewBox={"0 0 22 22"} style={{"flex": "none"} as CSSProperties} aria-hidden="true"><g style={{"fill": "none", "stroke": "#1A1916", "strokeWidth": "1.3"} as CSSProperties}><rect x={"1"} y={"1"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"7.5"} width={"6.5"} height={"6.5"}></rect><rect x={"1"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"7.5"} y={"14"} width={"6.5"} height={"6.5"}></rect><rect x={"14"} y={"14"} width={"6.5"} height={"6.5"}></rect></g><path d={"M9.6 16.1 L11.9 18.4 M11.9 16.1 L9.6 18.4"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.5", "strokeLinecap": "round"} as CSSProperties}></path><circle cx={"10.75"} cy={"17.25"} r={"3.6"} style={{"fill": "none", "stroke": "#B23A2E", "strokeWidth": "1.1"} as CSSProperties}></circle></svg>{"Crash-test a plan before Saturday does."}</span>
 <span >{"Built for Build With AI: Basics"}</span>
 </div>
 </footer>

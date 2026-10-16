@@ -11,6 +11,7 @@ export type LandingProps = {
   apiKey: string; onKeyChange: (value: string) => void;
   keyOpen: boolean; onKeyOpen: (open: boolean) => void;
   onLoadExample: () => Promise<string | undefined>; onReadPlan: () => void;
+  error?: string;
 };
 type Crack = { x1: number; y1: number; x2: number; y2: number; w: number; len: number };
 const pct = (minutes: number) => `${(minutes / 220 * 100).toFixed(2)}%`;
@@ -24,7 +25,7 @@ export function useLanding(props: LandingProps) {
   const [stage, setStage] = useState(0), [runId, setRunId] = useState(0), [sel, setSel] = useState<[number, number]>([11, 8]), [running, setRunning] = useState(false);
   const [cracks, setCracks] = useState<Crack[]>([]), [toast, setToast] = useState<{ x: number; y: number } | null>(null), [broke, setBroke] = useState(false);
   const [loaded, setLoaded] = useState(text === EXAMPLE), [loadingExample, setLoadingExample] = useState(false), [readFocus, setReadFocus] = useState(false), [edFocused, setEdFocused] = useState(false);
-  const root = useRef<HTMLDivElement>(null), progRef = useRef<HTMLDivElement>(null), navRef = useRef<HTMLElement>(null), indRef = useRef<HTMLDivElement>(null), tabRef = useRef<HTMLElement>(null), heroRef = useRef<HTMLDivElement>(null), gridWrap = useRef<HTMLDivElement>(null), readRef = useRef<HTMLButtonElement>(null), gutRef = useRef<HTMLDivElement>(null), minRef = useRef<HTMLInputElement>(null), shardLayer = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLDivElement>(null), progRef = useRef<HTMLDivElement>(null), navRef = useRef<HTMLElement>(null), indRef = useRef<HTMLDivElement>(null), tabRef = useRef<HTMLElement>(null), heroRef = useRef<HTMLDivElement>(null), gridWrap = useRef<HTMLDivElement>(null), readRef = useRef<HTMLButtonElement>(null), gutRef = useRef<HTMLDivElement>(null), minRef = useRef<HTMLSelectElement>(null), shardLayer = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const typer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const breakCleanup = useRef<(() => void) | null>(null);
@@ -36,6 +37,15 @@ export function useLanding(props: LandingProps) {
     const resize = () => setVw(window.innerWidth), motion = () => setReduce(media.matches);
     window.addEventListener("resize", resize); media.addEventListener("change", motion);
     return () => { window.removeEventListener("resize", resize); media.removeEventListener("change", motion); timers.current.forEach(clearTimeout); clearInterval(typer.current); loadingId.current++; breakCleanup.current?.(); };
+  }, []);
+  useEffect(() => {
+    if (reduce) { breakCleanup.current?.(); setCracks([]); setToast(null); }
+  }, [reduce]);
+  useEffect(() => {
+    let frame = 0;
+    const observer = new ResizeObserver(() => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => ScrollTrigger.refresh()); });
+    if (root.current) observer.observe(root.current);
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
   }, []);
   const go = useCallback((id: LandingTab) => {
     breakCleanup.current?.(); setCracks([]); setToast(null); setStep(0);
@@ -156,7 +166,7 @@ export function useLanding(props: LandingProps) {
     mapHint: mapHover?.length ? "line " + mapHover.join(", ") : `${PLAN.length} lines`, mapLeave: () => setMapHover(null), hoverQ: () => setMapHover([13]), qOpen: !answer, qDone: !!answer, answerText: answer,
     answerCar: () => setAnswer("Only his car"), answerVan: () => setAnswer("The van too"), reopenQ: () => setAnswer(null),
     qBorder: answer ? "#CFE0D3" : "#D9B45A", qBg: answer ? "#F4F8F4" : "#FBF6E9", qTag: answer ? "#1E6B47" : "#8A6410", qKicker: answer ? "ANSWERED" : "WE NEED ONE ANSWER",
-    minutes, onMinutes: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setMinutes(event.target.value), minKey: (event: KeyboardEvent<HTMLInputElement>) => { if (event.key === "Enter") save(); }, startEdit: () => { setEditing(true); later(() => minRef.current?.focus(), 0); }, saveCorrection: save,
+    minutes, onMinutes: (event: ChangeEvent<HTMLSelectElement>) => setMinutes(event.target.value), minKey: (event: KeyboardEvent<HTMLSelectElement>) => { if (event.key === "Enter") save(); }, startEdit: () => { setEditing(true); later(() => minRef.current?.focus(), 0); }, saveCorrection: save,
     confText: `${corrected ? 8 : 7} of 8 sample details checked, ${answer ? "no questions left" : "1 question left"}`, notReadyS: ready ? "false" : "true", confBg: ready ? "#1E6B47" : "#E4E0D6", confColor: ready ? "#F6F4EE" : "#77736A", confCursor: ready ? "pointer" : "not-allowed", confLabel: confirmed ? "Confirmed" : "Confirm sample", confirmPlan: () => { if (ready) { setConfirmed(true); go("test"); } },
     stage, runId, selR: sel[0], selC: sel[1], selectCell: contextSafe((r: number, c: number) => { setSel([r, c]); if (!reduce) gsap.fromTo(root.current?.querySelector("[data-case]") ?? [], { x: sampleCellType(r, c, stage) === "ring" ? -7 : 0, opacity: .5 }, { x: 0, opacity: 1, duration: .38, clearProps: "transform,opacity" }); }), cs, tl, axis: [["9:00", 0], ["10:00", 60], ["11:00", 120], ["12:30", 210]].map(([t, m]) => ({ t, x: pct(Number(m)) })),
     hasFix: stage < 3, fix: FIXES[Math.min(2, stage)], fixBtn: running ? "Showing the example change…" : "Show this example fix", acceptFix: contextSafe(() => { if (running || stage >= 3) return; setRunning(true); if (!reduce && gridWrap.current) gsap.fromTo(gridWrap.current.querySelector("[data-scan]"), { y: 0, opacity: 1 }, { y: gridWrap.current.offsetHeight + 64, duration: .82, ease: "power2.inOut", opacity: 0 }); later(() => { setStage(n => Math.min(3, n + 1)); setRunId(n => n + 1); setRunning(false); }, reduce ? 0 : 820); }),
@@ -165,7 +175,7 @@ export function useLanding(props: LandingProps) {
     outcomes: [{ isBreak: true, isOk: false, isQ: false, t: "Breaks", c: "#B23A2E", b: "We show you the exact case, the timeline and why.", br: "1px solid #DAD6CB", pl: "0px" }, { isBreak: false, isOk: true, isQ: false, t: "Survives", c: "#1E6B47", b: "Nothing failed in our tests. That’s not a promise about the real day.", br: "1px solid #DAD6CB", pl: "28px" }, { isBreak: false, isOk: false, isQ: true, t: "Unknown", c: "#8A6410", b: "Something was unclear, so we say so. It never counts as a pass.", br: "none", pl: "28px" }].map(o => ({ ...o, bg: "transparent", enter: () => {} })),
     text, onText: (event: ChangeEvent<HTMLTextAreaElement>) => { clearInterval(typer.current); loadingId.current++; setLoadingExample(false); props.onTextChange(event.target.value); setLoaded(false); }, onTaScroll: (event: UIEvent<HTMLTextAreaElement>) => { if (gutRef.current) gutRef.current.style.transform = `translateY(${-event.currentTarget.scrollTop}px)`; }, edFocus: () => setEdFocused(true), edBlur: () => setEdFocused(false), edBorder: edFocused ? "#1A1916" : "#CFC9BB",
     lineCount, gutter: Array.from({ length: Math.max(17, lineCount) }, (_, i) => ({ n: i + 1, c: i < lineCount ? "#57544C" : "#C9C3B4" })), charText: text.length.toLocaleString("en-US"), noTextS: noText ? "true" : "false", readBg: noText ? "#E4E0D6" : "#1E6B47", readColor: noText ? "#77736A" : "#F6F4EE", readCursor: noText ? "not-allowed" : "pointer", readOutline: readFocus && !noText ? "2px solid #1A1916" : "none", readPlan: () => { if (!noText) { setReadFocus(false); props.onReadPlan(); } },
-    loadExample, exampleLoaded: loaded, exampleLabel: loadingExample ? "Loading example…" : loaded ? "Example plan loaded" : "Load the example plan", toggleKey: () => props.onKeyOpen(!props.keyOpen), keyOpen: props.keyOpen, keyRot: props.keyOpen ? "90deg" : "0deg", apiKey: props.apiKey, onKey: (event: ChangeEvent<HTMLInputElement>) => props.onKeyChange(event.target.value),
+    loadExample, exampleLoaded: loaded, exampleLabel: loadingExample ? "Loading example…" : loaded ? "Example plan loaded" : "Load the example plan", toggleKey: () => props.onKeyOpen(!props.keyOpen), keyOpen: props.keyOpen, keyRot: props.keyOpen ? "90deg" : "0deg", apiKey: props.apiKey, onKey: (event: ChangeEvent<HTMLInputElement>) => props.onKeyChange(event.target.value), error: props.error,
   };
 }
 export type LandingValues = ReturnType<typeof useLanding>;

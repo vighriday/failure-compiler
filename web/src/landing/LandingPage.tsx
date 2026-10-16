@@ -9,6 +9,5 @@ export default function LandingPage(props: LandingProps & { readContent?: ReactN
   return <>
     <a className="skip-to-content" href="#landing-panel">Skip to content</a>
     <LandingView v={values} readContent={props.readContent} testContent={props.testContent} />
-    {props.error && props.tab === "start" && <div className="landing-error" role="alert">{props.error}</div>}
   </>;
 }

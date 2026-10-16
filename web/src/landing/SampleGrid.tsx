@@ -43,7 +43,7 @@ function useSampleGrid(props: GridProps) {
       const type = sampleCellType(r, c, st), ringIdx = ["11-3", "11-8", "13-1"].indexOf(`${r}-${c}`);
       const d = i * 9, rd = 1200 + Math.max(0, ringIdx) * 180;
       const anim = shown && !instant;
-      cells.push({ x: L + (c - 1) * s, y: T + (r - 1) * s, aria: caseTitle(r, c) + " " + SAMPLE_STATUS[type][0], ol: sel[0] === r && sel[1] === c ? "2px solid #1A1916" : hov?.[0] === r && hov[1] === c ? "1px solid #1A1916" : "none",
+      cells.push({ r, c, type, x: L + (c - 1) * s, y: T + (r - 1) * s, aria: caseTitle(r, c) + " " + SAMPLE_STATUS[type][0], ol: sel[0] === r && sel[1] === c ? "2px solid #1A1916" : hov?.[0] === r && hov[1] === c ? "1px solid #1A1916" : "none",
         isHatch: type === "hatch", isTick: type === "ok" || type === "fixed", isCross: type === "cross" || type === "ring", isDash: type === "dash", isRing: type === "ring", isBox: type === "fixed",
         off22: shown ? 0 : 22, off32: shown ? 0 : 32, off12: shown ? 0 : 12, off79: shown ? 0 : 79, off104: shown ? 0 : 104, hop: shown ? 1 : 0,
         tr: anim ? `stroke-dashoffset 280ms cubic-bezier(.4,0,.2,1) ${d}ms` : "none", htr: anim ? `opacity 300ms ease ${d}ms` : "none", rtr: anim ? `stroke-dashoffset 620ms cubic-bezier(.6,0,.2,1) ${rd}ms` : "none",

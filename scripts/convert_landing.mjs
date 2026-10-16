@@ -18,7 +18,16 @@ function value(text, locals) {
   return "`" + text.replace(/[`\\$]/g, "\\$&").replace(/\{\{(.+?)\}\}/g, (_, key) => "${" + expr(key, locals) + "}") + "`";
 }
 function render(node, locals = new Set()) {
-  if (node.type === "text") return node.data.trim() ? `{${value(node.data, locals)}}` : "\n";
+  if (node.type === "text") {
+    const text = node.data
+      .replace("Suggested by AI, tested by the checker.", "Hand-written example suggestion. This preview does not run the checker.")
+      .replace("This is a sample reading we wrote for the example. With your own key, AI writes it.", "Hand-written design preview. Start the example to review all 24 details and run the live checker.")
+      .replace("Free to try. No sign-up, no AI key, and we never store your plan.", "No sign-up. The example needs no AI key. No plan is saved to disk.")
+      .replace("We never store your plan. Close the tab and it’s gone.", "Plans stay in memory for this local session. Nothing is saved to disk.")
+      .replace("Your plan goes to the AI company only to be read.", "Live AI reading is planned. The example works without a key.")
+      .replace("12:00 noon", "Noon: families waiting.");
+    return text.trim() ? `{${value(text, locals)}}` : "\n";
+  }
   if (node.type !== "tag") return "";
   const a = node.attribs;
   const kids = (scope = locals) => node.children.map(child => render(child, scope)).join("");
@@ -29,11 +38,13 @@ function render(node, locals = new Set()) {
   }
   if (node.name === "sc-if") {
     let content = `<>${kids()}</>`;
-    if (a.value === "{{tab_read}}") content = `(readContent ?? ${content})`;
-    if (a.value === "{{tab_test}}") content = `(testContent ?? ${content})`;
+    const notice = '<div className="sample-notice"><span>Interactive design preview of the locked example. No live checker is running here.</span><button type="button" onClick={v.tryExample}>Start the live example →</button></div>';
+    if (a.value === "{{tab_read}}") content = `(readContent ?? <>${notice}${content}</>)`;
+    if (a.value === "{{tab_test}}") content = `(testContent ?? <>${notice}${content}</>)`;
     return `{${value(a.value, locals)} && ${content}}`;
   }
-  const tag = node.name === "dc-import" ? "SampleGrid" : node.name;
+  const minutePicker = node.name === "input" && a["aria-label"] === "Minutes";
+  const tag = node.name === "dc-import" ? "SampleGrid" : minutePicker ? "select" : node.name;
   const attrs = [];
   const classes = [];
   if (node.parent?.name === "x-dc" && tag === "div") classes.push("landing-root");
@@ -57,17 +68,29 @@ function render(node, locals = new Set()) {
     else attrs.push(`${mappings[key] ?? key}={${value(text, locals)}}`);
   }
   if (a.role === "button") attrs.push('onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }}');
+  if (a.role === "button") attrs.push('data-sample-state={c.type} data-sample-row={c.r} data-sample-column={c.c}');
   if (a.role === "tab") {
     attrs.push('tabIndex={t.sel === "true" ? 0 : -1} aria-controls="landing-panel"');
   }
   if (a.role === "tablist") attrs.push('aria-label="Explore Failure Compiler" onKeyDown={v.onNavKeyDown}');
+  if (a.onMouseEnter && !a.onFocus) attrs.push(`onFocus={${value(a.onMouseEnter, locals)}}`);
+  if (a.onMouseLeave && !a.onBlur) attrs.push(`onBlur={${value(a.onMouseLeave, locals)}}`);
+  if (a.onMouseEnter && !a.role && tag === "div") attrs.push('tabIndex={0}');
   if (tag === "button") attrs.push('type="button"');
   if (a["aria-disabled"]) attrs.push(`disabled={${value(a["aria-disabled"], locals)} === "true"}`);
   if (a.ref === "{{tabRef}}") attrs.push('id="landing-panel" role="tabpanel" tabIndex={-1}');
   if (tag === "textarea") attrs.push('data-plan-editor="true"');
   if (tag === "input" && a.type === "password") attrs.push('value={v.apiKey} onChange={v.onKey} autoComplete="off"');
+  if (a.onClick === "{{toggleKey}}") attrs.push('aria-expanded={v.keyOpen} aria-controls="landing-key"');
+  if (a.onClick === "{{goTop}}") attrs.push('aria-label="Failure Compiler home"');
+  if (tag === "input" && a.type === "password") attrs.push('id="landing-key"');
+  if (a["data-header"]) attrs.push('aria-label="Site header"');
+  if (tag === "svg" && !a["aria-label"]) attrs.push('aria-hidden="true"');
+  if (tag === "span" && node.children.length === 1 && node.children[0].type === "text" && /^[→↓›]$/.test(node.children[0].data.trim())) attrs.push('aria-hidden="true"');
   if (classes.length) attrs.push(`className=${JSON.stringify(classes.join(" "))}`);
-  return `<${tag} ${attrs.join(" ")}${voids.has(tag) ? " />" : `>${kids()}</${tag}>`}`;
+  let content = minutePicker ? '<option value="45">45 minutes</option><option value="60">60 minutes</option><option value="90">90 minutes</option>' : kids();
+  if (a["data-screen-label"] === "05 Start") content += '{v.error && <p className="landing-error" role="alert">{v.error}</p>}{v.text.length > 4000 && <p className="landing-error" role="alert">Your plan has {v.charText} characters. Keep it under 4,000 before reading.</p>}';
+  return `<${tag} ${attrs.join(" ")}${voids.has(tag) ? " />" : `>${content}</${tag}>`}`;
 }
 for (const [file, component, type] of [["Landing.html", "LandingView", "LandingValues"], ["Grid.html", "SampleGridView", "SampleGridValues"]]) {
   const doc = parseDocument(readFileSync(path.join(source, file), "utf8"), { xmlMode: true, decodeEntities: true });
