@@ -100,6 +100,7 @@ Doc links:
 | Styling | Plain CSS with CSS custom properties | Full control over the grid and timeline; no utility-class overhead. |
 | Fonts | `@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-mono` | Self-hosted; no runtime call to Google Fonts. |
 | Grid and timeline | CSS grid + SVG, hand-built | Exact visual control over all four cell states and the timeline. |
+| Landing conversion and motion | htmlparser2 at development time; GSAP, ScrollTrigger and `@gsap/react` in the UI | Converts the supplied v2 templates to typed React; scoped animation cleanup, scroll progress and source highlights. No editor runtime or HTML interpreter in production. |
 | Type sync | `openapi-typescript` from FastAPI's `/openapi.json` | Frontend types generated from backend schema; drift is a compile error. |
 
 Rules are implemented only in Python (`server/validation/rules.py`). The browser never reimplements them; it calls `POST /api/validate-map` instead.
@@ -134,13 +135,13 @@ Free tier constraints:
 
 Implements `prd.md > Look and Feel`.
 
-Warm off-white background (`#F8F6F1`), near-black ink (`#1A1A18`). No decoration that is not doing work.
+The supplied Landing v2 design is the visual source. Warm off-white background (`#F6F4EE`), paper sheets (`#FBFAF6`), near-black ink (`#1A1916`), and neutral rules (`#DAD6CB`).
 
 CSS custom properties:
-- `--color-tick`: deep green `#1A6B3C`
-- `--color-cross`: brick red `#B23A2A`
-- `--color-amber`: `#C47A00`
-- `--color-dim`: medium grey `#8A8A85`
+- `--color-tick`: deep green `#1E6B47`
+- `--color-cross`: brick red `#B23A2E`
+- `--color-amber`: `#8A6410`
+- `--color-dim`: medium grey `#8E8A80`
 - `--color-action`: same as `--color-tick` for the primary button
 
 Typography:
@@ -152,6 +153,8 @@ Grid cells: tick and cross are clean stroke SVG marks, not emoji, not Unicode ch
 Timeline: SVG. Routes as horizontal bars. Finish-time deadline as a solid red vertical line labelled “Noon: families waiting.” Late segments extend past it in `--color-cross`. A not-delivered route is drawn as never leaving, with the reason shown, e.g. “Van back 10:45. Loading team gone.”
 
 Motion: cells fill in sequence as the SSE stream delivers results. Accepted-fix cells flip with a short CSS transition. Both effects check `prefers-reduced-motion` and skip animation if set.
+
+V2 implementation: `design/landing-v2/` preserves both supplied templates. `scripts/convert_landing.mjs` generates React markup and hover/focus styles. `web/src/landing/` owns the typed interactions, responsive layout, example illustrations and animation cleanup. Six tabs share the same shell; real reading and crash-test views replace their illustrative counterparts once a plan is loaded. The Start editor uses the existing API; confirmation, fingerprints, SSE results, previews and fixes retain their existing server paths. A changed source or map cannot reuse an old confirmed result. GSAP restores the page-break fragments on completion, navigation and unmount. Reduced motion uses immediate end states.
 
 ## Problem Type Taxonomy
 

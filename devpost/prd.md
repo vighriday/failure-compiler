@@ -14,7 +14,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > Who It's For`.
 
 Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 
-1. **Arrive at the paste screen.** The user sees a single text area and a brief prompt. They paste their plan, or load the example in example mode.
+1. **Arrive at the v2 overview.** The landing navigation has Overview, Plan, Read, Crash test, Trust, and Start. The Start tab contains the paste screen: a single text area and a brief prompt. They paste their plan, or load the example in example mode.
 2. **The AI reads the plan.** It produces a structured map (people, vehicles, places, times, deadlines) and surfaces ambiguities as questions. In example mode, a saved AI reading loads instead; a small label reads "Example mode: using a saved AI reading."
 3. **Plan map screen.** The user sees the checklist view at the top (every job with a person and a backup, all ticked; it looks done), followed by the AI's structured reading as short plain statements each sourced to a line of the original. Below the plan statements: the "What we'll test" section listing each failure type with its size. The user confirms or corrects using constrained choices only, then hits confirm.
 4. **Crash test screen.** A grid fills in live. Every failure type across the top, every failure type down the side. Each scenario appears once: the diagonal plus the cells below it, so the grid shows one triangle, not two. Cells flip to tick, cross, dimmed mark, or question mark as the checker runs. A count line tracks results in real time.
@@ -31,6 +31,8 @@ Five screens, desktop-first.
 
 ### Screen 1: Paste Plan
 A text area. A brief prompt. No checklist yet. A button to load the example plan. Pasting your own plan requires an AI key; the key field surfaces here if none is set.
+
+Uses the supplied Landing v2 Start layout: prompt and assurances on the left, a paper editor with synchronized line numbers, counter, actions, and collapsed key field on the right. The layout stacks on smaller screens.
 
 ### Screen 2: Plan Map
 **Top: checklist view.** Every job with a person and a backup. All ticked. It looks complete. This is the "before": the plan as any coordinator would call it done.
@@ -116,6 +118,8 @@ Source: `scope.md > Inspiration and Identity`.
 
 A coordinator's run sheet, not a tech dashboard. The feel is calm and honest: warm off-white paper background, near-black ink text, no decoration that is not doing work.
 
+The user-approved Landing v2 design is the visual source: warm paper `#F6F4EE`, sheet `#FBFAF6`, ink `#1A1916`, green `#1E6B47`, brick red `#B23A2E`, amber `#8A6410`, and thin neutral rules. It adds six-section navigation, large editorial headings, a sticky source-plan story, a sample grid, and an animated explanation of the pipeline. Illustrations are labelled as example previews; the full confirmed-map flow runs the real checker.
+
 Colour carries meaning only:
 - Deep green: ticks and the main action button.
 - Brick red: crosses and broken states.
@@ -132,6 +136,8 @@ Marks: ticks and crosses are clean stroke marks, like a pen on a checklist. No e
 Timeline: the deadline is a solid red vertical line labelled "Noon: families waiting."
 
 Motion only where it means something: cells fill in order over a few seconds as the checker runs. Accepted fixes flip changed cells with a short animation. Both effects respect `prefers-reduced-motion`.
+
+V2 also includes tab entrances and underline movement, reading progress, scroll-linked source highlights, a replayable pipeline, example-plan typing, and the clickable “breaks” effect. The page-break effect restores every fragment and control after completion or navigation. All motion respects reduced-motion settings; keyboard users can operate every control.
 
 Tick and cross throughout (not colour alone), so the grid is readable by everyone.
 

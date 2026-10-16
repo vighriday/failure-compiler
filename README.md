@@ -415,9 +415,10 @@ Every number in this README can be reproduced from the repository.
 | Changing one fact un-confirms everything that depends on it | [`tests/test_rules.py`](tests/test_rules.py) |
 | The fingerprint changes only when the checker's inputs change | [`tests/test_fingerprint.py`](tests/test_fingerprint.py) |
 | The whole demo story plays end to end in a real browser | [`scripts/verify_story.py`](scripts/verify_story.py), with the dev server running and Playwright installed |
+| V2 navigation, animation recovery, every sample square, editor controls and responsive layouts work | [`scripts/verify_landing.py`](scripts/verify_landing.py), at desktop, tablet and phone sizes |
 | The saved AI reading plus the demo's corrections equals the hand-checked map | `tests/test_reading_matches_truth.py` *(slice 6)* |
 
-Run the Python tests with `uv run -- python -m pytest -q`. The Playwright browser story runs separately with `python scripts/verify_story.py`.
+Run the Python tests with `uv run -- python -m pytest -q`. Browser checks run separately with `uv run -- python scripts/verify_landing.py` and `uv run -- python scripts/verify_story.py`.
 
 ---
 
@@ -434,7 +435,9 @@ npm install
 uv run -- python scripts/dev.py
 ```
 
-Open **http://localhost:5173**, click **Load the example plan**, then **Read plan**. No account and no AI key needed.
+Open **http://localhost:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed.
+
+The interface follows the supplied Landing v2 design: Overview, a scroll-linked Plan story, Read, Crash test, Trust and Start. Sample illustrations are labelled; after loading a plan, Read and Crash test use the real confirmation and checker flow. The design templates and conversion instructions are in [`design/landing-v2/`](design/landing-v2/).
 
 **Live AI is planned for slice 6.** The current build supports the example plan and does not load `.env` or use the key field yet. You can prepare `.env` from `.env.example` with a [Groq](https://console.groq.com/keys) key in `GROQ_API_KEY` and a [Gemini](https://aistudio.google.com/apikey) key in `GEMINI_API_KEY`; these will become usable when the provider integration is connected.
 
@@ -446,7 +449,7 @@ Open **http://localhost:5173**, click **Load the example plan**, then **Read pla
 | Lint | `uv run -- ruff check .` |
 | Compare the two AI providers on the example | `uv run -- python scripts/bakeoff.py` *(slice 6)* |
 
-The browser verification also needs Playwright and its Chromium browser installed in the Python environment used to run `scripts/verify_story.py`.
+Playwright is a development dependency. Install its browser once with `uv run -- python -m playwright install chromium`. Start the app, then run either browser check. For a different frontend port, set `FAILURE_COMPILER_URL` to that local URL before running the scripts.
 
 ---
 

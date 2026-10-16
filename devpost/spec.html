@@ -549,14 +549,16 @@
 
 <!-- LOOK AND FEEL -->
 <section id="look">
+  <p><strong>Approved Landing v2:</strong> Overview, Plan, Read, Crash test, Trust and Start share the paper interface. The Start tab contains the editor. Source highlights follow the plan story on scroll; the pipeline can be replayed. The page-break effect restores every fragment and control, including when navigating away. All motion respects reduced motion. Illustrative previews are labelled; the confirmed-map flow runs the live checker.</p>
+  <p>Native React and TypeScript generated from the supplied templates with htmlparser2. GSAP, ScrollTrigger and @gsap/react handle animation and cleanup. No editor runtime is shipped; fonts remain self-hosted. Source templates live in <code>design/landing-v2/</code>, conversion in <code>scripts/convert_landing.mjs</code>, interactions in <code>web/src/landing/</code>.</p>
   <h2>Look and Feel <span class="prd-ref">prd.md &rsaquo; Look and Feel</span></h2>
-  <p>Warm off-white background (<code>#F8F6F1</code>), near-black ink (<code>#1A1A18</code>). Colour carries meaning only; no decoration that is not doing work.</p>
+  <p>Warm off-white background (<code>#F6F4EE</code>), near-black ink (<code>#1A1916</code>). Colour carries meaning only; no decoration that is not doing work.</p>
   <div class="swatches">
-    <div class="swatch"><div class="swatch-dot" style="background:#1A6B3C;"></div><strong>Deep green</strong> - ticks, action</div>
-    <div class="swatch"><div class="swatch-dot" style="background:#B23A2A;"></div><strong>Brick red</strong> - crosses, broken</div>
-    <div class="swatch"><div class="swatch-dot" style="background:#C47A00;"></div><strong>Amber</strong> - question marks</div>
-    <div class="swatch"><div class="swatch-dot" style="background:#8A8A85;border:1px solid #ccc;"></div><strong>Grey</strong> - dimmed marks</div>
-    <div class="swatch"><div class="swatch-dot" style="background:#F8F6F1;border:1px solid #D8D5CD;"></div><strong>Off-white</strong> - background</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#1E6B47;"></div><strong>Deep green</strong> - ticks, action</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#B23A2E;"></div><strong>Brick red</strong> - crosses, broken</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#8A6410;"></div><strong>Amber</strong> - question marks</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#8E8A80;border:1px solid #ccc;"></div><strong>Grey</strong> - dimmed marks</div>
+    <div class="swatch"><div class="swatch-dot" style="background:#F6F4EE;border:1px solid #DAD6CB;"></div><strong>Off-white</strong> - background</div>
   </div>
   <p style="margin-top:12px;"><strong>Typography:</strong> IBM Plex Sans for all body, labels, UI. IBM Plex Mono for times, counts, numbers. Self-hosted via <code>@fontsource</code>.</p>
   <p><strong>Grid marks:</strong> SVG stroke marks, not emoji. Colour plus shape so the grid is readable without colour.</p>
@@ -567,22 +569,22 @@
     <h4>Grid Cell States</h4>
     <div class="cell-demo">
       <div class="cell-item">
-        <svg width="44" height="44" viewBox="0 0 44 44"><polyline points="10,24 19,33 34,13" stroke="#1A6B3C" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="44" height="44" viewBox="0 0 44 44"><polyline points="10,24 19,33 34,13" stroke="#1E6B47" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div><span class="badge badge-tick">tick</span></div>
         <div class="cell-label">Plan survives</div>
       </div>
       <div class="cell-item">
-        <svg width="44" height="44" viewBox="0 0 44 44"><line x1="13" y1="13" x2="31" y2="31" stroke="#B23A2A" stroke-width="2.5" stroke-linecap="round"/><line x1="31" y1="13" x2="13" y2="31" stroke="#B23A2A" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <svg width="44" height="44" viewBox="0 0 44 44"><line x1="13" y1="13" x2="31" y2="31" stroke="#B23A2E" stroke-width="2.5" stroke-linecap="round"/><line x1="31" y1="13" x2="13" y2="31" stroke="#B23A2E" stroke-width="2.5" stroke-linecap="round"/></svg>
         <div><span class="badge badge-cross">cross</span></div>
         <div class="cell-label">Plan breaks</div>
       </div>
       <div class="cell-item">
-        <svg width="44" height="44" viewBox="0 0 44 44"><line x1="13" y1="13" x2="31" y2="31" stroke="#8A8A85" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 2"/><line x1="31" y1="13" x2="13" y2="31" stroke="#8A8A85" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 2"/></svg>
+        <svg width="44" height="44" viewBox="0 0 44 44"><line x1="13" y1="13" x2="31" y2="31" stroke="#8E8A80" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 2"/><line x1="31" y1="13" x2="13" y2="31" stroke="#8E8A80" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 2"/></svg>
         <div><span class="badge badge-dim">dimmed</span></div>
         <div class="cell-label">Already broken by a single</div>
       </div>
       <div class="cell-item">
-        <svg width="44" height="44" viewBox="0 0 44 44"><text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="22" font-weight="600" fill="#C47A00">?</text></svg>
+        <svg width="44" height="44" viewBox="0 0 44 44"><text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="22" font-weight="600" fill="#8A6410">?</text></svg>
         <div><span class="badge badge-amber">qmark</span></div>
         <div class="cell-label">Unknown; never a pass</div>
       </div>

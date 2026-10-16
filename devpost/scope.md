@@ -23,6 +23,8 @@ Paste a messy written plan. The AI reads it into a structured map and asks one o
 
 Calm and honest. Not a busy dashboard. The aesthetic of a tool that takes responsibility seriously: simple, direct, no decoration that is not doing work. The grid filling in live, the timeline of the broken morning, the fix being turned down and the real one passing: those are the emotional beats. Tick and cross, not just colour, so it is readable by everyone.
 
+The user-approved Landing v2 design supplies the overview, six-section navigation, paper editor, scroll-linked plan story and replayable pipeline. Its brief page-break interaction restores the page afterward, respects reduced motion and keeps every control usable. The plan confirmation and live checker flow remain the core experience.
+
 ## Why This Matters to the Learner
 
 The learning goal is a repeatable pipeline: AI reads messy input into a structured map, plain rules validate the map before any strict system touches it, the user confirms, and only then the deterministic checker acts. That pattern (AI reads, rules check, human confirms, strict system acts) is the thing to take away from this project and apply elsewhere.
