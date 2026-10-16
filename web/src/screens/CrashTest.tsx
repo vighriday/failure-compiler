@@ -5,7 +5,7 @@ import CasePanel from "../components/CasePanel";
 import { countResults } from "../lib/results";
 import type { CaseDetail, FixSuggestion, PlanMap, RunCount, RunMeta, ScenarioResult } from "../types";
 
-export default function CrashTest({ plan, onEdit, onPlanChange }: { plan: PlanMap; onEdit: () => void; onPlanChange: (plan: PlanMap) => void }) {
+export default function CrashTest({ plan, onEdit, onPlanChange, embedded = false }: { plan: PlanMap; onEdit: () => void; onPlanChange: (plan: PlanMap) => void; embedded?: boolean }) {
   const [meta, setMeta] = useState<RunMeta | null>(null);
   const [results, setResults] = useState<ScenarioResult[]>([]);
   const [count, setCount] = useState<RunCount | null>(null);
@@ -73,8 +73,9 @@ export default function CrashTest({ plan, onEdit, onPlanChange }: { plan: PlanMa
   }
 
   return <div className={`app-shell crash-shell ${selected ? "panel-open" : ""}`}>
-    <header className="topbar"><div className="brand brand-compact"><div className="brand-name">Failure Compiler</div><div className="brand-subtitle">Crash-test a plan before Saturday does.</div></div><div className="topbar-meta"><span>EXAMPLE MODE</span><button type="button" onClick={onEdit}>← Plan map</button></div></header>
-    <main className="crash-main">
+    {!embedded && <header className="topbar"><div className="brand brand-compact"><div className="brand-name">Failure Compiler</div><div className="brand-subtitle">Crash-test a plan before Saturday does.</div></div><div className="topbar-meta"><span>EXAMPLE MODE</span><button type="button" onClick={onEdit}>← Plan map</button></div></header>}
+    <section className="crash-main">
+      {embedded && <div className="live-view-bar"><span className="mono">EXAMPLE PLAN · LIVE CHECKER</span><button type="button" className="button button-text" onClick={onEdit}>← Plan map</button></div>}
       <div className="eyebrow">03 / CRASH TEST</div>
       <div className="crash-heading"><h1>What could break this plan?</h1><span className="mono run-progress">{count?.completed ?? 0} / {meta?.total ?? "…"} checked</span></div>
       <p className="crash-count mono" aria-live="polite">{preview && <span className="projected-label">PROJECTED · </span>}{shownCount?.line ?? "The checker is starting with one problem at a time."}</p>
@@ -88,6 +89,6 @@ export default function CrashTest({ plan, onEdit, onPlanChange }: { plan: PlanMa
       </div>
       {selected && meta && <CasePanel plan={plan} meta={meta} result={selected} detail={detail} loading={detailLoading} running={!done || applying} error={detailError} previewId={preview?.id} remaining={broken.length} onClose={() => { setSelectedId(null); setPreview(null); }} onPreview={setPreview} onAccept={accept} onNext={nextCase} />}
       </div>
-    </main>
+    </section>
   </div>;
 }

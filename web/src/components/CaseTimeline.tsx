@@ -9,6 +9,7 @@ export default function CaseTimeline({ plan, result, reasons }: { plan: PlanMap;
     return "Never leaves: no listed team can deliver this route.";
   };
   return <div className="case-timeline"><h3>The checker's best schedule</h3>
+    <div className="timeline-scroll" role="region" aria-label="Scrollable route timeline" tabIndex={0}>
     <svg className="timeline-svg" viewBox="0 0 520 290" role="img" aria-label="Best schedule from 9:00 to 12:30, one lane per route. Noon is the deadline.">
       {[540, 600, 660, 720, 750].map((time) => <g key={time}><line x1={x(time)} x2={x(time)} y1="45" y2="274" className="time-guide" /><text x={x(time) - (time === 720 ? 4 : 0)} y="36" textAnchor={time >= 720 ? "end" : "middle"} className="timeline-time">{`${Math.floor(time / 60)}:${String(time % 60).padStart(2, "0")}`}</text></g>)}
       {plan.routes.map((route, index) => {
@@ -29,5 +30,7 @@ export default function CaseTimeline({ plan, result, reasons }: { plan: PlanMap;
       })}
       <line x1={x(plan.finish_time)} x2={x(plan.finish_time)} y1="44" y2="274" className="deadline-line" /><text x={x(plan.finish_time) - 4} y="15" textAnchor="end" className="deadline-label">Noon: families waiting</text>
     </svg>
+    </div>
+    <p className="timeline-scroll-hint">Scroll across the timeline to see every route and the noon deadline.</p>
   </div>;
 }

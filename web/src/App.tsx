@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { confirmMap, readExample, validateMap } from "./api/client";
 import type { ExampleReading, PlanMap, ReadingItem, RuleQuestion, Status } from "./types";
 import CrashTest from "./screens/CrashTest";
+import LandingPage from "./landing/LandingPage";
+import { TABS, type LandingTab } from "./landing/data";
 
 const groups = ["People", "Vehicles", "Routes", "Times"] as const;
 const presets = [15, 30, 45, 60, 90];
@@ -21,8 +23,17 @@ const allProblems = [
 ];
 
 function LineNumbers({ text, activeLine, onLineClick }: { text: string; activeLine?: string; onLineClick?: (line: string) => void }) {
+  const lines = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const line = activeLine ? lines.current?.querySelector<HTMLElement>(`#plan-${activeLine}`) : undefined;
+    const paper = lines.current?.closest<HTMLElement>(".source-paper");
+    if (!line || !paper) return;
+    const target = line.getBoundingClientRect(), viewport = paper.getBoundingClientRect();
+    if (target.top < viewport.top) paper.scrollTop += target.top - viewport.top;
+    if (target.bottom > viewport.bottom) paper.scrollTop += target.bottom - viewport.bottom;
+  }, [activeLine]);
   return (
-    <div className="line-paper" aria-label="Original plan with line numbers">
+    <div ref={lines} className="line-paper" aria-label="Original plan with line numbers">
       {text.trimEnd().split("\n").map((line, index) => {
         const number = String(index + 1);
         const source = `L${number}`;
@@ -56,6 +67,7 @@ function initialStatement(item: ReadingItem) {
 }
 
 function correctedStatement(item: ReadingItem, planMap: PlanMap) {
+  if (item.id === "ravi-driver") return planMap.people.find((person) => person.id === item.entity_id)?.can_drive ? "Ravi can drive." : "Ravi cannot drive.";
   if (item.id === "route-c-loading") return `Route C's drive takes ${item.value ?? 60} minutes.`;
   if (item.entity_type === "route") {
     const route = planMap.routes.find((candidate) => candidate.id === item.entity_id);
@@ -70,6 +82,9 @@ function correctedStatement(item: ReadingItem, planMap: PlanMap) {
 }
 
 function App() {
+  const [tab, setTab] = useState<LandingTab>(() => TABS.find(([id]) => id === location.hash.slice(1))?.[0] ?? "top");
+  const navigate = useCallback((next: LandingTab) => { setTab(next); if (location.hash !== `#${next}`) history.pushState(null, "", `#${next}`); }, []);
+  useEffect(() => { const back = () => setTab(TABS.find(([id]) => id === location.hash.slice(1))?.[0] ?? "top"); window.addEventListener("popstate", back); return () => window.removeEventListener("popstate", back); }, []);
   const [screen, setScreen] = useState<"paste" | "map" | "grid">("paste");
   const [planText, setPlanText] = useState("");
   const [apiKey, setApiKey] = useState("");
@@ -106,6 +121,7 @@ function App() {
       const result = await readExample(planText);
       setReading(result);
       setPlanText(result.plan_text);
+      return result.plan_text;
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not load the example plan.");
     }
@@ -133,6 +149,7 @@ function App() {
       setConfirmed(false);
       setOutOfDate(false);
       setScreen("map");
+      navigate("read");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not load the example reading.");
     }
@@ -181,16 +198,17 @@ function App() {
   function changeDriverAbility(item: ReadingItem, value: boolean) {
     if (!planMap) return;
     const previous = planMap.people.find((person) => person.id === item.entity_id)?.can_drive;
-    updateMapItem(item, previous === value ? "confirmed" : "corrected", value);
+    const status: Status = value === reading?.plan_map.people.find((person) => person.id === item.entity_id)?.can_drive ? "confirmed" : "corrected";
+    updateMapItem(item, status, value);
     if (previous === value) {
-      setItems((current) => current.map((candidate) => candidate.id === item.id ? { ...candidate, status: "confirmed" } : candidate));
+      setItems((current) => current.map((candidate) => candidate.id === item.id ? { ...candidate, status, value } : candidate));
       setEditing(null);
       return;
     }
     if (!value) {
       const routeItems = new Set(planMap.routes.filter((route) => route.driver_ids.includes(item.entity_id)).map((route) => `route-${route.name.toLowerCase()}`));
       setItems((current) => current.map((candidate) => candidate.id === item.id
-        ? { ...candidate, status: "corrected" as const, value }
+        ? { ...candidate, status, value }
         : routeItems.has(candidate.id) ? { ...candidate, status: "stale" as const } : candidate));
       setPlanMap((current) => {
         if (!current) return current;
@@ -199,7 +217,7 @@ function App() {
         return updated;
       });
     } else {
-      setItems((current) => current.map((candidate) => candidate.id === item.id ? { ...candidate, status: "corrected" as const, value } : candidate));
+      setItems((current) => current.map((candidate) => candidate.id === item.id ? { ...candidate, status, value } : candidate));
     }
     setEditing(null);
   }
@@ -226,6 +244,8 @@ function App() {
       setConfirmed(true);
       setOutOfDate(false);
       setScreen("grid");
+      navigate("test");
+      window.scrollTo({ top: 0, behavior: "instant" });
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "The map could not be confirmed.");
     }
@@ -239,85 +259,36 @@ function App() {
 
   function answerQuestion(question: RuleQuestion, choice: string) {
     setAnswers((current) => ({ ...current, [question.id]: choice }));
-    if (question.id !== "ravi-van-loading-question" || choice !== "The van too" || !planMap) return;
+    if (question.id !== "ravi-van-loading-question" || !planMap) return;
     const updated = structuredClone(planMap);
     const changedRoutes = new Set<string>();
     for (const route of updated.routes) {
-      if (route.vehicle_id === "vehicle-van" && !route.loader_ids.includes("person-ravi")) {
-        route.loader_ids.push("person-ravi");
+      const baseline = reading?.plan_map.routes.find((candidate) => candidate.id === route.id);
+      const shouldLoad = choice === "The van too" || Boolean(baseline?.loader_ids.includes("person-ravi"));
+      if (route.vehicle_id === "vehicle-van" && route.loader_ids.includes("person-ravi") !== shouldLoad) {
+        route.loader_ids = shouldLoad ? [...route.loader_ids, "person-ravi"] : route.loader_ids.filter((id: string) => id !== "person-ravi");
         route.status = "corrected";
         changedRoutes.add(route.id);
       }
     }
+    if (changedRoutes.size === 0) return;
     updated.fingerprint = null;
     setOutOfDate(true);
     setPlanMap(updated);
     setItems((current) => current.map((item) => item.field === "route" && changedRoutes.has(item.entity_id) ? { ...item, status: "corrected" } : item));
   }
 
-  if (screen === "paste") {
-    const aboveLimit = planText.length > 4000;
-    return (
-      <div className="app-shell paste-shell">
-        <header className="brand brand-center">
-          <div className="brand-name">Failure Compiler</div>
-          <div className="brand-subtitle">Crash-test a plan before Saturday does.</div>
-        </header>
-        <main className="paste-main">
-          <p className="eyebrow">01 / PASTE PLAN</p>
-          <h1>What needs to go right<br />on Saturday?</h1>
-          <p className="intro-copy">Paste the plan you have. We’ll map the people, vehicles, routes and timing before we test what could go wrong.</p>
-          <div className="paper-input">
-            <div className="textarea-gutter" aria-hidden="true">
-              {Array.from({ length: Math.max(14, planText.trimEnd().split("\n").length) }, (_, index) => <span key={index}>{index + 1}</span>)}
-            </div>
-            <textarea
-              aria-label="Plan text"
-              value={planText}
-              onChange={(event) => setPlanText(event.target.value)}
-              placeholder="Paste the run sheet, group chat notes or the plan as it stands..."
-              spellCheck="false"
-            />
-          </div>
-          <div className={`character-count ${planText.length >= 3500 ? "count-warn" : ""} ${aboveLimit ? "count-error" : ""}`}>{planText.length.toLocaleString()} / 4,000 characters</div>
-          <div className="paste-actions">
-            <button className="button button-primary" type="button" disabled={!planText.trim() || aboveLimit} onClick={readPlan}>Read plan <span aria-hidden="true">→</span></button>
-            <button className="button button-secondary" type="button" onClick={loadExample}>Load the example plan</button>
-          </div>
-          <div className="key-disclosure">
-            <button type="button" className="disclosure-button" onClick={() => setShowKey(!showKey)} aria-expanded={showKey}>
-              <span className={`disclosure-chevron ${showKey ? "open" : ""}`}>›</span> Use your own AI key
-            </button>
-            {showKey && <label className="key-field">AI key<input type="password" autoComplete="off" value={apiKey} onChange={(event) => setApiKey(event.target.value)} placeholder="Paste key here" /></label>}
-          </div>
-          {error && <p className="inline-error" role="alert">{error}</p>}
-          <p className="privacy-note">Nothing is saved. Example mode makes no AI calls. With your own key, the plan is sent to the AI provider to be read.</p>
-          {apiKey.trim() && <p className="privacy-note">If you use a Gemini key, don't paste personal details - Google may use them to improve its models. The example plan is fictional.</p>}
-        </main>
-      </div>
-    );
-  }
-
-  if (!reading || !planMap) return null;
-  if (screen === "grid") return <CrashTest plan={planMap} onPlanChange={setPlanMap} onEdit={() => { setScreen("map"); setConfirmed(false); }} />;
-
-  return (
+  const mapContent = reading && planMap ? (
     <div className="app-shell map-shell">
-      <header className="topbar">
-        <div className="brand brand-compact">
-          <div className="brand-name">Failure Compiler</div>
-          <div className="brand-subtitle">Crash-test a plan before Saturday does.</div>
-        </div>
-        <div className="topbar-meta"><span>EXAMPLE MODE</span><button type="button" onClick={() => setScreen("paste")}>← Edit plan</button></div>
-      </header>
-      <main className="map-layout">
+      <div className="map-view-heading"><p className="eyebrow">02 · READ</p><h1>Here’s what we understood.</h1><p>Check each detail against the plan. You decide what the checker will use.</p></div>
+      <section className="map-layout">
         <aside className="source-column">
           <div className="source-heading">
             <div><span className="eyebrow">SOURCE PLAN</span><h2>Saturday food run</h2></div>
             <span className="mono small">{reading.plan_text.trimEnd().split("\n").length} lines</span>
           </div>
           <div className="source-paper">
-            <LineNumbers text={reading.plan_text} activeLine={activeLine} />
+            <LineNumbers text={reading.plan_text} activeLine={activeLine} onLineClick={setActiveLine} />
           </div>
           <div className="source-legend"><span className="legend-dot" /> Hover a statement to trace its source</div>
         </aside>
@@ -325,8 +296,6 @@ function App() {
         <section className="map-content" aria-label="Plan map">
           <div className="map-intro">
             {outOfDate && <div className="outdated-notice">Out of date: re-run. Confirm the edited map to test it again.</div>}
-            <div className="eyebrow">02 / PLAN MAP</div>
-            <h1>Here’s what we understood.</h1>
             <div className="placeholder-notice"><span className="notice-mark">i</span><span>Example mode: this reading was written by hand for testing and is not real AI output.</span></div>
           </div>
 
@@ -340,11 +309,11 @@ function App() {
           <section className="questions-section">
             <div className="section-heading"><div><div className="section-kicker">NEEDS YOUR ANSWER</div><h2>One question before we test</h2></div><span className={`question-count ${openQuestions.length + issues.length === 0 ? "count-neutral" : ""}`}>{openQuestions.length + issues.length} open</span></div>
             {questions.map((question) => (
-              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} key={question.id} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
+              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
                 <div className="question-icon">?</div>
                 <div className="question-body"><p>{question.question_text}</p>
                   {answers[question.id]
-                    ? <div className="question-answer"><span className="answer-check"><Tick /></span> Confirmed: {answers[question.id]}</div>
+                    ? <div className="question-answer"><span className="answer-check"><Tick /></span> Confirmed: {answers[question.id]}<button type="button" className="quiet-link" onClick={() => { setAnswers((current) => { const next = { ...current }; delete next[question.id]; return next; }); setConfirmed(false); setOutOfDate(true); }}>Change</button></div>
                     : <div className="choice-row">{question.choices.map((choice) => <button key={choice} type="button" className="choice-button" onClick={() => answerQuestion(question, choice)}>{choice}</button>)}</div>}
                 </div>
               </div>
@@ -370,18 +339,18 @@ function App() {
                   const changedBy = planEntity(item, planMap)?.changed_by_fix as number | undefined;
                   const acceptedChange = changedBy ? planMap.fix_history?.[changedBy - 1] : undefined;
                   return (
-                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" ? "needs-confirm" : ""}`} key={item.id} onMouseEnter={() => setActiveLine(item.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
+                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} key={item.id} tabIndex={0} onFocus={() => setActiveLine(item.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => setActiveLine(item.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
                       <div className="reading-copy">
                         <div className="statement-line">
-                          {item.status === "corrected" && (item.guessed || item.entity_type === "route") ? <><del>{initialStatement(item)}</del><span>{changedText}</span></> : <span>{item.statement}</span>}
+                          {item.status === "corrected" ? <><del>{initialStatement(item)}</del><span>{changedText}</span></> : <span>{item.statement}</span>}
                         </div>
                         <button type="button" className="source-tag" onClick={() => setActiveLine(item.source_line)}>{item.source_line}</button>
                         {acceptedChange && <div className="fix-map-note">{acceptedChange.description}</div>}
                       </div>
                       <div className="reading-controls">
                         {changedBy ? <span className="status-chip status-fix">changed by Fix {changedBy}</span> : item.status === "confirmed" ? <span className="confirmed-mark"><Tick /> confirmed</span> : <span className={`status-chip status-${item.status}`}>{statusLabel(item.status)}</span>}
-                        {item.status === "confirmed" && (isRouteCDuration || isRaviDriver) && <button className="edit-link" type="button" onClick={() => setEditing(editing === item.id ? null : item.id)}>Correct</button>}
-                        {item.status === "unconfirmed" && <button className="row-confirm" type="button" onClick={() => confirmItem(item)}>Confirm</button>}
+                        {["confirmed", "corrected", "added"].includes(item.status) && (isRouteCDuration || isRaviDriver) && <button className="edit-link" type="button" onClick={() => setEditing(editing === item.id ? null : item.id)}>Correct</button>}
+                        {["unconfirmed", "stale"].includes(item.status) && <button className="row-confirm" type="button" onClick={() => confirmItem(item)}>Confirm</button>}
                         {item.status === "guessed" && editing !== item.id && <button className="edit-link" type="button" onClick={() => setEditing(item.id)}>Answer</button>}
                       </div>
                       {editing === item.id && (isRouteCDuration || isRaviDriver) && <div className="inline-editor">
@@ -424,13 +393,21 @@ function App() {
           {error && <p className="inline-error map-error" role="alert">{error}</p>}
           {confirmed && <div className="confirmation-result" role="status"><Tick /> Plan confirmed. Fingerprint <span className="mono">{planMap.fingerprint}</span></div>}
         </section>
-      </main>
+      </section>
       <footer className="confirm-footer">
           <div className="footer-status"><span className="mono">{confirmedCount} of {items.length} confirmed</span><span className="footer-dot">·</span><span className="mono">{openQuestions.length + issues.length} question{openQuestions.length + issues.length === 1 ? "" : "s"} open</span></div>
         <div className="footer-actions"><button type="button" className="button button-text" onClick={bulkConfirm}>Confirm everything that isn’t a guess</button><button className="button button-primary" type="button" disabled={!ready || confirmed} onClick={handleConfirm}>{confirmed ? "Plan confirmed" : "Confirm plan"}<span aria-hidden="true">→</span></button></div>
       </footer>
     </div>
-  );
+  ) : undefined;
+  return <LandingPage
+    tab={tab} onNavigate={navigate}
+    text={planText} onTextChange={(value) => { setPlanText(value); if (planMap && value !== reading?.plan_text) { setOutOfDate(true); setConfirmed(false); } }}
+    apiKey={apiKey} onKeyChange={setApiKey} keyOpen={showKey} onKeyOpen={setShowKey}
+    onLoadExample={loadExample} onReadPlan={readPlan} error={error}
+    readContent={mapContent}
+    testContent={planMap ? planMap.fingerprint && !outOfDate ? <CrashTest embedded plan={planMap} onPlanChange={setPlanMap} onEdit={() => { setScreen("map"); setConfirmed(false); navigate("read"); }} /> : <section className="confirmation-gate"><p className="eyebrow">03 · CRASH TEST</p><h1>Confirm the plan before we test it.</h1><p>{outOfDate ? "The map changed. Review and confirm it so the checker uses your current plan." : "Every detail and open question needs your answer first."}</p><button type="button" className="button button-primary" onClick={() => navigate("read")}>Review the plan <span aria-hidden="true">→</span></button></section> : undefined}
+  />;
 }
 
 export default App;
