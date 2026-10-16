@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Load the example, correct one item, watch dependent items lose confirmation, confirm.
   Commit: `Add example-mode plan map with Screen 1, Screen 2, and dev server`
 
-- [ ] **4. The grid fills live**
+- [x] **4. The grid fills live**
   Becomes usable: After confirming the map, the crash-test grid fills cell by cell over SSE. The example plan's story is visible on screen: one cross on the diagonal, three crosses off-diagonal, dimmed marks, ticks. The count line updates live.
   Why now: Connects the confirmed map to the checker from slice 1, streamed to the browser. The grid is the emotional core of the demo.
   PRD ref: `prd.md > Screen 3: Crash Test`, `prd.md > Live-Filling Grid`
@@ -81,7 +81,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored - after slice 4 (grid fills live), I explore the running app and give feedback
+- [ ] Hands-on checkpoint - after slice 5 (the complete demo story), I explore the running app and give feedback
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -101,6 +101,8 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+- Slice 4 verified: 28 Python tests passed, production web build passed, and Playwright saw the first cell before completion, then all 100 expected marks with no page errors. Screenshot: `devpost/screens/slice4-grid.png`.
+- Slice 4/5 checkpoint moved from after slice 4 to after slice 5 so the learner can explore the complete demo story; slices 4 and 5 still have separate verification, commits, and checklist ticks.
 - Slice 3 example reading is explicitly a hand-made PLACEHOLDER fixture, not real AI output; the UI labels it as such.
 - B revision: pairs that combine two problems for the same entity are excluded because that combination cannot happen (for example, one person cannot be absent and leave early at once). The locked story stays the same: 100 total, 1 single weak spot, 3 hidden pairs, 12 dimmed, 84 survived.
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { confirmMap, readExample, validateMap } from "./api/client";
 import type { ExampleReading, PlanMap, ReadingItem, RuleQuestion, Status } from "./types";
+import CrashTest from "./screens/CrashTest";
 
 const groups = ["People", "Vehicles", "Routes", "Times"] as const;
 const presets = [15, 30, 45, 60, 90];
@@ -68,7 +69,7 @@ function correctedStatement(item: ReadingItem, planMap: PlanMap) {
 }
 
 function App() {
-  const [screen, setScreen] = useState<"paste" | "map">("paste");
+  const [screen, setScreen] = useState<"paste" | "map" | "grid">("paste");
   const [planText, setPlanText] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [showKey, setShowKey] = useState(false);
@@ -83,6 +84,7 @@ function App() {
   const [editing, setEditing] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [outOfDate, setOutOfDate] = useState(false);
 
   const confirmedCount = useMemo(() => items.filter((item) => ["confirmed", "corrected", "added"].includes(item.status)).length, [items]);
   const openQuestions = questions.filter((question) => !answers[question.id]);
@@ -215,6 +217,8 @@ function App() {
       const result = await confirmMap(planMap, items, questions, answers);
       setPlanMap((current) => current ? { ...current, fingerprint: result.fingerprint } : current);
       setConfirmed(true);
+      setOutOfDate(false);
+      setScreen("grid");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "The map could not be confirmed.");
     }
@@ -270,6 +274,7 @@ function App() {
   }
 
   if (!reading || !planMap) return null;
+  if (screen === "grid") return <CrashTest plan={planMap} onEdit={() => { setScreen("map"); setConfirmed(false); setOutOfDate(true); }} />;
 
   return (
     <div className="app-shell map-shell">
@@ -294,6 +299,7 @@ function App() {
 
         <section className="map-content" aria-label="Plan map">
           <div className="map-intro">
+            {outOfDate && <div className="outdated-notice">Out of date: re-run. Confirm the edited map to test it again.</div>}
             <div className="eyebrow">02 / PLAN MAP</div>
             <h1>Here’s what we understood.</h1>
             <div className="placeholder-notice"><span className="notice-mark">i</span><span>Example mode: this reading was written by hand for testing and is not real AI output.</span></div>

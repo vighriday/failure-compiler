@@ -47,3 +47,18 @@ export type ExampleReading = {
   read_by: string;
   problem_types: Record<string, number>;
 };
+
+export type CellState = "tick" | "cross" | "dim" | "qmark";
+export type TimelineEvent = { route_id: string; event: string; time: number; person_id: string | null; vehicle_id: string | null };
+export type ScenarioResult = {
+  scenario_id: string; failures: string[]; state: CellState; dim_cause: string | null;
+  lateness_minutes: number | null; timeline: TimelineEvent[]; human_cost: string | null;
+  map_fingerprint: string;
+};
+export type Problem = { id: string; type_id: string; entity_id: string; entity_type: string; size: number | null; label: string };
+export type ScenarioRef = { scenario_id: string; failures: string[] };
+export type RunMeta = { fingerprint: string; total: number; problems: Problem[]; scenarios: ScenarioRef[] };
+export type RunCount = {
+  total: number; completed: number; weak_spots: number; hidden_pairs: number;
+  dimmed: number; survived: number; unknown: number; pending: number; line: string;
+};

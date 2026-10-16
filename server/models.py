@@ -103,6 +103,18 @@ class ScenarioResult(BaseModel):
     map_fingerprint: str = ""
 
 
+class RunCount(BaseModel):
+    total: int
+    completed: int
+    weak_spots: int
+    hidden_pairs: int
+    dimmed: int
+    survived: int
+    unknown: int
+    pending: int
+    line: str
+
+
 # ---------------------------------------------------------------------------
 # Fix operations and suggestions (slice 5 / 6)
 # ---------------------------------------------------------------------------

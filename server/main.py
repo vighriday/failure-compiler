@@ -12,12 +12,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
 from server.models import PlanMapData
-from server.validation.fingerprint import fingerprint_plan_map
+from server.grid import router as grid_router
+from server.session import remember_map
 from server.validation.models import PlanMap
 from server.validation.rules import validate_plan_rules
 
 ROOT = Path(__file__).resolve().parents[1]
 app = FastAPI(title="Failure Compiler")
+app.include_router(grid_router)
 
 
 def _fixture(path: str) -> dict[str, Any]:
@@ -96,7 +98,7 @@ def confirm_map(request: dict[str, Any]) -> dict[str, Any]:
     issues = validate_plan_rules(plan)
     if issues:
         raise HTTPException(status_code=409, detail=[issue.message for issue in issues])
-    plan.fingerprint = fingerprint_plan_map(plan)
+    plan.fingerprint = remember_map(plan)
     return {"confirmed": True, "fingerprint": plan.fingerprint}
 
 
