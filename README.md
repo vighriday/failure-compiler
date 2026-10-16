@@ -427,7 +427,7 @@ Run the Python tests with `uv run -- python -m pytest -q`. The Playwright browse
 You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, and Node.js 20 or newer.
 
 ```bash
-git clone https://github.com/GITHUB_USERNAME/failure-compiler.git
+git clone https://github.com/vighriday/failure-compiler.git
 cd failure-compiler
 uv sync --extra dev
 npm install
