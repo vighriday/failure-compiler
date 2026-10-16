@@ -81,7 +81,7 @@ def test_one_spare_key_reveals_a_new_hidden_pair() -> None:
 def test_all_fixes_survive_every_scenario() -> None:
     fixed = add_driver(add_loader(example_plan(), "route-c", "person-sam"), "route-a", "person-sam")
     results = run_checker(give_spare_keys(fixed, "person-maya", "person-sam"))
-    assert len(results) == 105
+    assert len(results) == 100
     assert all(result.state == "tick" for result in results)
 
 

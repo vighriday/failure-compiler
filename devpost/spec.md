@@ -165,11 +165,11 @@ Fixed list. Each type is applied to every matching entity in the confirmed map, 
 | Supply delivery arrives late | Each incoming delivery | Minutes late | 45 |
 | Place blocked | Each place | Minutes blocked from loading start | 30 |
 
-Example plan: Route A has 10 households, Route B has 12, and Route C has 8. The van returns from an early pickup at 9:30; Joel has the only key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. Hidden pairs: Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent. Count: 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = 14 problems; 14 singles + 91 pairs = 105 tests, with 1 single weak spot, 3 hidden pairs, 13 dimmed, and 88 survived.
+Example plan: Route A has 10 households, Route B has 12, and Route C has 8. The van returns from an early pickup at 9:30; Joel has the only key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. Hidden pairs: Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent. Count: 5 volunteers x 2 types + 2 vehicles + 1 delivery + 1 loading area = 14 problems; 14 singles + 86 pairs = 100 tests, with 1 single weak spot, 3 hidden pairs, 12 dimmed, and 84 survived.
 
 Hall key: not a separate problem type. Joel holds the only key, so "Joel absent (only key holder)" is the single weak spot. The loading area rule checks `holds_key` on the `Person` model.
 
-Cap: 24 problems (300 tests). A larger plan shows a rule message before Confirm: "This version supports up to 24 problems (300 tests). This plan has N."
+Cap: 24 problems. A larger plan shows a rule message before Confirm: "This version supports up to 24 problems. This plan has N."
 
 Deliberately out of scope: volunteer arrives late. Listed under "What was NOT tested" in every report.
 
@@ -237,7 +237,7 @@ One AI call per broken case: `POST /api/suggest-fixes` sends the confirmed map p
 
 The checker's facts are always shown in the panel. The AI's sentence sits next to them, labelled "AI's explanation."
 
-Turned-down reasons come from the checker, not the AI. “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; the checker gives “Van back 10:45. Loading team gone.” The fixes are “Sam loads Route C” and “Sam backs up Route A.” One spare key is turned down because it reveals Joel absent + Maya absent; spare keys for Maya and Sam make all 105 scenarios survive.
+Turned-down reasons come from the checker, not the AI. “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; the checker gives “Van back 10:45. Loading team gone.” The fixes are “Sam loads Route C” and “Sam backs up Route A.” One spare key is turned down because it reveals Joel absent + Maya absent; spare keys for Maya and Sam make all 100 scenarios survive.
 
 ### Fix operations (fixed list, always gateable)
 
@@ -564,7 +564,7 @@ failure-compiler/
 │   ├── example-truth.json        # Correct confirmed map, written by hand
 │   ├── example-reading.json      # Chosen provider's real output, saved as-is
 │   ├── example-fixes.json        # Saved suggestions for each broken case
-│   └── expected-results.json     # Hand-checked verdicts for all 105 cells
+│   └── expected-results.json     # Hand-checked verdicts for all 100 cells
 ├── scripts/
 │   ├── dev.py                    # Starts both servers; 127.0.0.1 only
 │   └── bakeoff.py                # Compares both providers against example-truth.json
@@ -616,7 +616,7 @@ Implements `prd.md > States and Boundaries`.
 - **A fix suggestion fails the gate** - card shows "Couldn't apply" with the specific reason. Never scored, never acceptable.
 - **`is_distribution_plan` is false in the reading** - "This version only supports community distribution plans" plus the AI's reason. Offer to load the example.
 - **Solver hits the deterministic time limit** - question mark cell. Listed by name under "What was NOT tested." Never a pass.
-- **Plan exceeds 24 problems** - rule message on Screen 2 before Confirm: "This version supports up to 24 problems (300 tests). This plan has N."
+- **Plan exceeds 24 problems** - rule message on Screen 2 before Confirm: "This version supports up to 24 problems. This plan has N."
 - **Plan text exceeds ~4,000 characters** - counter turns amber at 3,500, red at 4,000, submit disabled above 4,000.
 - **AI key invalid or call fails** - clear error message, retry button, suggest example plan.
 
@@ -635,7 +635,7 @@ Implements `prd.md > States and Boundaries`.
 
 ### Decisions
 
-**CP-SAT for the checker.** Lateness is a proved minimum, not a found example. "Zero lateness proven" means the plan genuinely survives. A heuristic solver could find a good schedule but not prove it is the best; CP-SAT's optimality proof is what makes the three honest answers possible. Tradeoff: heavier dependency than a hand-written scheduler. At 14 problems / 105 tests with the deterministic limit, the full run completes in well under a minute.
+**CP-SAT for the checker.** Lateness is a proved minimum, not a found example. "Zero lateness proven" means the plan genuinely survives. A heuristic solver could find a good schedule but not prove it is the best; CP-SAT's optimality proof is what makes the three honest answers possible. Tradeoff: heavier dependency than a hand-written scheduler. At 14 problems / 100 tests with the deterministic limit, the full run completes in well under a minute.
 
 **Every scenario is kept feasible with a "not delivered" penalty.** Routes that cannot run (no driver available, loading area cannot open) are modelled as delivered with lateness equal to households times the full horizon (finish time plus 180 minutes). This means the solver always returns a number rather than "infeasible", the human cost can always be stated concretely, and tick/cross/question mark keep their meaning.
 

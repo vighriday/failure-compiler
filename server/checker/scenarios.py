@@ -70,6 +70,8 @@ def generate_scenarios(
 
     pairs = []
     for a, b in combinations(problems, 2):
+        if (a["entity_type"], a["entity_id"]) == (b["entity_type"], b["entity_id"]):
+            continue
         scenario_id = f"{a['id']}+{b['id']}"
         pairs.append({
             "scenario_id": scenario_id,

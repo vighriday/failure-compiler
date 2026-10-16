@@ -383,7 +383,7 @@ function App() {
                 }}>{presets.map((value) => <option key={value} value={value}>{value} min</option>)}</select></label> : <span className="no-size mono">no duration</span>}
               </div>)}
             </div>
-            <div className="problem-total"><span>Pairwise tests when you confirm</span><span className="mono">105 scenarios</span></div>
+            <div className="problem-total"><span>Pairwise tests when you confirm</span><span className="mono">100 scenarios</span></div>
           </section>
           <div className="read-by mono">READ BY · {reading.read_by} <span>·</span> {reading.placeholder ? "PLACEHOLDER" : "SAVED READING"}</div>
           {error && <p className="inline-error map-error" role="alert">{error}</p>}

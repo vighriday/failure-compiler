@@ -183,8 +183,7 @@ def validate_plan_rules(plan: PlanMap | PlanMapData) -> list[RuleViolation]:
                 "problem_count",
                 problem_count,
                 (
-                    f"This version supports up to {PROBLEM_CAP} problems "
-                    f"({PROBLEM_CAP * (PROBLEM_CAP + 1) // 2} tests). "
+                    f"This version supports up to {PROBLEM_CAP} problems. "
                     f"This plan has {problem_count}."
                 ),
             )

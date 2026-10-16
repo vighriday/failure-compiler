@@ -23,7 +23,7 @@ def test_example_locked() -> None:
     results = run_checker(plan)
     expected = json.loads((ROOT / "fixtures/expected-results.json").read_text())
 
-    assert len(results) == 105
+    assert len(results) == 100
     assert [
         {"scenario_id": r.scenario_id, "state": r.state,
          "lateness_minutes": r.lateness_minutes, "human_cost": r.human_cost}
@@ -59,5 +59,5 @@ def test_example_locked() -> None:
     assert crosses[TRUCK_RAVI].human_cost == "Route A: 10 households not delivered"
     assert crosses[VAN_ANITA_LEAVES].human_cost == "Route C: 8 households not delivered"
     assert crosses[VAN_ANITA_ABSENT].human_cost == "Route C: 8 households not delivered"
-    assert sum(result.state == "dim" for result in results) == 13
-    assert sum(result.state == "tick" for result in results) == 88
+    assert sum(result.state == "dim" for result in results) == 12
+    assert sum(result.state == "tick" for result in results) == 84

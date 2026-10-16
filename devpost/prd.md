@@ -20,7 +20,7 @@ Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 4. **Crash test screen.** A grid fills in live. Every failure type across the top, every failure type down the side. Each scenario appears once: the diagonal plus the cells below it, so the grid shows one triangle, not two. Cells flip to tick, cross, dimmed mark, or question mark as the checker runs. A count line tracks results in real time.
 5. **Broken case detail panel.** The user clicks a cross. A panel slides in on the right; the grid stays visible on the left. The panel shows the failures, a timeline of the broken morning, the human cost, and up to three fix suggestions, each already scored.
 6. **Fix and re-test.** The user previews a fix on the live grid, accepts it, watches the grid re-test in place. The panel updates: "Now survives." They move to the next broken case. Fixes stack.
-7. **All cases survive (or the coordinator stops here).** When nothing is left, the panel reads "All 105 tested scenarios survive" and offers "See report." If the coordinator decides to stop fixing, "See report" is available any time after the first run. The report then shows what is still broken.
+7. **All cases survive (or the coordinator stops here).** When nothing is left, the panel reads "All 100 tested scenarios survive" and offers "See report." If the coordinator decides to stop fixing, "See report" is available any time after the first run. The report then shows what is still broken.
 8. **Report screen.** The full run in plain language: plan, what was tested, what broke, what fixed it, what was NOT tested. Print or save as PDF via browser print.
 
 ---
@@ -61,7 +61,7 @@ A live-filling grid. Failure types across the top and down the side; roughly 12 
 - **Dimmed mark:** the pair breaks, but only because one failure already breaks it alone. Labelled "already broken by X alone." Keeps one weak spot from filling a whole row and column with crosses.
 - **Question mark:** the checker could not determine the result. Never counted as survived.
 
-**Count line** (updates live): "105 tests: 1 single weak spot, 3 hidden pairs, 13 already broken by the weak spot, 88 survived."
+**Count line** (updates live): "100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived."
 
 **Before/After toggle** sits above the grid once any fix is accepted. Compares the original plan against the current fixed version.
 
@@ -79,14 +79,14 @@ Opens on the right when a cross is clicked. The grid stays visible on the left. 
   - What the fix changes.
   - Fixes N / still broken N / new crosses N, scored by the checker before the user touches it.
   - Turn down “Add Maya as backup driver for Route C”: the gap is loading, not driving; show the checker-derived reason “Van back 10:45. Loading team gone.”
-  - The working fixes are “Sam loads Route C” and “Sam backs up Route A.” Turn down “one spare key” because it reveals “Joel absent + Maya absent.” “Spare keys for Maya and Sam” makes all 105 scenarios survive. Turned-down fixes can be previewed but not accepted.
+  - The working fixes are “Sam loads Route C” and “Sam backs up Route A.” Turn down “one spare key” because it reveals “Joel absent + Maya absent.” “Spare keys for Maya and Sam” makes all 100 scenarios survive. Turned-down fixes can be previewed but not accepted.
 - Accept button (enabled only for accepted-eligible fixes).
 
 **After accepting a fix:**
 - Grid re-tests in place. Cells flip. Takes a few seconds.
 - Panel updates: "Now survives."
 - Button: "Next broken case (N left)."
-- When nothing is left: "All 105 tested scenarios survive." Button: "See report."
+- When nothing is left: "All 100 tested scenarios survive." Button: "See report."
 - Accepted changes appear on the plan map, marked "changed by Fix 1" (or Fix 2, etc.).
 
 ### Screen 5: Report
@@ -95,9 +95,9 @@ Reached from "See report." One page in the app.
 **Sections:**
 1. **The plan:** confirmed map with correction trail: "AI read 24 items, 2 corrected by you, 1 added by you."
 2. **What was tested:** the problem list with the sizes used; total test count.
-3. **What broke (before fixes):** single weak spots and hidden pairs, each with its human cost. Dimmed results grouped separately: "13 pairs already broken by the hall key alone." If removing a weak spot via a fix caused any formerly-dimmed pairs to resolve or reveal a new hidden pair, the report shows that honestly.
+3. **What broke (before fixes):** single weak spots and hidden pairs, each with its human cost. Dimmed results grouped separately: "12 pairs already broken by the hall key alone." If removing a weak spot via a fix caused any formerly-dimmed pairs to resolve or reveal a new hidden pair, the report shows that honestly.
 4. **Fixes:** every accepted fix with what it changed and its result. Every turned-down fix with its one-line reason.
-5. **After fixes:** final count, e.g. "All 105 tested scenarios survive."
+5. **After fixes:** final count, e.g. "All 100 tested scenarios survive."
 6. **What was NOT tested:** specific, not a generic disclaimer:
    - Three or more problems at once.
    - Problem types outside the fixed list, with concrete examples (bad weather, a volunteer getting sick halfway through, wrong addresses, running short on food).
@@ -244,8 +244,8 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - **Plan map: rule failure:** surfaces as a question. Confirm button inactive until resolved.
 - **Grid: question mark cell:** never counted as survived. Listed by name in the report under "What was NOT tested."
 - **Fix: turned down:** card visible and previewable; accept button absent.
-- **Plan survives everything on the first run:** the count line reads "Your plan survived all 105 tested scenarios." The panel (or a prominent message) offers "See report" directly. No broken cases to open.
-- **After all cases survive (via fixes):** panel reads "All 105 tested scenarios survive" and offers "See report."
+- **Plan survives everything on the first run:** the count line reads "Your plan survived all 100 tested scenarios." The panel (or a prominent message) offers "See report" directly. No broken cases to open.
+- **After all cases survive (via fixes):** panel reads "All 100 tested scenarios survive" and offers "See report."
 - **Report available after first run:** "See report" is accessible any time after the checker has completed at least one run, regardless of whether all cases are resolved. The report shows what is still broken if the coordinator stops early.
 - **AI key invalid or AI call fails:** a clear error message, a retry button, and a suggestion to try the example plan instead.
 - **AI reading fails the format check:** "The AI's reading did not pass the format check." Retry button offered. Nothing reaches the plan map unchecked; the format check is part of the validation pipeline.

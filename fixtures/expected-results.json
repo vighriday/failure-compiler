@@ -108,12 +108,6 @@
     "human_cost": null
   },
   {
-    "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-ravi",
-    "state": "tick",
-    "lateness_minutes": 0,
-    "human_cost": null
-  },
-  {
     "scenario_id": "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
     "state": "tick",
     "lateness_minutes": 0,
@@ -186,12 +180,6 @@
     "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
   },
   {
-    "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-joel",
-    "state": "dim",
-    "lateness_minutes": 27000,
-    "human_cost": "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
-  },
-  {
     "scenario_id": "volunteer_absent__person-joel+volunteer_leaves_early__person-anita",
     "state": "dim",
     "lateness_minutes": 27000,
@@ -258,12 +246,6 @@
     "human_cost": null
   },
   {
-    "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-anita",
-    "state": "tick",
-    "lateness_minutes": 0,
-    "human_cost": null
-  },
-  {
     "scenario_id": "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
     "state": "tick",
     "lateness_minutes": 0,
@@ -324,12 +306,6 @@
     "human_cost": null
   },
   {
-    "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-maya",
-    "state": "tick",
-    "lateness_minutes": 0,
-    "human_cost": null
-  },
-  {
     "scenario_id": "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
     "state": "tick",
     "lateness_minutes": 0,
@@ -379,12 +355,6 @@
   },
   {
     "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-    "state": "tick",
-    "lateness_minutes": 0,
-    "human_cost": null
-  },
-  {
-    "scenario_id": "volunteer_absent__person-sam+volunteer_leaves_early__person-sam",
     "state": "tick",
     "lateness_minutes": 0,
     "human_cost": null
