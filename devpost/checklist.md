@@ -101,6 +101,7 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+- Local launcher corrected after a previous preview left ports occupied: it checks ports before starting, keeps Vite on 5173, waits for both servers to be ready, and shuts down their process groups. Two launcher regression tests and a real startup, duplicate-launch, and shutdown check passed; all development ports were released afterward.
 - Slice 5 verified: 31 Python tests passed and the production web build passed. `scripts/verify_story.py` plays the full story at 1440x900, verifies all four crosses, both turned-down fixes, exact preview cancellation, the three-link fingerprint chain, corrected map marks, reduced motion, and all 100 scenarios surviving, with no page errors. Six full-page screenshots are saved as `devpost/screens/slice5-*.png`; screenshots remain ignored by Git.
 - Slice 5 explanations and suggestions in `fixtures/example-fixes.json` are hand-made PLACEHOLDER data, labelled in the interface. The checker generates reasons from its schedule and confirmed inputs; every suggested change is gated and scored live against all 100 scenarios.
 - The alternate answer "The van too" now updates Ravi's loading roles on the van routes; "Only his car" still matches the truth map. Opening the map alone does not mark results out of date; changing a checker input does.
