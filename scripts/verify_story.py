@@ -1,11 +1,13 @@
 """Playwright contract for the full example story. Run with a local dev server up."""
 
+import os
 import re
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+BASE_URL = os.environ.get("FAILURE_COMPILER_URL", "http://127.0.0.1:5173")
 SCREENS = ROOT / "devpost/screens"
 VAN_ANITA = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van"
 VAN_ANITA_ABSENT = "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van"
@@ -49,7 +51,7 @@ def main() -> None:
                 for route in request.post_data_json["plan_map"]["routes"]
             )
 
-        page.goto("http://127.0.0.1:5173/")
+        page.goto(f"{BASE_URL}/#start")
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan").click()
         # The alternative answer must change checker inputs, not just its caption.
@@ -57,6 +59,7 @@ def main() -> None:
             page.get_by_role("button", name="The van too", exact=True).click()
         expect(page.get_by_text(re.compile("Loading cover:.*Ravi"))).to_have_count(2)
         page.reload()
+        page.get_by_role("tab", name="Start", exact=True).click()
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan").click()
         page.get_by_role("button", name=re.compile("Confirm everything")).click()
@@ -65,10 +68,12 @@ def main() -> None:
         page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option("60")
         page.get_by_role("button", name="Confirm plan").click()
         page.wait_for_function(
-            "document.querySelectorAll('.result-cell').length > 0 && document.querySelectorAll('.result-cell').length < 100"
+            "document.querySelectorAll('.result-cell').length > 0"
+            " && document.querySelectorAll('.result-cell').length < 100"
         )
         expect(page.locator(".crash-count")).to_have_text(
-            "100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived.",
+            "100 tests: 1 single weak spot, 3 hidden pairs,"
+            " 12 already broken by the weak spot, 84 survived.",
             timeout=30000,
         )
         expect(page.locator(".result-cell")).to_have_count(100)
@@ -85,7 +90,8 @@ def main() -> None:
         expect(page.locator(".checker-facts")).to_contain_text("Van back 10:45. Loading team gone.")
         expect(page.locator(".single-proof")).to_contain_text("Each alone: survives")
         assert page.locator(".axis-column span").last.evaluate(
-            "el => el.getBoundingClientRect().right <= el.closest('.triangle-scroll').getBoundingClientRect().right"
+            "el => el.getBoundingClientRect().right"
+            " <= el.closest('.triangle-scroll').getBoundingClientRect().right"
         ), "Last column label is clipped"
         screenshot("slice5-van-anita-panel.png")
 
@@ -164,7 +170,7 @@ def main() -> None:
 
         reduced = browser.new_page(viewport={"width": 1440, "height": 900}, reduced_motion="reduce")
         reduced.on("pageerror", lambda error: errors.append(str(error)))
-        reduced.goto("http://127.0.0.1:5173/")
+        reduced.goto(f"{BASE_URL}/#start")
         reduced.get_by_role("button", name="Load the example plan", exact=True).click()
         reduced.get_by_role("button", name="Read plan").click()
         reduced.get_by_role("button", name=re.compile("Confirm everything")).click()
@@ -175,7 +181,8 @@ def main() -> None:
         )
         reduced.evaluate("""() => {
             window.cellCounts = [];
-            new MutationObserver(() => window.cellCounts.push(document.querySelectorAll('.result-cell').length))
+            new MutationObserver(() => window.cellCounts.push(
+                document.querySelectorAll('.result-cell').length))
                 .observe(document.body, {childList: true, subtree: true});
         }""")
         reduced.get_by_role("button", name="Confirm plan").click()
@@ -189,7 +196,8 @@ def main() -> None:
         )
         assert not errors, errors
         print(
-            "PASS: full example story; all 100 survived; 3 linked fingerprints; 6 screenshots; reduced motion; no page errors."
+            "PASS: full example story; all 100 survived; 3 linked fingerprints;"
+            " 6 screenshots; reduced motion; no page errors."
         )
         browser.close()
 
