@@ -63,7 +63,8 @@ function correctedStatement(item: ReadingItem, planMap: PlanMap) {
     const driverNames = route.driver_ids.map((id: string) => planMap.people.find((person: Record<string, any>) => person.id === id)?.name).filter(Boolean);
     const vehicleName = planMap.vehicles.find((vehicle) => vehicle.id === route.vehicle_id)?.name.toLowerCase() ?? "vehicle";
     const backups = driverNames.slice(1);
-    return `Route ${route.name} serves ${route.households} households by ${vehicleName}; ${driverNames[0]} drives${backups.length ? `, with ${backups.join(" and ")} as backups` : ""}.`;
+    const loaderNames = route.loader_ids.map((id: string) => planMap.people.find((person: Record<string, any>) => person.id === id)?.name).filter(Boolean);
+    return `Route ${route.name} serves ${route.households} households by ${vehicleName}; ${driverNames[0]} drives${backups.length ? `, with ${backups.join(" and ")} as backups` : ""}. Loading cover: ${loaderNames.join(", ")}.`;
   }
   return item.statement;
 }
@@ -130,6 +131,7 @@ function App() {
       setSizes(result.problem_types);
       setAnswers({});
       setConfirmed(false);
+      setOutOfDate(false);
       setScreen("map");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not load the example reading.");
@@ -146,6 +148,10 @@ function App() {
   }
 
   function updateMapItem(item: ReadingItem, status: Status, value?: number | boolean) {
+    if (value !== undefined && planMap && planEntity(item, planMap)?.[item.field] !== value) {
+      setOutOfDate(true);
+      setConfirmed(false);
+    }
     setPlanMap((current) => {
       if (!current) return current;
       const updated = structuredClone(current);
@@ -205,6 +211,7 @@ function App() {
     if (!route) return;
     route.driver_ids = [personId, ...route.driver_ids.filter((id: string) => id !== "person-ravi" && id !== personId)];
     route.status = "corrected";
+    setOutOfDate(true);
     setPlanMap(updated);
     const routeItemId = `route-${route.name.toLowerCase()}`;
     setItems((current) => current.map((item) => item.id === routeItemId ? { ...item, status: "corrected" } : item));
@@ -228,6 +235,24 @@ function App() {
     const toConfirm = items.filter((item) => item.status === "unconfirmed" && !item.guessed);
     setItems((current) => current.map((item) => item.status === "unconfirmed" && !item.guessed ? { ...item, status: "confirmed" } : item));
     for (const item of toConfirm) updateMapItem(item, "confirmed");
+  }
+
+  function answerQuestion(question: RuleQuestion, choice: string) {
+    setAnswers((current) => ({ ...current, [question.id]: choice }));
+    if (question.id !== "ravi-van-loading-question" || choice !== "The van too" || !planMap) return;
+    const updated = structuredClone(planMap);
+    const changedRoutes = new Set<string>();
+    for (const route of updated.routes) {
+      if (route.vehicle_id === "vehicle-van" && !route.loader_ids.includes("person-ravi")) {
+        route.loader_ids.push("person-ravi");
+        route.status = "corrected";
+        changedRoutes.add(route.id);
+      }
+    }
+    updated.fingerprint = null;
+    setOutOfDate(true);
+    setPlanMap(updated);
+    setItems((current) => current.map((item) => item.field === "route" && changedRoutes.has(item.entity_id) ? { ...item, status: "corrected" } : item));
   }
 
   if (screen === "paste") {
@@ -274,7 +299,7 @@ function App() {
   }
 
   if (!reading || !planMap) return null;
-  if (screen === "grid") return <CrashTest plan={planMap} onEdit={() => { setScreen("map"); setConfirmed(false); setOutOfDate(true); }} />;
+  if (screen === "grid") return <CrashTest plan={planMap} onPlanChange={setPlanMap} onEdit={() => { setScreen("map"); setConfirmed(false); }} />;
 
   return (
     <div className="app-shell map-shell">
@@ -320,7 +345,7 @@ function App() {
                 <div className="question-body"><p>{question.question_text}</p>
                   {answers[question.id]
                     ? <div className="question-answer"><span className="answer-check"><Tick /></span> Confirmed: {answers[question.id]}</div>
-                    : <div className="choice-row">{question.choices.map((choice) => <button key={choice} type="button" className="choice-button" onClick={() => setAnswers((current) => ({ ...current, [question.id]: choice }))}>{choice}</button>)}</div>}
+                    : <div className="choice-row">{question.choices.map((choice) => <button key={choice} type="button" className="choice-button" onClick={() => answerQuestion(question, choice)}>{choice}</button>)}</div>}
                 </div>
               </div>
             ))}
@@ -342,6 +367,8 @@ function App() {
                   const isRouteCDuration = item.id === "route-c-loading";
                   const isRaviDriver = item.id === "ravi-driver";
                   const changedText = item.status === "corrected" ? correctedStatement(item, planMap) : item.statement;
+                  const changedBy = planEntity(item, planMap)?.changed_by_fix as number | undefined;
+                  const acceptedChange = changedBy ? planMap.fix_history?.[changedBy - 1] : undefined;
                   return (
                     <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" ? "needs-confirm" : ""}`} key={item.id} onMouseEnter={() => setActiveLine(item.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
                       <div className="reading-copy">
@@ -349,9 +376,10 @@ function App() {
                           {item.status === "corrected" && (item.guessed || item.entity_type === "route") ? <><del>{initialStatement(item)}</del><span>{changedText}</span></> : <span>{item.statement}</span>}
                         </div>
                         <button type="button" className="source-tag" onClick={() => setActiveLine(item.source_line)}>{item.source_line}</button>
+                        {acceptedChange && <div className="fix-map-note">{acceptedChange.description}</div>}
                       </div>
                       <div className="reading-controls">
-                        {item.status === "confirmed" ? <span className="confirmed-mark"><Tick /> confirmed</span> : <span className={`status-chip status-${item.status}`}>{statusLabel(item.status)}</span>}
+                        {changedBy ? <span className="status-chip status-fix">changed by Fix {changedBy}</span> : item.status === "confirmed" ? <span className="confirmed-mark"><Tick /> confirmed</span> : <span className={`status-chip status-${item.status}`}>{statusLabel(item.status)}</span>}
                         {item.status === "confirmed" && (isRouteCDuration || isRaviDriver) && <button className="edit-link" type="button" onClick={() => setEditing(editing === item.id ? null : item.id)}>Correct</button>}
                         {item.status === "unconfirmed" && <button className="row-confirm" type="button" onClick={() => confirmItem(item)}>Confirm</button>}
                         {item.status === "guessed" && editing !== item.id && <button className="edit-link" type="button" onClick={() => setEditing(item.id)}>Answer</button>}
@@ -384,6 +412,7 @@ function App() {
                 <div><span className="problem-name">{problemLabels[problem.id]}</span><span className="problem-count mono">{problem.count} {problem.count === 1 ? "problem" : "problems"}</span></div>
                 {problem.hasSize ? <label className="size-select"><select aria-label={`${problemLabels[problem.id]} size`} value={sizes[problem.id] ?? 30} onChange={(event) => {
                   const value = Number(event.target.value);
+                  setOutOfDate(true);
                   setSizes((current) => ({ ...current, [problem.id]: value }));
                   setPlanMap((current) => current ? { ...current, problem_sizes: { ...current.problem_sizes, [problem.id]: value } } : current);
                 }}>{presets.map((value) => <option key={value} value={value}>{value} min</option>)}</select></label> : <span className="no-size mono">no duration</span>}

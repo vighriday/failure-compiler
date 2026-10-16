@@ -49,7 +49,7 @@ Build mode: fast
   Learner check: Watch the grid fill, check the count line, click around the grid.
   Commit: `Add live SSE crash-test grid`
 
-- [ ] **5. Broken case, fixes, flip**
+- [x] **5. Broken case, fixes, flip**
   Becomes usable: Click a cross, and the detail panel slides in with the timeline, human cost, and fix cards. The turned-down fix shows a checker-derived reason. The real fix previews on the grid and, when accepted, flips cells and re-tests. After all fixes, 100 ticks.
   Why now: Completes the core journey narrative. With slices 3 to 5 done the full demo is recordable without any AI provider.
   PRD ref: `prd.md > Screen 4: Broken Case Detail (panel)`, `prd.md > Fix Cards and Scoring`, `prd.md > Fix Preview`, `prd.md > Fix Acceptance and Re-test`
@@ -101,6 +101,9 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+- Slice 5 verified: 31 Python tests passed and the production web build passed. `scripts/verify_story.py` plays the full story at 1440x900, verifies all four crosses, both turned-down fixes, exact preview cancellation, the three-link fingerprint chain, corrected map marks, reduced motion, and all 100 scenarios surviving, with no page errors. Six full-page screenshots are saved as `devpost/screens/slice5-*.png`; screenshots remain ignored by Git.
+- Slice 5 explanations and suggestions in `fixtures/example-fixes.json` are hand-made PLACEHOLDER data, labelled in the interface. The checker generates reasons from its schedule and confirmed inputs; every suggested change is gated and scored live against all 100 scenarios.
+- The alternate answer "The van too" now updates Ravi's loading roles on the van routes; "Only his car" still matches the truth map. Opening the map alone does not mark results out of date; changing a checker input does.
 - Slice 4 verified: 28 Python tests passed, production web build passed, and Playwright saw the first cell before completion, then all 100 expected marks with no page errors. Screenshot: `devpost/screens/slice4-grid.png`.
 - Slice 4/5 checkpoint moved from after slice 4 to after slice 5 so the learner can explore the complete demo story; slices 4 and 5 still have separate verification, commits, and checklist ticks.
 - Slice 3 example reading is explicitly a hand-made PLACEHOLDER fixture, not real AI output; the UI labels it as such.

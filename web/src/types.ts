@@ -36,6 +36,7 @@ export type PlanMap = {
   finish_time_guessed: boolean;
   problem_sizes: Record<string, number>;
   questions: Array<Record<string, any>>;
+  fix_history: AppliedFix[];
 };
 
 export type ExampleReading = {
@@ -61,4 +62,16 @@ export type RunMeta = { fingerprint: string; total: number; problems: Problem[];
 export type RunCount = {
   total: number; completed: number; weak_spots: number; hidden_pairs: number;
   dimmed: number; survived: number; unknown: number; pending: number; line: string;
+};
+
+export type FixOperation = { op: string; target_id: string; field: string; value: string | number | boolean | string[] };
+export type AppliedFix = { fix_id: string; description: string; operations: FixOperation[]; from_fingerprint: string; to_fingerprint: string };
+export type FixSuggestion = {
+  id: string; description: string; operations: FixOperation[]; scenario_results: ScenarioResult[];
+  fixes_n: number; still_broken_n: number; new_crosses_n: number; new_crosses: string[];
+  eligible: boolean; rejection_reason: string | null; gate_status: string; gate_reason: string | null;
+};
+export type CaseDetail = {
+  placeholder: boolean; explanation: string | null; result: ScenarioResult;
+  route_reasons: Record<string, string>; alone_results: ScenarioResult[]; suggestions: FixSuggestion[];
 };

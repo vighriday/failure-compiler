@@ -12,9 +12,10 @@ export function CellMark({ state }: { state: CellState }) {
 
 const stateWords: Record<CellState, string> = { tick: "Survives", cross: "Breaks", dim: "Already broken", qmark: "Unknown" };
 
-export default function CrashGrid({ meta, results, onSelect, changedIds = [], newCrossIds = [], selectedId }: {
+export default function CrashGrid({ meta, results, onSelect, changedIds = [], newCrossIds = [], flippedIds = [], selectedId, rechecking = false }: {
   meta: RunMeta; results: ScenarioResult[]; onSelect?: (result: ScenarioResult) => void;
-  changedIds?: string[]; newCrossIds?: string[]; selectedId?: string;
+  changedIds?: string[]; newCrossIds?: string[]; flippedIds?: string[]; selectedId?: string;
+  rechecking?: boolean;
 }) {
   const [active, setActive] = useState<{ row: number; col: number; id: string } | null>(null);
   const byId = new Map(results.map((result) => [result.scenario_id, result]));
@@ -42,9 +43,9 @@ export default function CrashGrid({ meta, results, onSelect, changedIds = [], ne
           const classes = `cell-slot ${separator ? "type-start" : ""}`;
           if (!id) return <div key={`${row}-${col}`} className={`${classes} omitted-cell`} style={{ gridColumn: col + 2, gridRow: row + 2 }} title="Not tested: two problems for the same person cannot happen together." aria-label="Impossible combination omitted" />;
           if (!result) return <div key={id} className={`${classes} pending-cell`} style={{ gridColumn: col + 2, gridRow: row + 2 }} aria-label="Waiting for checker" />;
-          return <button key={id} type="button" style={{ gridColumn: col + 2, gridRow: row + 2 }} className={`${classes} result-cell result-${result.state} ${row === col ? "single-cell" : ""} ${result.state === "cross" && row !== col ? "hidden-pair-cell" : ""} ${changedIds.includes(id) ? "changed-cell" : ""} ${newCrossIds.includes(id) ? "new-cross-cell" : ""} ${id === selectedId ? "selected-cell" : ""}`}
+          return <button key={id} type="button" data-scenario={id} data-state={result.state} style={{ gridColumn: col + 2, gridRow: row + 2 }} className={`${classes} result-cell result-${result.state} ${row === col ? "single-cell" : ""} ${result.state === "cross" && row !== col ? "hidden-pair-cell" : ""} ${changedIds.includes(id) ? "changed-cell" : ""} ${newCrossIds.includes(id) ? "new-cross-cell" : ""} ${flippedIds.includes(id) ? "flipped-cell" : ""} ${rechecking && result.map_fingerprint !== meta.fingerprint ? "previous-run-cell" : ""} ${id === selectedId ? "selected-cell" : ""}`}
             onMouseEnter={() => setActive({ row, col, id })} onMouseLeave={() => setActive(null)} onFocus={() => setActive({ row, col, id })} onBlur={() => setActive(null)}
-            onClick={() => onSelect?.(result)} aria-label={`${result.failures.map(label).join(" + ")}: ${stateWords[result.state]}`} aria-describedby={active?.id === id ? "case-tooltip" : undefined}>
+            onClick={() => onSelect?.(result)} aria-label={`${result.failures.map(label).join(" + ")}: ${stateWords[result.state]}${newCrossIds.includes(id) ? ", new cross in preview" : ""}`} aria-describedby={active?.id === id ? "case-tooltip" : undefined}>
             <CellMark state={result.state} />{newCrossIds.includes(id) && <span className="new-cross-star" aria-hidden="true">*</span>}
           </button>;
         }))}

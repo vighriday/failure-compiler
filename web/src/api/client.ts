@@ -1,4 +1,4 @@
-import type { ExampleReading, PlanMap, RunCount, RunMeta, ScenarioResult } from "../types";
+import type { AppliedFix, CaseDetail, ExampleReading, PlanMap, RunCount, RunMeta, ScenarioResult } from "../types";
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, {
@@ -47,3 +47,9 @@ export async function streamTests(fingerprint: string, reducedMotion: boolean, o
     }
   } finally { reader.releaseLock(); }
 }
+
+export const suggestFixes = (fingerprint: string, scenario_id: string) =>
+  request<CaseDetail>("/api/suggest-fixes", { fingerprint, scenario_id });
+
+export const applyFix = (fingerprint: string, scenario_id: string, fix_id: string) =>
+  request<{ fingerprint: string; plan_map: PlanMap; applied_fix: AppliedFix }>("/api/apply-fix", { fingerprint, scenario_id, fix_id });
