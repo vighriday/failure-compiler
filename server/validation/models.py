@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from server.models import Delivery, Person, Place, PlanMapData, Route, Vehicle
+from server.models import AppliedFix, Delivery, Person, Place, PlanMapData, Route, Vehicle
 
 ItemStatus = Literal["unconfirmed", "confirmed", "corrected", "added"]
 
@@ -103,6 +103,7 @@ class MapPerson(Person):
     can_drive_guessed: bool = False
     status: ItemStatus = "unconfirmed"
     original_value: dict[str, object] | None = None
+    changed_by_fix: int | None = None
 
 
 class MapVehicle(Vehicle):
@@ -110,6 +111,7 @@ class MapVehicle(Vehicle):
     guessed: bool = False
     status: ItemStatus = "unconfirmed"
     original_value: dict[str, object] | None = None
+    changed_by_fix: int | None = None
 
 
 class MapPlace(Place):
@@ -131,6 +133,7 @@ class MapRoute(Route):
     guessed: bool = False
     status: ItemStatus = "unconfirmed"
     original_value: dict[str, object] | None = None
+    changed_by_fix: int | None = None
 
 
 class MapQuestion(BaseModel):
@@ -155,6 +158,7 @@ class PlanMap(BaseModel):
     finish_time_guessed: bool = False
     problem_sizes: dict[str, int]
     questions: list[MapQuestion] = []
+    fix_history: list[AppliedFix] = []
 
     @classmethod
     def from_truth_map(cls, data: PlanMapData) -> PlanMap:

@@ -1,0 +1,35 @@
+{
+  "placeholder": true,
+  "cases": {
+    "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van": {
+      "explanation": "Route C has drivers, but its loading cover ends before the van is free.",
+      "fixes": [
+        {"id": "maya-route-c-driver", "description": "Add Maya as backup driver for Route C", "operations": [{"op": "add_driver", "target_id": "route-c", "field": "driver_ids", "value": "person-maya"}]},
+        {"id": "sam-route-c-loader", "description": "Sam loads Route C", "operations": [{"op": "add_loader", "target_id": "route-c", "field": "loader_ids", "value": "person-sam"}]}
+      ]
+    },
+    "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van": {
+      "explanation": "Without Anita, nobody listed to load Route C is still available when the van returns.",
+      "fixes": [
+        {"id": "maya-route-c-driver", "description": "Add Maya as backup driver for Route C", "operations": [{"op": "add_driver", "target_id": "route-c", "field": "driver_ids", "value": "person-maya"}]},
+        {"id": "sam-route-c-loader", "description": "Sam loads Route C", "operations": [{"op": "add_loader", "target_id": "route-c", "field": "loader_ids", "value": "person-sam"}]}
+      ]
+    },
+    "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies": {
+      "explanation": "With the truck late and Ravi away, the remaining Route A drivers cannot stay long enough.",
+      "fixes": [
+        {"id": "sam-route-a-driver", "description": "Sam backs up Route A", "operations": [{"op": "add_driver", "target_id": "route-a", "field": "driver_ids", "value": "person-sam"}]}
+      ]
+    },
+    "volunteer_absent__person-joel": {
+      "explanation": "The loading-area key is one job with only one person covering it.",
+      "fixes": [
+        {"id": "maya-spare-key", "description": "Give Maya a spare key", "operations": [{"op": "give_spare_key", "target_id": "person-maya", "field": "holds_key", "value": true}]},
+        {"id": "maya-sam-spare-keys", "description": "Spare keys for Maya and Sam", "operations": [
+          {"op": "give_spare_key", "target_id": "person-maya", "field": "holds_key", "value": true},
+          {"op": "give_spare_key", "target_id": "person-sam", "field": "holds_key", "value": true}
+        ]}
+      ]
+    }
+  }
+}

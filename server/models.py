@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -120,8 +122,10 @@ class RunCount(BaseModel):
 # ---------------------------------------------------------------------------
 
 class FixOperation(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    op: str          # one of the fixed operation types
+    model_config = ConfigDict(extra="forbid", strict=True)
+    op: Literal["add_driver", "replace_drivers", "add_loader", "replace_loaders",
+                "move_route", "set_person_availability", "set_vehicle_availability",
+                "give_spare_key"]
     target_id: str   # entity id being changed
     field: str       # field name being changed
     value: str | int | bool | list[str]  # new value
@@ -145,6 +149,7 @@ class FixSuggestion(BaseModel):
     fixes_n: int = 0
     still_broken_n: int = 0
     new_crosses_n: int = 0
+    new_crosses: list[str] = []
     eligible: bool = False
     rejection_reason: str | None = None
     gate_status: str = "passed"  # "passed" | "format_error" | "rules_error" | "couldnt_apply"
