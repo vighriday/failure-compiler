@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 from server.checker.scenarios import _instantiate_problems, generate_scenarios
-from server.checker.solver import solve_scenario
 from server.models import PlanMapData, ScenarioResult
 
 
@@ -53,6 +52,10 @@ def _run_one(
     scenario: dict,
     problems: dict[str, dict],
 ) -> ScenarioResult:
+    # CP-SAT's native dependencies are only needed when a scenario is checked.
+    # Keep them off the API startup path, including the health endpoint.
+    from server.checker.solver import solve_scenario
+
     disabled: dict[str, dict] = {}
     for problem_id in scenario["failures"]:
         problem = problems[problem_id]

@@ -2,10 +2,28 @@
 
 import os
 import socket
+import subprocess
 import sys
 import time
 
 from scripts import dev
+
+
+def test_api_can_start_without_loading_the_solver() -> None:
+    probe = subprocess.run(
+        [sys.executable, "-c", """
+import sys
+from server.main import health
+assert health() == {"status": "ok"}
+assert "server.checker.solver" not in sys.modules
+assert not {"ortools", "numpy", "pandas"}.intersection(sys.modules)
+"""],
+        cwd=dev.ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert probe.returncode == 0, probe.stderr
 
 
 def test_busy_port_rejects_start_without_spawning(monkeypatch, capsys) -> None:
