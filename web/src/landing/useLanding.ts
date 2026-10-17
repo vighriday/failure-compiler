@@ -17,7 +17,7 @@ type Crack = { x1: number; y1: number; x2: number; y2: number; w: number; len: n
 const pct = (minutes: number) => `${(minutes / 220 * 100).toFixed(2)}%`;
 export function useLanding(props: LandingProps) {
   const { tab, text } = props;
-  const [vw, setVw] = useState(window.innerWidth);
+  const [vw, setVw] = useState(Math.max(320, window.innerWidth));
   const [reduce, setReduce] = useState(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [step, setStep] = useState(0), [flow, setFlow] = useState(0), [heroIn, setHeroIn] = useState(false);
   const [mapHover, setMapHover] = useState<number[] | null>(null);
@@ -34,7 +34,7 @@ export function useLanding(props: LandingProps) {
   const later = useCallback((fn: () => void, delay: number) => { const id = setTimeout(fn, delay); timers.current.push(id); return id; }, []);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const resize = () => setVw(window.innerWidth), motion = () => setReduce(media.matches);
+    const resize = () => setVw(Math.max(320, window.innerWidth)), motion = () => setReduce(media.matches);
     window.addEventListener("resize", resize); media.addEventListener("change", motion);
     return () => { window.removeEventListener("resize", resize); media.removeEventListener("change", motion); timers.current.forEach(clearTimeout); clearInterval(typer.current); loadingId.current++; breakCleanup.current?.(); };
   }, []);

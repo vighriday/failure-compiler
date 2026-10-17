@@ -32,7 +32,9 @@ function useSampleGrid(props: GridProps) {
     media.addEventListener("change", update);
     return () => { observer.disconnect(); clearInterval(timer); cancelAnimationFrame(frame); media.removeEventListener("change", update); };
   }, [props.runId, props.animate, run]);
-  const s = Number(props.cell ?? 34), names = props.labels === "names", st = Number(props.stage ?? 0);
+  const requestedCell = Number(props.cell ?? 34);
+  const s = Number.isFinite(requestedCell) ? Math.max(16, Math.min(44, requestedCell)) : 34;
+  const names = props.labels === "names", st = Number(props.stage ?? 0);
   const L = names ? 176 : 30, T = names ? 168 : 0;
   const sel = [props.selR ?? 0, props.selC ?? 0];
   const cells = [], diag = [];

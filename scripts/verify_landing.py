@@ -109,6 +109,23 @@ def main():
 
         page = new_page()
         page.wait_for_timeout(3000)
+        page.evaluate("""() => {
+            window.originalWidthDescriptor = Object.getOwnPropertyDescriptor(window, 'innerWidth');
+            Object.defineProperty(window, 'innerWidth', {configurable: true, value: 0});
+            window.dispatchEvent(new Event('resize'));
+        }""")
+        page.wait_for_timeout(100)
+        assert page.locator("svg").evaluate_all("""nodes => nodes.every(node =>
+            ['width', 'height'].every(name => {
+                const value = node.getAttribute(name);
+                return value === null || !Number.isFinite(Number(value)) || Number(value) >= 0;
+            }))""")
+        page.evaluate("""() => {
+            Object.defineProperty(window, 'innerWidth', window.originalWidthDescriptor);
+            window.dispatchEvent(new Event('resize'));
+        }""")
+        page.wait_for_timeout(100)
+        checked.append("Transient zero-width resize keeps every SVG dimension valid")
         screenshot(page, "v2-overview.png")
         primary = page.locator('[data-shard="0"]')
         before = primary.get_attribute("style")
@@ -149,9 +166,29 @@ def main():
         )
         tab(page, "Overview")
 
+        for name in ["Read", "Trust", "Start"]:
+            tab(page, name)
+            selected_url = page.url
+            page.get_by_role("link", name="Skip to content", exact=True).focus()
+            page.get_by_role("link", name="Skip to content", exact=True).click()
+            assert page.url == selected_url
+            expect(page.get_by_role("tab", name=name, exact=True)).to_have_attribute(
+                "aria-selected", "true"
+            )
+            expect(page.locator("#landing-panel")).to_be_focused()
+        checked.append("Skip link preserves the selected section and moves focus to its content")
+        tab(page, "Overview")
+
         page.get_by_role("tab", name="Overview", exact=True).focus()
+        page.keyboard.press("End")
+        expect(page.get_by_role("tab", name="Start", exact=True)).to_be_focused()
+        page.keyboard.press("Home")
+        expect(page.get_by_role("tab", name="Overview", exact=True)).to_be_focused()
         page.keyboard.press("ArrowRight")
         expect(page.get_by_role("tab", name="Plan", exact=True)).to_be_focused()
+        page.keyboard.press("ArrowLeft")
+        expect(page.get_by_role("tab", name="Overview", exact=True)).to_be_focused()
+        page.keyboard.press("ArrowRight")
         for index in range(5):
             item = page.locator(f'[data-story-step="{index}"]')
             item.evaluate(
@@ -274,7 +311,7 @@ def main():
         )
         page.close()
 
-        for width, height in [(768, 1024), (390, 844)]:
+        for width, height in [(768, 1024), (390, 844), (320, 844)]:
             mobile = new_page(width, height)
             for name in ["Overview", "Plan", "Read", "Crash test", "Trust", "Start"]:
                 tab(mobile, name)
@@ -302,6 +339,33 @@ def main():
             " at tablet and phone sizes"
         )
 
+        # Every driver rule picker must recover the map when the listed driver cannot drive.
+        rule_page = new_page()
+        load(rule_page)
+        rule_page.get_by_role("button", name="Read plan", exact=True).click()
+        rule_page.get_by_role("button", name=re.compile("Confirm everything")).click()
+        rule_page.locator('[data-item-id="ravi-driver"]').get_by_role(
+            "button", name="Correct", exact=True
+        ).click()
+        rule_page.get_by_role(
+            "combobox", name="Correction for Ravi can drive.", exact=True
+        ).select_option("false")
+        expect(rule_page.locator(".rule-question")).to_have_count(3)
+        for route, driver in [("A", "person-maya"), ("B", "person-sam"), ("C", "person-anita")]:
+            rule_page.get_by_role(
+                "combobox", name=f"Choose a driver for route {route}", exact=True
+            ).select_option(driver)
+        expect(rule_page.locator(".rule-question")).to_have_count(0)
+        rule_page.get_by_role("button", name="Only his car", exact=True).click()
+        rule_page.get_by_role("button", name="Answer", exact=True).click()
+        rule_page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
+            "60"
+        )
+        rule_page.get_by_role("button", name="Confirm plan", exact=True).click()
+        expect(rule_page.locator(".result-cell")).to_have_count(100, timeout=30000)
+        rule_page.close()
+        checked.append("All three driver rule pickers recover a valid, confirmable map")
+
         reduced = new_page(reduced=True)
         reduced.get_by_role("button", name="Break the page", exact=True).click()
         expect(reduced.locator("[data-shard]")).to_have_count(1)
@@ -314,11 +378,11 @@ def main():
         reduced.close()
         checked.append("Reduced motion shows completed states without fragment or scroll animation")
         browser.close()
-    assert not errors, errors
+    assert not errors, dict(Counter(errors))
     report = {
         "checks": checked,
         "page_errors": errors,
-        "viewports": [1440, 768, 390],
+        "viewports": [1440, 768, 390, 320],
         "sample_cells_clicked": 105,
     }
     (SCREENS / "v2-verification.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
