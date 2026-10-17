@@ -6,6 +6,7 @@ from collections.abc import Iterator
 
 from server.checker.scenarios import _instantiate_problems, generate_scenarios
 from server.models import PlanMapData, ScenarioResult
+from server.ordering import canonical_order
 
 
 def run_checker(plan: PlanMapData) -> list[ScenarioResult]:
@@ -19,6 +20,7 @@ def iter_checker(plan: PlanMapData) -> Iterator[ScenarioResult]:
     Singles must be solved first so pairs containing a broken single can be
     marked dim without sending a redundant model to CP-SAT.
     """
+    plan = canonical_order(plan)
     problems = {problem["id"]: problem for problem in _instantiate_problems(plan)}
     singles, pairs = generate_scenarios(plan)
     single_results: dict[str, ScenarioResult] = {}

@@ -6,6 +6,7 @@ from itertools import combinations
 
 from server.config import PROBLEM_TYPES
 from server.models import PlanMapData
+from server.ordering import canonical_order
 
 
 def _instantiate_problems(plan: PlanMapData) -> list[dict]:
@@ -19,6 +20,7 @@ def _instantiate_problems(plan: PlanMapData) -> list[dict]:
         size:     minutes (from plan.problem_sizes or default), or None for absent
         label:    human-readable label
     """
+    plan = canonical_order(plan)
     entity_lists: dict[str, list] = {
         "person": plan.people,
         "vehicle": plan.vehicles,
