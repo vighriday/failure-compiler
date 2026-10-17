@@ -437,6 +437,8 @@ uv run -- python scripts/dev.py
 
 Open **http://localhost:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed.
 
+The launcher waits for the API health check and web page before printing both addresses. It allows up to 90 seconds for a cold start and names any server still starting. Keep that terminal open; press `Ctrl+C` to stop both servers. If a port is already in use, it stops without launching a duplicate.
+
 The interface follows the supplied Landing v2 design: Overview, a scroll-linked Plan story, Read, Crash test, Trust and Start. Sample illustrations are labelled; after loading a plan, Read and Crash test use the real confirmation and checker flow. The design templates and conversion instructions are in [`design/landing-v2/`](design/landing-v2/).
 
 **Live AI is planned for slice 6.** The current build supports the example plan and does not load `.env` or use the key field yet. You can prepare `.env` from `.env.example` with a [Groq](https://console.groq.com/keys) key in `GROQ_API_KEY` and a [Gemini](https://aistudio.google.com/apikey) key in `GEMINI_API_KEY`; these will become usable when the provider integration is connected.

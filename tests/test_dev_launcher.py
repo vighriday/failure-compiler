@@ -1,10 +1,14 @@
-"""Do not start a duplicate app or leave child servers behind after stopping."""
+"""Check startup readiness, slow starts, diagnostics and child-server cleanup."""
 
 import os
 import socket
 import subprocess
 import sys
 import time
+from types import SimpleNamespace
+from unittest.mock import Mock
+
+import pytest
 
 from scripts import dev
 
@@ -39,6 +43,90 @@ def test_busy_port_rejects_start_without_spawning(monkeypatch, capsys) -> None:
         monkeypatch.setattr(dev, "start_process", must_not_spawn)
         assert dev.main() == 1
         assert f"API port {port} is already in use." in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(("name", "status", "body", "expected"), [
+    ("API", 200, b'{"status":"ok"}', True),
+    ("API", 503, b'{"status":"ok"}', False),
+    ("API", 200, b'{"status":"starting"}', False),
+    ("API", 200, b'not JSON', False),
+    ("Web", 200, b'<html></html>', True),
+    ("Web", 503, b'<html></html>', False),
+])
+def test_readiness_requires_a_successful_http_response(
+    monkeypatch, name, status, body, expected
+) -> None:
+    connection = Mock()
+    response = connection.getresponse.return_value
+    response.status = status
+    response.read.return_value = body
+    factory = Mock(return_value=connection)
+    monkeypatch.setattr(dev, "HTTPConnection", factory)
+
+    assert dev.endpoint_ready(name, dev.ENDPOINTS[name]) is expected
+    factory.assert_called_once_with("127.0.0.1", dev.ENDPOINTS[name], timeout=0.5)
+    connection.request.assert_called_once_with("GET", "/api/health" if name == "API" else "/")
+    connection.close.assert_called_once()
+
+
+def test_readiness_retries_a_server_that_is_not_accepting_requests(monkeypatch) -> None:
+    connection = Mock()
+    connection.request.side_effect = ConnectionRefusedError()
+    monkeypatch.setattr(dev, "HTTPConnection", Mock(return_value=connection))
+    assert not dev.endpoint_ready("API", 8000)
+    connection.close.assert_called_once()
+
+
+@pytest.fixture
+def startup_clock(monkeypatch):
+    clock = SimpleNamespace(now=0.0)
+
+    def sleep(seconds):
+        clock.now += seconds
+
+    monkeypatch.setattr(dev, "time", SimpleNamespace(monotonic=lambda: clock.now, sleep=sleep))
+    return clock
+
+
+def test_slow_api_is_allowed_to_start_after_twenty_seconds(
+    monkeypatch, capsys, startup_clock
+) -> None:
+    servers = {name: SimpleNamespace(poll=lambda: None) for name in dev.ENDPOINTS}
+    monkeypatch.setattr(
+        dev, "endpoint_ready", lambda name, _port: name == "Web" or startup_clock.now >= 25
+    )
+    assert dev.wait_for_servers(servers)
+    assert startup_clock.now >= 25
+    output = capsys.readouterr()
+    assert "Still starting: API" in output.out
+    assert "Still starting: Web" not in output.out
+    assert not output.err
+
+
+def test_timeout_names_the_server_still_pending(monkeypatch, capsys, startup_clock) -> None:
+    servers = {name: SimpleNamespace(poll=lambda: None) for name in dev.ENDPOINTS}
+    monkeypatch.setattr(dev, "endpoint_ready", lambda name, _port: name == "Web")
+    assert not dev.wait_for_servers(servers, timeout=2)
+    assert "Startup timed out after 2 seconds. Still waiting for: API." in capsys.readouterr().err
+
+
+def test_early_exit_names_the_server_and_exit_code(capsys) -> None:
+    assert not dev.wait_for_servers({"API": SimpleNamespace(poll=lambda: 7)})
+    assert "API server exited during startup (exit code 7)." in capsys.readouterr().err
+
+
+def test_failed_startup_stops_both_servers(monkeypatch) -> None:
+    processes = [Mock(), Mock()]
+    start = Mock(side_effect=processes)
+    stop = Mock()
+    monkeypatch.setattr(dev, "port_in_use", lambda _port: False)
+    monkeypatch.setattr(dev, "start_process", start)
+    monkeypatch.setattr(dev, "wait_for_servers", lambda _servers: False)
+    monkeypatch.setattr(dev, "stop_processes", stop)
+    monkeypatch.setattr(dev.signal, "signal", Mock())
+
+    assert dev.main() == 1
+    stop.assert_called_once_with(processes)
 
 
 def test_shutdown_stops_the_child_server_as_well_as_its_parent(tmp_path) -> None:
