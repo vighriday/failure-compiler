@@ -2,11 +2,11 @@
 
 ## Status
 
-Hardening is complete. Slice 6 stops at the user's required checkpoint: the one-shot primary reading cannot be corrected to the truth map using the approved controls. No example fixture was replaced or committed. Slice 7 has not started.
+Hardening is complete. Work resumed under the revised seven-part instruction: compare aligned checker inputs and full outcomes, treat names as labels, and add missing facts only through rule questions. The earlier stop and its raw output are retained below as history. No example fixture has yet been replaced. Slice 7 has not started.
 
 The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. Live HTTP/UI integration, session keys, live fix suggestions and the real-reading screenshots are still pending. The running app continues to use its labelled hand-written example.
 
-## Bake-off
+## Original exact-name bake-off (superseded measurement)
 
 All six calls passed the format gate. Responses were retained without editing; see [bakeoff.json](bakeoff.json) for each response, source lines, guessed marks, mismatch list, metadata and token usage. The primary remains Groq as requested. Gemini's higher mean is recorded as the bake-off winner in `server/config.py` with today's date.
 
@@ -56,3 +56,16 @@ The missing delivery is a substantive missing checker input; this is more than a
 - The two required hardening screenshots are in ignored `devpost/screens/`.
 - No live fix suggestions were requested after the stop condition. There are no real per-case verdicts or real-reading UI screenshots yet.
 - Slice 6 remains unchecked. Continuing requires a decision on missing records and name normalisation or correction before replacing the example fixtures.
+
+## Prompt versions and aligned scores
+
+The revised measurement aligns entity identities by type and role, ignores display names in field comparison, and compares every result field, including numeric costs and schedules. Human-cost wording uses common labels only for this comparison. A missing entity is not filled from truth: failures targeting it are no-ops in the unchanged solver, and its missing inputs remain field mismatches. Ranking is mean exact checker results, mean aligned field percentage, lower variance across those two scores, then fewer total tokens.
+
+| Prompt | Provider | Aligned fields, three runs | Exact results out of 100, three runs | Total tokens |
+| --- | --- | --- | --- | --- |
+| read-v1, rescored saved responses | Groq | 84%, 88%, 84% | 18, 18, 18 | 10,282 |
+| read-v1, rescored saved responses | Gemini | 96%, 96%, 96% | 33, 48, 48 | 13,047 |
+| read-v2 | Groq | Pending the new bake-off | Pending | Pending |
+| read-v2 | Gemini | Pending the new bake-off | Pending | Pending |
+
+No new provider calls were made to rescore `read-v1`; [bakeoff-read-v1.json](bakeoff-read-v1.json) preserves the raw records and the new scores. `read-v2` asks for every person, vehicle, place, route and supply arrival, keeps the plan's own names, and marks approximate durations as guessed. Example names, times and preset numbers are absent from the system prompt. Test settings are supplied separately from application configuration. `fix-v1` is unchanged; it contains generic operation instructions and has not yet been called for the new real example.

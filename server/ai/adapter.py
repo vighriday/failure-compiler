@@ -16,6 +16,7 @@ from server.ai.prompts import (
     numbered_plan,
 )
 from server.ai.types import AIError, AIFixResponse, ProviderResponse, compact_schema
+from server.config import PROBLEM_TYPES
 from server.validation.gate import GateError, validate_ai_reading
 from server.validation.models import AIPlanReading
 
@@ -117,7 +118,16 @@ def read_plan(text: str, keys: dict[str, str], *, provider: str | None = None) -
 
     raw, reading, attempts = _call(
         READ_SYSTEM,
-        numbered_plan(text),
+        json.dumps(
+            {
+                "plan": numbered_plan(text),
+                "test_settings": {
+                    problem["id"]: problem["default_size"]
+                    for problem in PROBLEM_TYPES
+                    if problem["has_size"]
+                },
+            }
+        ),
         AIPlanReading.model_json_schema(),
         keys,
         READ_PROMPT_VERSION,
