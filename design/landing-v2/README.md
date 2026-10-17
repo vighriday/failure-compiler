@@ -11,3 +11,5 @@ The conversion adds keyboard operation, accessible icon labels, real disabled st
 The landing illustrations are labelled example previews. The confirmed-map workflow continues to use the Python validation gate, live SSE checker, and scored fixes.
 
 With the app running, use `uv run -- python scripts/verify_landing.py` for the interaction audit and `uv run -- python scripts/verify_story.py` for the complete checker story. Screenshots and the interaction report are saved to the ignored `devpost/screens/` folder.
+
+See [the interaction coverage](verification.md) for the controls and recovery paths checked by both scripts.
