@@ -16,42 +16,22 @@ sys.path.insert(0, str(ROOT))
 from server.ai.adapter import read_plan  # noqa: E402
 from server.ai.groq_provider import cooldown_seconds  # noqa: E402
 from server.ai.types import AIError  # noqa: E402
+from server.evaluation import checker_fields, compare_reading, rank_providers  # noqa: E402
 from server.models import PlanMapData  # noqa: E402
-from server.validation.gate import normalise_plan_map_ids, plan_map_from_reading  # noqa: E402
+from server.validation.gate import (  # noqa: E402
+    plan_map_from_reading,
+    validate_ai_reading,
+)
 from server.validation.models import PlanMap  # noqa: E402
 
 
 def flatten(plan: PlanMap) -> dict:
-    data = normalise_plan_map_ids(plan).checker_data()
-    result = {"finish_time": data.finish_time}
-    for collection in ("people", "vehicles", "places", "deliveries", "routes"):
-        for entity in getattr(data, collection):
-            for field, value in entity.model_dump().items():
-                if field != "id":
-                    result[f"{collection}.{entity.id}.{field}"] = value
-    result.update({f"problem_sizes.{key}": value for key, value in data.problem_sizes.items()})
-    return result
+    return checker_fields(plan)
 
 
 def compare(plan: PlanMap, expected: PlanMap | None = None) -> dict:
     truth = PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
-    wanted, actual = flatten(expected or PlanMap.from_truth_map(truth)), flatten(plan)
-    mismatches = [
-        {
-            "field": key,
-            "expected": wanted.get(key, "<not in truth>"),
-            "actual": actual.get(key, "<missing>"),
-        }
-        for key in sorted(wanted.keys() | actual.keys())
-        if wanted.get(key) != actual.get(key)
-    ]
-    matches = sum(key in actual and actual[key] == value for key, value in wanted.items())
-    return {
-        "matches": matches,
-        "truth_fields": len(wanted),
-        "field_match_percent": round(100 * matches / len(wanted), 2),
-        "mismatches": mismatches,
-    }
+    return compare_reading(plan, expected or PlanMap.from_truth_map(truth))
 
 
 def wait_for_groq() -> None:
@@ -68,6 +48,9 @@ def main():
     logger.addHandler(logging.StreamHandler())
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "devpost/bakeoff.json")
+    parser.add_argument(
+        "--rescore", type=Path, help="Score saved raw calls without calling a provider"
+    )
     args = parser.parse_args()
     values = dotenv_values(ROOT / ".env")
     keys = {"groq": values.get("GROQ_API_KEY"), "gemini": values.get("GEMINI_API_KEY")}
@@ -79,6 +62,32 @@ def main():
         args.output.write_text(
             json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
+
+    if args.rescore:
+        saved = json.loads(args.rescore.read_text(encoding="utf-8"))
+        for row in saved["readings"]:
+            if "raw" not in row:
+                report["readings"].append(row)
+                continue
+            raw = row["raw"]
+            reading = validate_ai_reading(raw["raw_text"])
+            plan = plan_map_from_reading(
+                reading, provider=raw["provider"], model=raw["model"], timestamp=raw["timestamp"]
+            )
+            report["readings"].append(
+                {
+                    "provider": row["provider"],
+                    "reading": row["reading"],
+                    "raw": raw,
+                    "attempts": row["attempts"],
+                    **compare(plan),
+                }
+            )
+        report["ranking"] = rank_providers(report["readings"])
+        report["winner"] = report["ranking"][0]["provider"] if report["ranking"] else None
+        save()
+        print(json.dumps(report["ranking"], indent=2))
+        return
 
     for provider in ("groq", "gemini"):
         for index in range(1, 4):
@@ -102,7 +111,8 @@ def main():
                     **comparison,
                 }
                 print(
-                    f"  {comparison['field_match_percent']}% fields; "
+                    f"  {comparison['aligned_field_match_percent']}% fields; "
+                    f"{comparison['checker_matches']}/{comparison['checker_total']} exact results; "
                     f"{result.raw.total_tokens} tokens",
                     flush=True,
                 )
@@ -117,24 +127,12 @@ def main():
                 print(f"  {error.code}: {error}", flush=True)
             report["readings"].append(row)
             save()
-    scores = {
-        provider: [
-            row["field_match_percent"]
-            for row in report["readings"]
-            if row["provider"] == provider and "field_match_percent" in row
-        ]
-        for provider in ("groq", "gemini")
-    }
-    means = {
-        provider: round(sum(values) / len(values), 2)
-        for provider, values in scores.items()
-        if len(values) == 3
-    }
-    report["mean_field_match_percent"] = means
-    report["winner"] = max(means, key=means.get) if means else None
+    ranking = rank_providers(report["readings"])
+    report["ranking"] = ranking
+    report["winner"] = ranking[0]["provider"] if ranking else None
     save()
     print(
-        json.dumps({"means": means, "winner": report["winner"], "saved": str(args.output)}),
+        json.dumps({"ranking": ranking, "winner": report["winner"], "saved": str(args.output)}),
         flush=True,
     )
 
