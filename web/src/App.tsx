@@ -186,7 +186,7 @@ function App() {
           <section className="questions-section">
             <div className="section-heading"><div><div className="section-kicker">NEEDS YOUR ANSWER</div><h2>One question before we test</h2></div><span className={`question-count ${openQuestions.length + issues.length === 0 ? "count-neutral" : ""}`}>{openQuestions.length + issues.length} open</span></div>
             {questions.map((question) => (
-              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
+              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} data-question-id={question.id} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
                 <div className="question-icon">?</div>
                 <div className="question-body"><p>{question.question_text}</p>
                   {answers[question.id]

@@ -57,3 +57,23 @@ def test_extra_hall_cannot_be_silently_dropped_despite_matching_reference_result
     assert audit["actual_scenario_count"] == 115
     assert len(audit["fixed_by_control"]) == 1
     assert len(audit["corrected_plan"]["places"]) == 2
+
+
+def test_explicit_place_identity_answer_reaches_all_inputs_and_actual_100_scenarios():
+    plan = confirmed_truth_map()
+    plan.places.append(
+        plan.places[0].model_copy(
+            update={
+                "id": "place-extra",
+                "name": "Hall",
+                "needs_key": False,
+                "one_vehicle_at_a_time": False,
+            }
+        )
+    )
+    audit = correction_audit(plan, place_aliases={"place-extra": "place-loading-area"})
+    assert audit["correctable"]
+    assert audit["after"]["aligned_field_match_percent"] == 100
+    assert audit["after"]["checker_matches"] == audit["actual_scenario_count"] == 100
+    assert len(plan.places) == 2  # Original reading stays untouched.
+    assert audit["actions"][0]["question_id"] == "rule-place-extra-identity"

@@ -281,6 +281,8 @@ Three sections stacked vertically:
 
 **Structured reading (middle):** one statement per map item, with its `source_line`. Three visual states: default (status `unconfirmed`), corrected (AI's `original_value` struck through, correction marked "corrected by you"), added (no source line, marked "added by you"). Confirmed items get a small confirmed mark. Corrections use constrained inputs only: `<select>` from known entity ids, time picker for times. No free-text fields. Every correction triggers `POST /api/validate-map` (debounced 150 ms). Affected items that depend on the changed item lose their confirmed mark and show "check this, [name] changed."
 
+**Place identity question:** an unused place listing alongside a loading or supply place requires an individual choice: keep separate, or select the same existing place. Only a listing with no loading activity and no delivery references can be merged. The server preserves its entity, source rows and question references for undo, retains the selected place's label and details, and requires its facts to be reviewed individually again. The raw reading is unchanged. This review operation does not change the checker model or infer aliases from the truth fixture.
+
 **"What we'll test" (bottom):** each problem instantiated against confirmed map entities, with preset size picker. Confirmed alongside the plan with the same Confirm button.
 
 Confirm button: disabled until every item is confirmed and all rules pass. "Read by [provider/model]" label. On click, sends map to `POST /api/confirm-map`.

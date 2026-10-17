@@ -9,6 +9,14 @@ export default function MissingFactQuestion({question, plan, disabled, onAnswer}
   const [arrival, setArrival] = useState("");
   const [place, setPlace] = useState("");
   const minutes = (time: string) => { const [hour, minute] = time.split(":").map(Number); return hour * 60 + minute; };
+  if (question.kind === "place_identity") return <div>
+    <div className="choice-row"><button type="button" className="choice-button" disabled={disabled} onClick={() => onAnswer("Keep as a separate place")}>Keep as a separate place</button><button type="button" className="choice-button" disabled={disabled} onClick={() => setAdding(true)}>Same place as another listing</button></div>
+    {adding && <div className="inline-editor">
+      <p>Use the selected place’s details, then review them individually.</p>
+      <label>Listed place<select aria-label="Same place as" value={place} disabled={disabled} onChange={(event) => setPlace(event.target.value)}><option value="">Choose a listed place</option>{plan.places.filter((entity) => entity.id !== question.entity_id && (entity.needs_key || entity.one_vehicle_at_a_time || plan.deliveries.some((delivery) => delivery.place_id === entity.id))).map((entity) => <option key={entity.id} value={entity.id}>{entity.name}</option>)}</select></label>
+      <button type="button" className="choice-button" disabled={disabled || !place} onClick={() => onAnswer({choice: "Same place as another listing", place_id: place})}>Use this place</button>
+    </div>}
+  </div>;
   if (question.kind === "missing_delivery") return <div>
     <div className="choice-row"><button type="button" className="choice-button" disabled={disabled} onClick={() => onAnswer("No delivery")}>No delivery</button><button type="button" className="choice-button" disabled={disabled} onClick={() => setAdding(true)}>Add a delivery</button></div>
     {adding && <div className="inline-editor">

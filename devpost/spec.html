@@ -716,6 +716,7 @@
 
   <h3>Screen 2: Plan Map <span class="prd-ref">prd.md &rsaquo; Screen 2</span></h3>
   <p>Three stacked sections. <strong>Checklist view (top):</strong> computed from item status counts. Summary "AI read N items, M corrected by you, P added by you" derived from <code>status</code> fields. <strong>Structured reading (middle):</strong> one statement per item with <code>source_line</code>. Three visual states: unconfirmed, corrected (AI's <code>original_value</code> struck through), added. Constrained corrections only: <code>&lt;select&gt;</code> from entity ids, time picker. Every correction triggers <code>POST /api/validate-map</code> (debounced 150 ms). <strong>"What we'll test" (bottom):</strong> each problem with preset size picker.</p>
+  <p><strong>Place identity question:</strong> an unused place listing alongside a loading or supply place requires an individual choice: keep separate, or select the same existing place. Only a listing without loading activity or delivery references can be merged. The server preserves its entity, source rows and question references for undo, retains the selected place's label and details, and requires its facts to be reviewed individually again. Raw AI output is unchanged. This review operation does not change the checker model or infer aliases from the truth fixture.</p>
   <p>Confirm button disabled until all items confirmed and all rules pass. Connects to <code>POST /api/confirm-map</code>.</p>
 
   <h3>Screen 3: Crash Test Grid <span class="prd-ref">prd.md &rsaquo; Screen 3</span></h3>

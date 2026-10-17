@@ -30,7 +30,7 @@ export type RuleQuestion = {
   item_id: string;
   question_text: string;
   source_line?: string | null;
-  kind?: "missing_delivery" | "missing_assignment" | "missing_finish";
+  kind?: "missing_delivery" | "missing_assignment" | "missing_finish" | "place_identity";
   entity_id?: string;
   field?: string;
   choices: string[];

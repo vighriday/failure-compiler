@@ -17,6 +17,7 @@ from playwright.sync_api import expect, sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.browser_review import review_saved_plan  # noqa: E402
 from server import main as http  # noqa: E402
 from server.evaluation import compare_reading  # noqa: E402
 from server.models import PlanMapData  # noqa: E402
@@ -28,10 +29,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("reading", type=Path)
     parser.add_argument("--port", type=int, default=8011)
+    parser.add_argument("--audit", type=Path)
+    parser.add_argument("--prefix", default="read-v3-candidate")
     args = parser.parse_args()
     record = json.loads(args.reading.read_text(encoding="utf-8"))
     plan_from_record(record)  # Format gate before opening a browser.
-    audit = json.loads(args.reading.with_name("reading-audit.json").read_text(encoding="utf-8"))
+    audit_path = args.audit or args.reading.with_name("reading-audit.json")
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
     screens = ROOT / "devpost/screens"
     screens.mkdir(parents=True, exist_ok=True)
     original_fixture = http._fixture
@@ -58,63 +62,13 @@ def main():
             page.get_by_role("button", name="Load the example plan", exact=True).click()
             page.get_by_role("button", name="Read plan", exact=True).click()
             expect(page.locator(".placeholder-notice")).to_contain_text("saved AI reading")
-            page.screenshot(path=str(screens / "read-v3-candidate-before.png"), full_page=True)
-            for action in audit["scripted_corrections"]:
-                if action["action"] != "correct" or action["field"] != "loader_ids":
-                    raise AssertionError(f"This UI proof needs an explicit control for {action}")
-                row = page.locator(f'[data-item-id="{action["item_id"]}"]')
-                opener = row.get_by_role("button", name="Correct", exact=True)
-                (
-                    opener
-                    if opener.count()
-                    else row.get_by_role("button", name="Answer", exact=True)
-                ).click()
-                # Only reorder the existing loaders, preserving the raw entity set.
-                for position, person_id in enumerate(action["value"]):
-                    while True:
-                        choice = row.locator(".choice-row").filter(
-                            has=page.get_by_role(
-                                "button", name=f"Move {person_id} earlier in loader_ids", exact=True
-                            )
-                        )
-                        current = int(choice.locator("span").inner_text().split(".", 1)[0]) - 1
-                        if current == position:
-                            break
-                        with page.expect_response(
-                            lambda response: response.url.endswith("/api/update-map")
-                        ):
-                            choice.get_by_role(
-                                "button", name=f"Move {person_id} earlier in loader_ids", exact=True
-                            ).click()
-                        expect(choice.locator("span")).to_contain_text(f"{current}. ")
-                expect(row.locator(".status-chip")).to_have_text("corrected by you")
-            with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
-                page.get_by_role(
-                    "button", name="Confirm everything that isn’t a guess", exact=True
-                ).click()
-            guessed = page.locator(".reading-row").filter(has=page.locator(".status-guessed"))
-            while guessed.count():
-                row = guessed.first
-                row.get_by_role("button", name="Answer", exact=True).click()
-                with page.expect_response(
-                    lambda response: response.url.endswith("/api/update-map")
-                ):
-                    row.get_by_role("button", name="Keep this guess", exact=True).click()
-            question_buttons = page.get_by_role(
-                "button", name="Use the reviewed details", exact=True
-            )
-            while question_buttons.count():
-                previous_count = question_buttons.count()
-                with page.expect_response(
-                    lambda response: response.url.endswith("/api/update-map")
-                ):
-                    question_buttons.first.click()
-                expect(question_buttons).to_have_count(previous_count - 1)
+            page.screenshot(path=str(screens / f"{args.prefix}-before.png"), full_page=True)
+            review_saved_plan(page, audit["scripted_corrections"], verify_undo=True)
             expect(page.locator(".problem-total")).to_contain_text(
                 f"{audit['actual_scenario_count']} scenarios"
             )
             expect(page.get_by_role("button", name="Confirm plan", exact=True)).to_be_enabled()
-            page.screenshot(path=str(screens / "read-v3-candidate-reviewed.png"), full_page=True)
+            page.screenshot(path=str(screens / f"{args.prefix}-reviewed.png"), full_page=True)
             with page.expect_response(
                 lambda response: response.url.endswith("/api/confirm-map")
             ) as confirmation:
@@ -127,7 +81,7 @@ def main():
                 f"{audit['actual_scenario_count']} / {audit['actual_scenario_count']}",
                 timeout=60000,
             )
-            page.screenshot(path=str(screens / "read-v3-candidate-grid.png"), full_page=True)
+            page.screenshot(path=str(screens / f"{args.prefix}-grid.png"), full_page=True)
             truth = PlanMap.from_truth_map(
                 PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
             )
@@ -143,7 +97,7 @@ def main():
                 "page_errors": errors,
                 "suggestions_requested": False,
             }
-            args.reading.with_name("ui-proof.json").write_text(
+            args.reading.with_name(f"{args.prefix}-ui-proof.json").write_text(
                 json.dumps(proof, indent=2) + "\n", encoding="utf-8"
             )
             print(json.dumps(proof, indent=2))

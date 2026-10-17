@@ -3,11 +3,13 @@
 from fastapi import HTTPException
 from pydantic import TypeAdapter
 
+from server.place_review import sync_place_questions
 from server.validation.models import MapDelivery
 from server.validation.rules import validate_plan_rules
 
 
 def sync_rule_questions(review) -> None:
+    sync_place_questions(review)
     for issue in validate_plan_rules(review.plan):
         kind = None
         if issue.field == "supply_delivery":

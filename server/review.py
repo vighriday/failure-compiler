@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from pydantic import TypeAdapter
 
 from server.facts import changed_by, controls, entity_for, loading_team, statement
+from server.place_review import answer_place_question, reopen_place_question
 from server.rule_questions import answer_rule_question, sync_rule_questions
 from server.session import SESSIONS, remember_map
 from server.validation.gate import normalise_plan_map_ids
@@ -190,11 +191,18 @@ def update_review(request: dict) -> dict:
         if question is None:
             raise HTTPException(422, f"Unknown question_id {request.get('question_id')!r}")
         if action == "reopen_question":
+            if question.get("kind") == "place_identity":
+                reopen_place_question(review, question)
             review.answers.pop(question["id"], None)
             review.confirmed = False
             review.out_of_date = True
         else:
             answer = request.get("value")
+            if question.get("kind") == "place_identity":
+                answer_place_question(review, question, answer)
+                _sync_entity_statuses(review)
+                REVIEWS[reading_id] = review
+                return snapshot(reading_id)
             if question.get("kind", "").startswith("missing_"):
                 answer_rule_question(review, question, answer)
                 _sync_entity_statuses(review)

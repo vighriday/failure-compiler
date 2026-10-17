@@ -9,16 +9,11 @@ from server.review import ACCEPTED, REVIEWS, confirm_review, create_review, upda
 from server.validation.models import PlanMap
 
 
-def correction_audit(plan: PlanMap, truth: PlanMap) -> dict:
+def correction_audit(plan: PlanMap, truth: PlanMap, *, place_aliases: dict | None = None) -> dict:
     before = compare_reading(plan, truth)
     aligned, mapping, unmatched = align_entities(plan, truth)
     inverse = {target: source for source, target in mapping.items()}
-    unsupported = [row for row in unmatched if row["collection"] != "deliveries"]
-    unsupported += [
-        row
-        for row in unmatched
-        if row["collection"] == "deliveries" and row["reason"] != "Missing role"
-    ]
+    unsupported = []
     items = items_for_plan(plan)
     state = create_review(plan, items, questions_for_plan(plan, items))
     reading_id = state["reading_id"]
@@ -39,6 +34,23 @@ def correction_audit(plan: PlanMap, truth: PlanMap) -> dict:
             data_actions.append(request)
 
     try:
+        # These are explicit review choices supplied by the caller, never inferred from truth.
+        for source_id, target_id in (place_aliases or {}).items():
+            act(
+                "answer",
+                question_id=f"rule-{source_id}-identity",
+                value={
+                    "choice": "Same place as another listing",
+                    "place_id": target_id,
+                },
+            )
+        aligned, mapping, unmatched = align_entities(REVIEWS[reading_id].plan, truth)
+        inverse = {target: source for source, target in mapping.items()}
+        unsupported = [
+            row
+            for row in unmatched
+            if not (row["collection"] == "deliveries" and row["reason"] == "Missing role")
+        ]
         for delivery in truth.deliveries:
             if delivery.id in inverse:
                 continue
@@ -160,6 +172,7 @@ def correction_audit(plan: PlanMap, truth: PlanMap) -> dict:
         not unsupported
         and after["aligned_field_match_percent"] == 100
         and after["checker_matches"] == after["checker_total"] == 100
+        and len(singles) + len(pairs) == 100
     )
     return {
         "correctable": correctable,

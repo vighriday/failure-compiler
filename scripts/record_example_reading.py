@@ -24,11 +24,11 @@ from server.validation.models import PlanMap  # noqa: E402
 OUT = ROOT / "devpost/screens/live-candidates"
 
 
-def correction_audit(plan: PlanMap) -> dict:
+def correction_audit(plan: PlanMap, *, place_aliases: dict | None = None) -> dict:
     truth = PlanMap.from_truth_map(
         PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
     )
-    return audit_review(plan, truth)
+    return audit_review(plan, truth, place_aliases=place_aliases)
 
 
 def main():
@@ -38,10 +38,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=OUT / READ_PROMPT_VERSION)
     parser.add_argument("--audit-only", action="store_true")
+    parser.add_argument("--place-alias", action="append", default=[], metavar="SOURCE=TARGET")
+    parser.add_argument("--audit-output", type=Path)
     args = parser.parse_args()
     output = args.output
     output.mkdir(parents=True, exist_ok=True)
     target = output / "example-reading.json"
+    aliases = dict(value.split("=", 1) for value in args.place_alias)
+    audit_path = args.audit_output or output / "reading-audit.json"
     if args.audit_only:
         record = json.loads(target.read_text(encoding="utf-8"))
         plan = plan_map_from_reading(
@@ -50,10 +54,8 @@ def main():
             model=record["model"],
             timestamp=record["timestamp"],
         )
-        audit = correction_audit(plan)
-        (output / "reading-audit.json").write_text(
-            json.dumps(audit, indent=2) + "\n", encoding="utf-8"
-        )
+        audit = correction_audit(plan, place_aliases=aliases)
+        audit_path.write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
         print(
             json.dumps(
                 {k: v for k, v in audit.items() if k not in {"corrected_plan", "aligned_inputs"}},
@@ -99,8 +101,8 @@ def main():
         model=result.raw.model,
         timestamp=result.raw.timestamp,
     )
-    audit = correction_audit(plan)
-    (output / "reading-audit.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
+    audit = correction_audit(plan, place_aliases=aliases)
+    audit_path.write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
     print(
         json.dumps(
             {

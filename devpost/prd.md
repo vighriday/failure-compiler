@@ -42,6 +42,8 @@ Uses the supplied Landing v2 Start layout: prompt and assurances on the left, a 
 - Corrected: original AI reading struck through, user's correction next to it, marked "corrected by you." The source line stays.
 - Added: no source line, marked "added by you" (created because a rule asked a question).
 
+If an extra place listing has no loading activity or supply arrival, a rule question asks whether it is separate or the same place as another listed loading or supply place. The user chooses from existing places. Keeping it preserves its tests; identifying it as another place uses that place's details and requires those facts to be checked individually again. The original listing and source stay in the question history. Change restores it. Bulk confirmation never answers this question.
+
 Confirmed items get a small "confirmed" mark. Corrections use constrained choices only: pick from known people, vehicles, or places; use a time picker; no free text. Corrections go directly into the map; the AI does not re-read.
 
 **Below: "What we'll test."** Each failure type with its size, for example:
