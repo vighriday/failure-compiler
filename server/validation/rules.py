@@ -29,8 +29,32 @@ def validate_plan_rules(plan: PlanMap | PlanMapData) -> list[RuleViolation]:
     vehicles = {vehicle.id: vehicle for vehicle in data.vehicles}
     places = {place.id: place for place in data.places}
 
+    for field in ("people", "routes"):
+        if not getattr(data, field):
+            issues.append(RuleViolation(field, field, [], f"The plan needs at least one {field}"))
+
+    times = [("finish_time", "finish_time", data.finish_time)]
+    times += [
+        (person.id, field, getattr(person, field))
+        for person in data.people
+        for field in ("available_from", "available_until")
+    ]
+    times += [(vehicle.id, "available_from", vehicle.available_from) for vehicle in data.vehicles]
+    times += [(place.id, "opens_at", place.opens_at) for place in data.places]
+    times += [(delivery.id, "arrives_at", delivery.arrives_at) for delivery in data.deliveries]
+    for entity_id, field, value in times:
+        if not 0 <= value < 1440:
+            issues.append(
+                RuleViolation(
+                    entity_id,
+                    field,
+                    value,
+                    f"{entity_id} {field} value {value!r} must be within the day (0 to 1439)",
+                )
+            )
+
     for person in data.people:
-        if person.available_from > person.available_until:
+        if person.available_from >= person.available_until:
             issues.append(
                 RuleViolation(
                     person.id,
@@ -135,13 +159,19 @@ def validate_plan_rules(plan: PlanMap | PlanMapData) -> list[RuleViolation]:
             )
         for field in ("households", "load_minutes", "drive_minutes"):
             value = getattr(route, field)
-            if value <= 0:
+            valid = (
+                1 <= value <= 500
+                if field == "households"
+                else (5 <= value <= 240 and value % 5 == 0)
+            )
+            if not valid:
                 issues.append(
                     RuleViolation(
                         route.id,
                         field,
                         value,
-                        f"{route.name} {field} must be greater than zero",
+                        f"{route.name} {field} value {value!r} must be "
+                        + ("1 to 500" if field == "households" else "5 to 240 in 5-minute steps"),
                     )
                 )
 

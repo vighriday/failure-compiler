@@ -44,20 +44,21 @@ def main() -> None:
             return response.value.json()
 
         def van_loading_answer(request):
-            if not request.url.endswith("/api/validate-map"):
-                return False
-            return any(
-                route["id"] == "route-c" and "person-ravi" in route["loader_ids"]
-                for route in request.post_data_json["plan_map"]["routes"]
+            return (
+                request.url.endswith("/api/update-map")
+                and request.post_data_json.get("action") == "answer"
+                and request.post_data_json.get("value") == "The van too"
             )
 
         page.goto(f"{BASE_URL}/#start")
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan").click()
         # The alternative answer must change checker inputs, not just its caption.
-        with page.expect_request(van_loading_answer):
+        with page.expect_response(lambda response: van_loading_answer(response.request)):
             page.get_by_role("button", name="The van too", exact=True).click()
-        expect(page.get_by_text(re.compile("Loading cover:.*Ravi"))).to_have_count(2)
+        expect(
+            page.locator(".statement-line").filter(has_text=re.compile("Loading cover:.*Ravi"))
+        ).to_have_count(5)
         page.reload()
         page.get_by_role("tab", name="Start", exact=True).click()
         page.get_by_role("button", name="Load the example plan", exact=True).click()
@@ -65,7 +66,7 @@ def main() -> None:
         page.get_by_role("button", name=re.compile("Confirm everything")).click()
         page.get_by_role("button", name="Only his car", exact=True).click()
         page.get_by_role("button", name="Answer", exact=True).click()
-        page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option("60")
+        page.get_by_role("button", name="Keep this guess", exact=True).click()
         page.get_by_role("button", name="Confirm plan").click()
         page.wait_for_function(
             "document.querySelectorAll('.result-cell').length > 0"
@@ -176,9 +177,7 @@ def main() -> None:
         reduced.get_by_role("button", name=re.compile("Confirm everything")).click()
         reduced.get_by_role("button", name="Only his car", exact=True).click()
         reduced.get_by_role("button", name="Answer", exact=True).click()
-        reduced.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
-            "60"
-        )
+        reduced.get_by_role("button", name="Keep this guess", exact=True).click()
         reduced.evaluate("""() => {
             window.cellCounts = [];
             new MutationObserver(() => window.cellCounts.push(

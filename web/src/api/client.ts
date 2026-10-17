@@ -1,4 +1,4 @@
-import type { AppliedFix, CaseDetail, ExampleReading, PlanMap, RunCount, RunMeta, ScenarioResult } from "../types";
+import type { AppliedFix, CaseDetail, ExampleReading, PlanMap, ReviewState, RunCount, RunMeta, ScenarioResult } from "../types";
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, {
@@ -16,14 +16,11 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 export const readExample = (text: string) =>
   request<ExampleReading>("/api/read-plan", { text, example: true });
 
-export const validateMap = (plan_map: PlanMap, items: unknown[], questions: unknown[], answers: Record<string, string>) =>
-  request<{ valid: boolean; issues: Array<{ item_id: string; message: string }>; unconfirmed_items: number; open_questions: number }>(
-    "/api/validate-map",
-    { plan_map, items, questions, answers },
-  );
+export const updateMap = (reading_id: string, action: string, values: Record<string, unknown> = {}) =>
+  request<ReviewState>("/api/update-map", { reading_id, action, ...values });
 
-export const confirmMap = (plan_map: PlanMap, items: unknown[], questions: unknown[], answers: Record<string, string>) =>
-  request<{ confirmed: boolean; fingerprint: string | null }>("/api/confirm-map", { plan_map, items, questions, answers });
+export const confirmMap = (reading_id: string) =>
+  request<ReviewState>("/api/confirm-map", { reading_id });
 
 type RunEvent = ({ type: "start" } & RunMeta) | { type: "result"; result: ScenarioResult; count: RunCount } | { type: "complete"; count: RunCount };
 

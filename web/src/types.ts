@@ -13,6 +13,16 @@ export type ReadingItem = {
   value?: number | boolean;
   correct_value?: number | boolean;
   choices?: number[];
+  original_statement?: string;
+  changed_by_fix?: number | null;
+  controls: FactControl[];
+};
+
+export type FactControl = {
+  field: string; label: string; value: number | boolean | string | string[];
+  type: "time" | "boolean" | "number" | "select" | "ordered_people";
+  options?: Array<{value: string; label: string}>;
+  min?: number; max?: number; step?: number;
 };
 
 export type RuleQuestion = {
@@ -40,6 +50,7 @@ export type PlanMap = {
 };
 
 export type ExampleReading = {
+  reading_id: string;
   plan_text: string;
   plan_map: PlanMap;
   items: ReadingItem[];
@@ -47,6 +58,12 @@ export type ExampleReading = {
   placeholder: boolean;
   read_by: string;
   problem_types: Record<string, number>;
+};
+
+export type ReviewState = Pick<ExampleReading, "reading_id" | "plan_map" | "items" | "questions"> & {
+  answers: Record<string, string>;
+  issues: Array<{item_id: string; field: string; bad_value: unknown; message: string}>;
+  confirmed: boolean; out_of_date: boolean;
 };
 
 export type CellState = "tick" | "cross" | "dim" | "qmark";

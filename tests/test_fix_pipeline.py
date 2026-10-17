@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from server.checker.runner import run_checker
+from server.facts import changed_by, statement
 from server.fixes import SCORED, score_fix
 from server.main import app
 from server.models import PlanMapData
@@ -116,6 +117,15 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     ]
     assert next(p for p in final["plan_map"]["people"] if p["name"] == "Joel")["holds_key"]
     assert next(r for r in final["plan_map"]["routes"] if r["name"] == "C")["changed_by_fix"] == 1
+    # Reading sentences must follow the accepted map rather than stale extraction text.
+    final_plan = SESSIONS[final_fp].plan
+    key_item = {"entity_type": "person", "entity_id": "person-joel", "field": "holds_key"}
+    assert statement(final_plan, key_item) == "Joel, Maya and Sam hold loading-area keys."
+    assert changed_by(final_plan, key_item) == 3
+    for route_id, fix_number in [("route-c", 1), ("route-a", 2)]:
+        route_item = {"entity_type": "route", "entity_id": route_id, "field": "route"}
+        assert "Sam" in statement(final_plan, route_item)
+        assert changed_by(final_plan, route_item) == fix_number
 
 
 def test_bad_fix_is_couldnt_apply_and_names_the_bad_reference() -> None:

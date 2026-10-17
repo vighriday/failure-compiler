@@ -18,9 +18,9 @@ SESSIONS: dict[str, MapSession] = {}
 
 
 def remember_map(plan: PlanMap, results: list[ScenarioResult] | None = None) -> str:
-    plan = canonical_order(plan)
     fingerprint = fingerprint_plan_map(plan)
     plan.fingerprint = fingerprint
+    plan = canonical_order(plan)
     if fingerprint not in SESSIONS:
         SESSIONS[fingerprint] = MapSession(plan.model_copy(deep=True), results)
     else:

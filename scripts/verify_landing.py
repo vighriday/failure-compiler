@@ -71,7 +71,6 @@ def main():
             ).select_option("false")
             expect(page.locator(".rule-question")).to_have_count(3)
             expect(ravi).to_contain_text("Ravi cannot drive.")
-            ravi.get_by_role("button", name="Correct", exact=True).click()
             page.get_by_role(
                 "combobox", name="Correction for Ravi can drive.", exact=True
             ).select_option("true")
@@ -95,15 +94,17 @@ def main():
             page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
                 "45"
             )
-            page.locator('[data-item-id="route-c-loading"]').get_by_role(
-                "button", name="Correct", exact=True
-            ).click()
             page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
                 "60"
             )
             sizes = page.get_by_role("combobox", name="Vehicle returns late size", exact=True)
             sizes.select_option("45")
             sizes.select_option("30")
+            while page.get_by_role("button", name="Confirm", exact=True).count():
+                with page.expect_response(
+                    lambda response: response.url.endswith("/api/update-map")
+                ):
+                    page.get_by_role("button", name="Confirm", exact=True).first.click()
             page.get_by_role("button", name="Confirm plan", exact=True).click()
             expect(page.locator(".result-cell")).to_have_count(100, timeout=30000)
 
@@ -358,9 +359,12 @@ def main():
         expect(rule_page.locator(".rule-question")).to_have_count(0)
         rule_page.get_by_role("button", name="Only his car", exact=True).click()
         rule_page.get_by_role("button", name="Answer", exact=True).click()
-        rule_page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
-            "60"
-        )
+        rule_page.get_by_role("button", name="Keep this guess", exact=True).click()
+        while rule_page.get_by_role("button", name="Confirm", exact=True).count():
+            with rule_page.expect_response(
+                lambda response: response.url.endswith("/api/update-map")
+            ):
+                rule_page.get_by_role("button", name="Confirm", exact=True).first.click()
         rule_page.get_by_role("button", name="Confirm plan", exact=True).click()
         expect(rule_page.locator(".result-cell")).to_have_count(100, timeout=30000)
         rule_page.close()

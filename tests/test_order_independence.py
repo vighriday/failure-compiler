@@ -31,6 +31,7 @@ def test_shuffled_map_has_identical_results_and_no_missing_cached_ids():
     assert fingerprint_plan_map(shuffled_map) == fingerprint
     remember_map(original_map, expected)
     remember_map(shuffled_map)
+    assert shuffled_map.fingerprint == fingerprint
     response = TestClient(app).get(
         "/api/run-tests", params={"map": fingerprint, "reduced_motion": True}
     )

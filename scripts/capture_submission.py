@@ -55,7 +55,7 @@ def main() -> None:
         page.get_by_role("button", name=re.compile("Confirm everything")).click()
         page.get_by_role("button", name="Only his car", exact=True).click()
         page.get_by_role("button", name="Answer", exact=True).click()
-        page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option("60")
+        page.get_by_role("button", name="Keep this guess", exact=True).click()
         page.get_by_role("button", name="Confirm plan", exact=True).click()
         expect(page.locator(".result-cell")).to_have_count(100, timeout=30000)
         expect(page.locator(".result-cross")).to_have_count(4)

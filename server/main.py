@@ -7,14 +7,15 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
-from server.models import PlanMapData
-from server.grid import router as grid_router
 from server.fixes import router as fixes_router
-from server.session import remember_map
+from server.grid import router as grid_router
+from server.models import PlanMapData
+from server.review import confirm_review, create_review, snapshot, update_review
+from server.validation.gate import GateError, normalise_plan_map_ids
 from server.validation.models import PlanMap
 from server.validation.rules import validate_plan_rules
 
@@ -22,6 +23,21 @@ ROOT = Path(__file__).resolve().parents[1]
 app = FastAPI(title="Failure Compiler")
 app.include_router(grid_router)
 app.include_router(fixes_router)
+
+
+@app.exception_handler(GateError)
+def gate_error(_request: Any, error: GateError) -> JSONResponse:
+    return JSONResponse(status_code=422, content={"detail": str(error)})
+
+
+@app.exception_handler(ValidationError)
+def shape_error(_request: Any, error: ValidationError) -> JSONResponse:
+    issue = error.errors(include_url=False)[0]
+    field = ".".join(str(part) for part in issue["loc"])
+    return JSONResponse(
+        status_code=422,
+        content={"detail": f"Invalid {field}: {issue.get('input')!r}. {issue['msg']}"},
+    )
 
 
 def _fixture(path: str) -> dict[str, Any]:
@@ -49,9 +65,7 @@ def read_plan(request: dict[str, Any]) -> dict[str, Any]:
     # The one deliberately guessed value is already equal to the truth map.
     return {
         "plan_text": (ROOT / "fixtures/example-plan.txt").read_text(encoding="utf-8"),
-        "plan_map": plan.model_dump(mode="json"),
-        "items": reading["items"],
-        "questions": reading["questions"],
+        **create_review(plan, reading["items"], reading["questions"]),
         "placeholder": reading["placeholder"],
         "read_by": reading["provider"],
         "problem_types": _fixture("fixtures/example-truth.json")["problem_sizes"],
@@ -60,10 +74,13 @@ def read_plan(request: dict[str, Any]) -> dict[str, Any]:
 
 @app.post("/api/validate-map")
 def validate_map(request: dict[str, Any]) -> dict[str, Any]:
+    if request.get("reading_id"):
+        return snapshot(request["reading_id"])
     try:
         plan = PlanMap.model_validate(request["plan_map"])
     except (KeyError, ValidationError) as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+    normalise_plan_map_ids(plan)
     issues = validate_plan_rules(plan)
     items = request.get("items", [])
     questions = request.get("questions", [])
@@ -74,34 +91,18 @@ def validate_map(request: dict[str, Any]) -> dict[str, Any]:
         "unconfirmed_items": sum(
             item.get("status") not in {"confirmed", "corrected", "added"} for item in items
         ),
-        "open_questions": sum(
-            not answers.get(question.get("id")) for question in questions
-        ),
+        "open_questions": sum(not answers.get(question.get("id")) for question in questions),
     }
 
 
 @app.post("/api/confirm-map")
 def confirm_map(request: dict[str, Any]) -> dict[str, Any]:
-    try:
-        plan = PlanMap.model_validate(request["plan_map"])
-    except (KeyError, ValidationError) as error:
-        raise HTTPException(status_code=422, detail=str(error)) from error
-    items = request.get("items", [])
-    questions = request.get("questions", [])
-    answers = request.get("answers", {})
-    if any(item.get("status") not in {"confirmed", "corrected", "added"} for item in items):
-        raise HTTPException(
-            status_code=409, detail="Every reading item must be confirmed or corrected"
-        )
-    if any(not answers.get(question.get("id")) for question in questions):
-        raise HTTPException(
-            status_code=409, detail="Every open question needs an individual answer"
-        )
-    issues = validate_plan_rules(plan)
-    if issues:
-        raise HTTPException(status_code=409, detail=[issue.message for issue in issues])
-    plan.fingerprint = remember_map(plan)
-    return {"confirmed": True, "fingerprint": plan.fingerprint}
+    return confirm_review(request)
+
+
+@app.post("/api/update-map")
+def update_map(request: dict[str, Any]) -> dict[str, Any]:
+    return update_review(request)
 
 
 if (ROOT / "web/dist").is_dir():

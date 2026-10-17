@@ -12,7 +12,7 @@ ItemStatus = Literal["unconfirmed", "confirmed", "corrected", "added"]
 
 
 class AIPerson(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     id: str
     name: str
     can_drive: bool
@@ -25,7 +25,7 @@ class AIPerson(BaseModel):
 
 
 class AIVehicle(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     id: str
     name: str
     available_from: int
@@ -34,7 +34,7 @@ class AIVehicle(BaseModel):
 
 
 class AIPlace(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     id: str
     name: str
     opens_at: int
@@ -45,7 +45,7 @@ class AIPlace(BaseModel):
 
 
 class AIDelivery(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     id: str
     name: str
     arrives_at: int
@@ -55,7 +55,7 @@ class AIDelivery(BaseModel):
 
 
 class AIRoute(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     id: str
     name: str
     households: int
@@ -69,13 +69,13 @@ class AIRoute(BaseModel):
 
 
 class AIQuestion(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     item_id: str
     question_text: str
 
 
 class AIPlanReading(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     people: list[AIPerson]
     vehicles: list[AIVehicle]
     places: list[AIPlace]
@@ -91,7 +91,7 @@ class AIPlanReading(BaseModel):
 
 
 class AIMetadata(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     provider: str
     model: str
     timestamp: str
@@ -137,7 +137,7 @@ class MapRoute(Route):
 
 
 class MapQuestion(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     item_id: str
     question_text: str
 
@@ -145,7 +145,7 @@ class MapQuestion(BaseModel):
 class PlanMap(BaseModel):
     """Server-owned map, including UI provenance separate from checker inputs."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
     fingerprint: str | None = None
     ai_meta: AIMetadata
     people: list[MapPerson]
