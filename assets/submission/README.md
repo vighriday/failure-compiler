@@ -6,10 +6,12 @@ All artwork and website screenshots are saved in this folder. This pack represen
 
 | File | Dimensions | Use |
 | --- | --- | --- |
-| [thumbnail.png](thumbnail.png) | 1672 × 941 | Wide project or demo-video thumbnail. |
-| [cover-square.png](cover-square.png) | 1254 × 1254 | Square project cover or social post. |
+| [thumbnail.png](thumbnail.png) | 1536 × 1024 | Landscape project thumbnail, with smaller artwork and generous crop margins. |
+| [cover-square.png](cover-square.png) | 1254 × 1254 | Square cover, with the title, grid and footer inset for a landscape card crop. |
 
 The covers are generated editorial artwork using the project's existing name, tagline, palette and grid motif. They are not app screenshots. The exact prompts and generation method are recorded in [prompts.md](prompts.md).
+
+Both covers were revised to fit the project card shown in the review. The full composition is smaller inside the image, with empty paper around it. Use the landscape thumbnail for the project card; the square cover also keeps its full title and footer visible in a centered 337 × 223 card crop. These versions replace the earlier edge-filling covers.
 
 ## Actual website screenshots
 

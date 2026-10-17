@@ -1,15 +1,15 @@
-﻿[
+[
     {
         "File":  "cover-square.png",
         "Width":  1254,
         "Height":  1254,
-        "Bytes":  1704782
+        "Bytes":  1679645
     },
     {
         "File":  "thumbnail.png",
-        "Width":  1672,
-        "Height":  941,
-        "Bytes":  1680180
+        "Width":  1536,
+        "Height":  1024,
+        "Bytes":  1637625
     },
     {
         "File":  "screenshots/01-overview.png",

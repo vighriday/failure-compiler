@@ -44,3 +44,40 @@ Palette: #F6F4EE warm paper, #FBFAF6 sheet, #1A1916 ink, #1E6B47 green, #B23A2E 
 Keep the title strong and legible at small square thumbnail sizes. Minimal, crisp, calm graphic design. All lettering must be correct, especially "Compiler" and "scenarios".
 Avoid: photographic objects, 3D, gradients, shadows, glows, robots, awards, invented features, fake product windows, tiny labels, watermarks, provider names or additional copy.
 ```
+
+## Card crop revision
+
+Tool: built-in `image_gen`, editing the original saved covers. Only composition scale and surrounding paper margins were requested to change.
+
+### thumbnail.png revision
+
+```text
+Edit target: the supplied Failure Compiler landscape thumbnail.
+Change only the scale and canvas framing so it fits a tightly cropped project card. Preserve the title, tagline, colors, matrix illustration and exact wording from the original. Do not redesign or add anything.
+Output a landscape 3:2 image, approximately 1200 x 800 pixels. Uniformly SHRINK the ENTIRE existing composition to about 68% of the canvas width, including its footer, then center it both horizontally and vertically. Extend the warm off-white paper background around it. Leave very generous EMPTY paper padding: at least 16% of canvas width on the left and right, and at least 20% of canvas height above and below the entire artwork. There must be no title, caption, footer number or matrix cell near an outside edge.
+All important content should fit inside the central 68% width and 60% height. This must survive centered 3:2, 16:9 and square card crops without cutting off Failure, Compiler or the footer.
+Keep these exact original words:
+"Failure"
+"Compiler"
+"Crash-test a plan"
+"before Saturday does."
+"100 scenarios"
+"3 hidden pairs"
+Keep a clear readable hierarchy, but the artwork and typography should be visibly smaller than in the supplied original. Flat warm paper, near-black ink, deep green checks, brick-red crosses and underline. No frame, no browser UI, no extra labels, no new graphics, no watermark.
+```
+
+### cover-square.png revision
+
+```text
+Edit target: the supplied Failure Compiler square cover. Use case: precise-object-edit.
+Change ONLY the scale and framing so every element survives a tightly cropped project card. Preserve all original title letters, tagline, colors, triangular grid and footer wording. Do not redesign or add anything.
+Output a SQUARE 1:1 image, approximately 1024 x 1024. Uniformly shrink the ENTIRE existing composition, including title, tagline, matrix and footer, until the full artwork occupies no more than the CENTRAL 54% OF THE CANVAS HEIGHT. Center this shrunken artwork horizontally and vertically. Extend the same warm off-white paper background around it. Leave at least 23% of canvas height completely empty at BOTH top and bottom. Leave generous blank sides too. This substantial empty padding is intentional and required: the square will be center-cropped to a landscape 3:2 or 16:9 card. Nothing may get cut off in that crop.
+Keep exact original words:
+"Failure"
+"Compiler"
+"Crash-test a plan"
+"before Saturday does."
+"100 scenarios"
+"3 hidden pairs"
+Preserve the original stacked title above the grid, green checks, red crosses, fine underline and thin footer rule, with the whole poster clearly smaller and surrounded by blank paper. All typography and footer labels inside the central safe area. No border, extra text, browser UI, watermark or added graphics.
+```
