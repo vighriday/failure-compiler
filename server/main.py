@@ -14,6 +14,7 @@ from pydantic import ValidationError
 from server.fixes import router as fixes_router
 from server.grid import router as grid_router
 from server.models import PlanMapData
+from server.reading import items_for_plan, plan_from_record, questions_for_plan
 from server.review import confirm_review, create_review, snapshot, update_review
 from server.validation.gate import GateError, normalise_plan_map_ids
 from server.validation.models import PlanMap
@@ -58,6 +59,16 @@ def read_plan(request: dict[str, Any]) -> dict[str, Any]:
         )
     truth = PlanMapData.model_validate(_fixture("fixtures/example-truth.json"))
     reading = _fixture("fixtures/example-reading.json")
+    if "raw_text" in reading:
+        plan = plan_from_record(reading)
+        items = items_for_plan(plan)
+        return {
+            "plan_text": (ROOT / "fixtures/example-plan.txt").read_text(encoding="utf-8"),
+            **create_review(plan, items, questions_for_plan(plan, items)),
+            "placeholder": False,
+            "read_by": f"{reading['provider']} / {reading['model']}",
+            "problem_types": plan.problem_sizes,
+        }
     plan = PlanMap.from_truth_map(truth)
     for collection in (plan.people, plan.vehicles, plan.places, plan.deliveries, plan.routes):
         for entity in collection:

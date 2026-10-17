@@ -2,9 +2,9 @@
 
 ## Status
 
-Hardening is complete. The revised seven-part instruction is in progress: aligned checker inputs and full outcomes, names as labels, missing facts through rule questions, and a new three-run provider comparison. The read-v3 bake-off is complete. Gemini is now primary: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. The earlier stop and its raw output are retained below as history. No example fixture has yet been replaced. Slice 7 has not started.
+Hardening and revised parts 1 to 5 are complete. The read-v3 bake-off selected Gemini: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. Part 6 reached a new correction checkpoint: two loader-order edits match all 100 reference results, but the one-shot reading includes an extra Hall entity that cannot be removed with the approved controls. Its actual matrix has 115 scenarios and its checker inputs still differ. No example fixture has been replaced and no live fix suggestions were requested. Slice 6 remains unchecked; slice 7 has not started.
 
-The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. Live HTTP/UI integration, session keys, live fix suggestions and the real-reading screenshots are still pending. The running app continues to use its labelled hand-written example.
+The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. The candidate has real-reading browser screenshots; live HTTP/UI integration, session keys and live fix suggestions remain pending. The running app continues to use its labelled hand-written example.
 
 ## Original exact-name bake-off (superseded measurement)
 
@@ -88,3 +88,40 @@ All saved campaigns use the same final evaluator: route letters, primary-driver/
 | 2 | Groq / openai/gpt-oss-120b | 12 | 82% | 0 | 10,775 |
 
 Ranking follows the requested order: exact full-result equivalence, aligned fields, consistency, tokens. The variance is the sum of population variances of those two scores across three runs. Gemini wins on the first criterion. Run 2 puts Ravi first in Route A's loading list; the other runs put Joel first. Assignment order is meaningful, and full schedule equality is intentionally included in the score. `server/config.py` records the date, winner and scores; the adapter reads that order, and each provider keeps its own model ID when primary and fallback switch.
+
+## Part 6: one-shot winner reading and the remaining control gap
+
+One separate Gemini call captured the example with read-v3, LOW thinking and 2,480 total tokens. The successful response was not rerun or edited. Local evidence is under ignored `devpost/screens/live-candidates/read-v3/`:
+
+- `example-reading.json`: unedited provider record, exact `raw_text`, model, prompt version, timestamp and token usage.
+- `reading-attempts.json`: the single successful attempt.
+- `reading-audit.json`: alignment, before/after full results, actual scenario count, exact correction actions and remaining input mismatches.
+- `ui-proof.json`: the result of using the visible browser controls against that same saved response.
+
+| Mismatch class | Actual reading | Treatment |
+| --- | --- | --- |
+| Naming only | `Loading bay` instead of `Loading area`; `Route A/B/C` instead of `A/B/C` | Preserve the AI's labels. Alignment excludes them from scoring. |
+| Fixed by a control | Route A loaders: Joel, Anita, Maya, Ravi | Move Maya above Anita: Joel, Maya, Anita, Ravi. |
+| Fixed by a control | Route C loaders: Joel, Anita, Maya | Move Anita and Maya above Joel: Anita, Maya, Joel. |
+| Not fixable with the approved controls | A separate `Hall` place, in addition to `Loading bay`, with `opens_at=540`, `needs_key=false`, `one_vehicle_at_a_time=false` | No remove/merge rule question exists. Keep it in both the raw response and diagnostic map. |
+
+No supply delivery is missing in this reading, so it needs no addition. The guessed facts still require individual confirmation. The AI's four arrival-time questions require explicit answers after reviewing their associated facts; bulk confirmation answers none of them.
+
+The local browser proof used the existing up-arrow controls, individual guess confirmations and the question buttons. It reached 100/100 exact matches on the common truth matrix, with all 50 truth inputs matching. The three extra Hall fields remain: the complete aligned input score is **50/53 = 94.34%**. The real grid has **115 tests: 1 single weak spot, 3 hidden pairs, 13 already broken by the weak spot, 98 survived**. An extra place introduces one new single and 14 new pairs. Ignoring it would hide a checker input and would not satisfy the requested reading-to-truth test.
+
+Screenshots at a 1440x900 viewport are saved locally as `devpost/screens/read-v3-candidate-before.png`, `read-v3-candidate-reviewed.png` and `read-v3-candidate-grid.png`. The preview overrides the fixture loader only inside its own local server process; canonical fixtures are untouched. There were no page errors or fix-suggestion requests. Map totals now reflect the current entity count instead of always claiming 14 problems and 100 scenarios.
+
+### Stop and remaining work
+
+The requested reference-result score is reachable, but complete checker-input equivalence and the actual 100-scenario example are not reachable with the current controls. `test_reading_matches_truth.py` has not been added as a passing test by ignoring the extra entity. Regression tests instead prove that the guard retains extra entities and reports this distinction. A decision about handling extra extracted entities is needed before replacing the fixture. No removal control, merge rule, checker change, another successful capture or fix-suggestion call was added to get past the checkpoint.
+
+Part 7 is not eligible yet. Suggestions and checker verdicts for Joel absent, supply delivery late + Ravi absent, van late + Anita leaves early, and van late + Anita absent are therefore **not requested**, rather than represented by placeholder output. The existing hand-written example reading and fix fixtures remain in use and labelled as such. Live HTTP reading, session keys, live suggestions and the remaining slice 6 work are pending.
+
+### Final verification at this checkpoint
+
+- `uv run -- python -m pytest -q`: **126 passed**, with one dependency deprecation warning.
+- `uv run -- python -m ruff check .`: passed.
+- `npm run build`: passed (TypeScript and production Vite bundle).
+- `scripts/verify_saved_reading.py`: real candidate reviewed through visible controls; 100/100 common results, 115 actual cells, no page errors, no suggestion request.
+- Existing `scripts/verify_review.py` and `scripts/verify_story.py`: both passed on an isolated local server. The canonical demo, three fixes, 100 survived, linked fingerprints, re-confirmation and reduced motion remain intact.
+- Checker constraints, truth fixture, expected results and canonical reading/fix fixtures are unchanged. The preview server shut down after verification. Screenshots remain ignored.

@@ -15,17 +15,45 @@ def test_audit_accepts_only_supported_corrections():
     assert len(audit["scripted_corrections"]) == 4
 
 
-def test_audit_stops_for_missing_delivery_or_entity_renaming():
+def test_audit_uses_rule_addition_and_ignores_entity_labels():
     plan = confirmed_truth_map()
     plan.deliveries = []
     plan.routes[0].name = "Route A"
     plan.vehicles[0].name = "van"
     audit = correction_audit(plan)
+    assert audit["correctable"] is True
+    assert audit["after"]["checker_matches"] == 100
+    assert audit["naming_only"]
+    assert audit["scripted_corrections"][0]["value"]["choice"] == "Add a delivery"
+
+
+def test_audit_stops_for_an_extra_entity_without_a_removal_control():
+    plan = confirmed_truth_map()
+    plan.vehicles.append(
+        plan.vehicles[0].model_copy(update={"id": "vehicle-extra", "name": "Extra"})
+    )
+    audit = correction_audit(plan)
     assert audit["correctable"] is False
-    assert any(
-        item["collection"] == "deliveries" and item["reason"] == "Missing entity"
-        for item in audit["uneditable"]
+    assert audit["not_fixable"]
+
+
+def test_extra_hall_cannot_be_silently_dropped_despite_matching_reference_results():
+    plan = confirmed_truth_map()
+    plan.places.append(
+        plan.places[0].model_copy(
+            update={
+                "id": "place-hall",
+                "name": "Hall",
+                "needs_key": False,
+                "one_vehicle_at_a_time": False,
+            }
+        )
     )
-    assert any(
-        item.get("field") == "name" and item["id"] == "vehicle-van" for item in audit["uneditable"]
-    )
+    plan.routes[0].loader_ids = ["person-ravi", "person-joel", "person-anita", "person-maya"]
+    audit = correction_audit(plan)
+    assert audit["correctable"] is False
+    assert audit["after"]["checker_matches"] == 100
+    assert audit["after"]["aligned_field_match_percent"] < 100
+    assert audit["actual_scenario_count"] == 115
+    assert len(audit["fixed_by_control"]) == 1
+    assert len(audit["corrected_plan"]["places"]) == 2

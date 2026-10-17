@@ -98,6 +98,8 @@ function App() {
   const unresolvedItems = items.filter((item) => !["confirmed", "corrected", "added"].includes(item.status));
   const ready = Boolean(planMap && planText === reading?.plan_text && unresolvedItems.length === 0 && openQuestions.length === 0 && issues.length === 0 && pending === 0);
   const allProblems = problemTypes.map((problem) => ({...problem, count: !planMap ? problem.count : problem.id.startsWith("volunteer_") ? planMap.people.length : problem.id === "vehicle_returns_late" ? planMap.vehicles.length : problem.id === "place_blocked" ? planMap.places.length : planMap.deliveries.length}));
+  const totalProblems = allProblems.reduce((total, problem) => total + problem.count, 0);
+  const totalScenarios = totalProblems + totalProblems * (totalProblems - 1) / 2 - (planMap?.people.length ?? 5);
 
   function syncReview(result: ReviewState) {
     if (result.reading_id !== activeReading.current) return;
@@ -171,7 +173,7 @@ function App() {
         <section className="map-content" aria-label="Plan map">
           <div className="map-intro">
             {outOfDate && <div className="outdated-notice">Out of date: re-run. Confirm the edited map to test it again.</div>}
-            <div className="placeholder-notice"><span className="notice-mark">i</span><span>Example mode: this reading was written by hand for testing and is not real AI output.</span></div>
+            <div className="placeholder-notice"><span className="notice-mark">i</span><span>{reading.placeholder ? "Example mode: this reading was written by hand for testing and is not real AI output." : `Example mode: saved AI reading. Read by ${reading.read_by}.`}</span></div>
           </div>
 
           <section className="checklist-card">
@@ -234,14 +236,14 @@ function App() {
           <section className="what-test-section">
             <div className="section-kicker">THE CRASH TEST</div>
             <h2>What we’ll test</h2>
-            <p className="section-subtitle">14 problems, tested one at a time and in pairs.</p>
+            <p className="section-subtitle">{totalProblems} problems, tested one at a time and in pairs.</p>
             <div className="problem-list">
               {allProblems.map((problem) => <div className="problem-row" key={problem.id}>
                 <div><span className="problem-name">{problemLabels[problem.id]}</span><span className="problem-count mono">{problem.count} {problem.count === 1 ? "problem" : "problems"}</span></div>
                 {problem.hasSize ? <label className="size-select"><select aria-label={`${problemLabels[problem.id]} size`} value={sizes[problem.id] ?? 30} disabled={pending > 0} onChange={(event) => { void mutate("problem_size", {field: problem.id, value: Number(event.target.value)}); }}>{presets.map((value) => <option key={value} value={value}>{value} min</option>)}</select></label> : <span className="no-size mono">no duration</span>}
               </div>)}
             </div>
-            <div className="problem-total"><span>Pairwise tests when you confirm</span><span className="mono">100 scenarios</span></div>
+            <div className="problem-total"><span>Pairwise tests when you confirm</span><span className="mono">{totalScenarios} scenarios</span></div>
           </section>
           <div className="read-by mono">READ BY · {reading.read_by} <span>·</span> {reading.placeholder ? "PLACEHOLDER" : "SAVED READING"}</div>
           {error && <p className="inline-error map-error" role="alert">{error}</p>}

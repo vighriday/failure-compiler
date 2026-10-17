@@ -202,6 +202,16 @@ def update_review(request: dict) -> dict:
                 return snapshot(reading_id)
             if not isinstance(answer, str) or answer not in question["choices"]:
                 raise HTTPException(422, f"Invalid answer {answer!r} for {question['id']}")
+            if question["id"].startswith("reading-question-"):
+                associated = next(row for row in review.items if row["id"] == question["item_id"])
+                if any(
+                    row["status"] not in ACCEPTED
+                    for row in review.items
+                    if row["entity_id"] == associated["entity_id"]
+                ):
+                    raise HTTPException(
+                        422, "Review the associated facts individually before answering"
+                    )
             if question["id"] == "ravi-van-loading-question":
                 for route in list(review.plan.routes):
                     if route.vehicle_id != "vehicle-van":

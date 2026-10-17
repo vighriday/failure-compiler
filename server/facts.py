@@ -91,6 +91,12 @@ def statement(plan: PlanMap, item: dict) -> str:
         return f"{names(plan, loading_team(plan))} make up the shared loading team."
     if kind == "person":
         if field == "holds_key":
+            if item.get("id") not in {None, "joel-key"}:
+                return f"{entity.name} " + (
+                    "holds a loading-area key."
+                    if entity.holds_key
+                    else "does not hold a loading-area key."
+                )
             holders = [person.id for person in plan.people if person.holds_key]
             return f"{names(plan, holders)} " + (
                 "holds the only loading-area key."

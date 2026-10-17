@@ -1,5 +1,6 @@
 """Make the one authorised primary reading and stop if the existing controls cannot reach truth."""
 
+import argparse
 import json
 import logging
 import sys
@@ -10,104 +11,68 @@ from dotenv import dotenv_values
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.bakeoff import compare, flatten, wait_for_groq  # noqa: E402
+from scripts.bakeoff import wait_for_groq  # noqa: E402
 from server.ai.adapter import read_plan  # noqa: E402
+from server.ai.prompts import READ_PROMPT_VERSION  # noqa: E402
 from server.ai.types import AIError  # noqa: E402
-from server.facts import FIELDS  # noqa: E402
+from server.config import PRIMARY_PROVIDER  # noqa: E402
 from server.models import PlanMapData  # noqa: E402
-from server.validation.gate import normalise_plan_map_ids, plan_map_from_reading  # noqa: E402
+from server.reading_review import correction_audit as audit_review  # noqa: E402
+from server.validation.gate import plan_map_from_reading, validate_ai_reading  # noqa: E402
 from server.validation.models import PlanMap  # noqa: E402
 
 OUT = ROOT / "devpost/screens/live-candidates"
 
 
 def correction_audit(plan: PlanMap) -> dict:
-    """Do not rename, add or remove entities: none is an approved Part 1 correction."""
-    truth = normalise_plan_map_ids(
-        PlanMap.from_truth_map(
-            PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
-        )
+    truth = PlanMap.from_truth_map(
+        PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
     )
-    candidate = normalise_plan_map_ids(plan)
-    uneditable = []
-    corrections = []
-    for kind, collection in {
-        "person": "people",
-        "vehicle": "vehicles",
-        "place": "places",
-        "delivery": "deliveries",
-        "route": "routes",
-    }.items():
-        wanted = {entity.id: entity for entity in getattr(truth, collection)}
-        actual = {entity.id: entity for entity in getattr(candidate, collection)}
-        for entity_id in sorted(wanted.keys() - actual.keys()):
-            uneditable.append(
-                {"collection": collection, "id": entity_id, "reason": "Missing entity"}
-            )
-        for entity_id in sorted(actual.keys() - wanted.keys()):
-            uneditable.append(
-                {
-                    "collection": collection,
-                    "id": entity_id,
-                    "reason": "Unexpected entity or different name",
-                }
-            )
-        for entity_id in wanted.keys() & actual.keys():
-            expected, current = wanted[entity_id], actual[entity_id]
-            for field in expected.__class__.model_fields:
-                if field not in expected.__class__.__mro__[1].model_fields:
-                    continue
-                before, after = getattr(current, field), getattr(expected, field)
-                if before == after:
-                    continue
-                if field not in FIELDS[kind]:
-                    uneditable.append(
-                        {
-                            "collection": collection,
-                            "id": entity_id,
-                            "field": field,
-                            "actual": before,
-                            "expected": after,
-                            "reason": "No existing constrained correction",
-                        }
-                    )
-                else:
-                    corrections.append({"entity_id": entity_id, "field": field, "value": after})
-                    setattr(current, field, after)
-    if candidate.finish_time != truth.finish_time:
-        corrections.append(
-            {"entity_id": "finish-time", "field": "finish_time", "value": truth.finish_time}
-        )
-        candidate.finish_time = truth.finish_time
-    for field, value in truth.problem_sizes.items():
-        if candidate.problem_sizes.get(field) != value:
-            corrections.append({"entity_id": "problem_sizes", "field": field, "value": value})
-            candidate.problem_sizes[field] = value
-    same_after_corrections = flatten(candidate) == flatten(truth)
-    return {
-        "correctable": not uneditable and same_after_corrections,
-        "uneditable": uneditable,
-        "scripted_corrections": corrections,
-    }
+    return audit_review(plan, truth)
 
 
 def main():
     logger = logging.getLogger("server.ai")
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
-    OUT.mkdir(parents=True, exist_ok=True)
-    target = OUT / "example-reading.json"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=OUT / READ_PROMPT_VERSION)
+    parser.add_argument("--audit-only", action="store_true")
+    args = parser.parse_args()
+    output = args.output
+    output.mkdir(parents=True, exist_ok=True)
+    target = output / "example-reading.json"
+    if args.audit_only:
+        record = json.loads(target.read_text(encoding="utf-8"))
+        plan = plan_map_from_reading(
+            validate_ai_reading(record["raw_text"]),
+            provider=record["provider"],
+            model=record["model"],
+            timestamp=record["timestamp"],
+        )
+        audit = correction_audit(plan)
+        (output / "reading-audit.json").write_text(
+            json.dumps(audit, indent=2) + "\n", encoding="utf-8"
+        )
+        print(
+            json.dumps(
+                {k: v for k, v in audit.items() if k not in {"corrected_plan", "aligned_inputs"}},
+                indent=2,
+            )
+        )
+        return
     if target.exists():
         raise SystemExit("A real reading is already recorded. Do not rerun a successful call.")
     values = dotenv_values(ROOT / ".env")
-    attempts_path = OUT / "reading-attempts.json"
+    attempts_path = output / "reading-attempts.json"
     attempts = json.loads(attempts_path.read_text()) if attempts_path.exists() else []
-    wait_for_groq()
+    if PRIMARY_PROVIDER == "groq":
+        wait_for_groq()
     try:
         result = read_plan(
             (ROOT / "fixtures/example-plan.txt").read_text(),
-            {"groq": values.get("GROQ_API_KEY")},
-            provider="groq",
+            {"groq": values.get("GROQ_API_KEY"), "gemini": values.get("GEMINI_API_KEY")},
+            provider=PRIMARY_PROVIDER,
         )
     except AIError as error:
         attempts.append(
@@ -134,12 +99,26 @@ def main():
         model=result.raw.model,
         timestamp=result.raw.timestamp,
     )
-    audit = {**compare(plan), **correction_audit(plan)}
-    (OUT / "reading-audit.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps(audit, indent=2), flush=True)
+    audit = correction_audit(plan)
+    (output / "reading-audit.json").write_text(json.dumps(audit, indent=2) + "\n", encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "correctable": audit["correctable"],
+                "before": audit["before"],
+                "after": audit["after"],
+                "actual_scenario_count": audit["actual_scenario_count"],
+                "not_fixable": audit["not_fixable"],
+                "corrections": audit["scripted_corrections"],
+            },
+            indent=2,
+        ),
+        flush=True,
+    )
     if not audit["correctable"]:
         print(
-            "STOP: the real reading cannot reach the truth map with the approved controls. "
+            "STOP: checker-input equivalence is incomplete with the approved controls. "
+            "Reference-result matches do not discard extra entities or scenarios. "
             "No fixture was replaced or committed.",
             flush=True,
         )
