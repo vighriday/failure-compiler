@@ -1,0 +1,68 @@
+﻿[
+    {
+        "File":  "cover-square.png",
+        "Width":  1254,
+        "Height":  1254,
+        "Bytes":  1704782
+    },
+    {
+        "File":  "thumbnail.png",
+        "Width":  1672,
+        "Height":  941,
+        "Bytes":  1680180
+    },
+    {
+        "File":  "screenshots/01-overview.png",
+        "Width":  1440,
+        "Height":  900,
+        "Bytes":  111945
+    },
+    {
+        "File":  "screenshots/02-paste-plan.png",
+        "Width":  1440,
+        "Height":  900,
+        "Bytes":  86977
+    },
+    {
+        "File":  "screenshots/03-plan-map-full.png",
+        "Width":  1440,
+        "Height":  3491,
+        "Bytes":  268261
+    },
+    {
+        "File":  "screenshots/03-plan-map.png",
+        "Width":  1440,
+        "Height":  900,
+        "Bytes":  103473
+    },
+    {
+        "File":  "screenshots/04-live-grid.png",
+        "Width":  1440,
+        "Height":  1550,
+        "Bytes":  136540
+    },
+    {
+        "File":  "screenshots/05-broken-case.png",
+        "Width":  1440,
+        "Height":  1795,
+        "Bytes":  220627
+    },
+    {
+        "File":  "screenshots/06-fix-turned-down.png",
+        "Width":  587,
+        "Height":  1177,
+        "Bytes":  87865
+    },
+    {
+        "File":  "screenshots/07-one-key-new-pair.png",
+        "Width":  1440,
+        "Height":  1752,
+        "Bytes":  212039
+    },
+    {
+        "File":  "screenshots/08-all-survived.png",
+        "Width":  1440,
+        "Height":  1523,
+        "Bytes":  163803
+    }
+]

@@ -1,0 +1,19 @@
+{
+  "viewport": [
+    1440,
+    900
+  ],
+  "source": "http://127.0.0.1:5173",
+  "files": [
+    "01-overview.png",
+    "02-paste-plan.png",
+    "03-plan-map.png",
+    "03-plan-map-full.png",
+    "04-live-grid.png",
+    "05-broken-case.png",
+    "06-fix-turned-down.png",
+    "07-one-key-new-pair.png",
+    "08-all-survived.png"
+  ],
+  "page_errors": []
+}
