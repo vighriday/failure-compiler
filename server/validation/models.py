@@ -74,6 +74,16 @@ class AIQuestion(BaseModel):
     question_text: str
 
 
+class AIProblemSizes(BaseModel):
+    """A closed object is required by Groq strict structured output."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+    volunteer_leaves_early: int
+    vehicle_returns_late: int
+    supply_delivery_late: int
+    place_blocked: int
+
+
 class AIPlanReading(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     people: list[AIPerson]
@@ -84,7 +94,7 @@ class AIPlanReading(BaseModel):
     finish_time: int
     finish_time_source: str
     finish_time_guessed: bool
-    problem_sizes: dict[str, int]
+    problem_sizes: AIProblemSizes
     questions: list[AIQuestion]
     is_distribution_plan: bool
     not_distribution_reason: str | None

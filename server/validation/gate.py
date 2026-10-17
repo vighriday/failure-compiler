@@ -309,6 +309,6 @@ def plan_map_from_reading(
         finish_time=reading.finish_time,
         finish_time_source=reading.finish_time_source,
         finish_time_guessed=reading.finish_time_guessed,
-        problem_sizes=reading.problem_sizes.copy(),
+        problem_sizes=reading.problem_sizes.model_dump(),
         questions=[MapQuestion(**item.model_dump()) for item in reading.questions],
     )
