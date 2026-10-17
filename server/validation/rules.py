@@ -79,6 +79,19 @@ def validate_plan_rules(plan: PlanMap | PlanMapData) -> list[RuleViolation]:
             )
 
     for place in data.places:
+        if (
+            (place.one_vehicle_at_a_time or place.needs_key)
+            and not any(delivery.place_id == place.id for delivery in data.deliveries)
+            and place.id not in getattr(plan, "no_delivery_place_ids", [])
+        ):
+            issues.append(
+                RuleViolation(
+                    place.id,
+                    "supply_delivery",
+                    None,
+                    "The loading area has no supply delivery listed. Is one expected?",
+                )
+            )
         if place.opens_at > data.finish_time:
             issues.append(
                 RuleViolation(
@@ -150,7 +163,9 @@ def validate_plan_rules(plan: PlanMap | PlanMapData) -> list[RuleViolation]:
                     route.id,
                     "vehicle_id",
                     route.vehicle_id,
-                    f"Unknown vehicle id '{route.vehicle_id}' in {route.id} vehicle_id",
+                    f"Unknown vehicle id '{route.vehicle_id}' in {route.id} vehicle_id"
+                    if route.vehicle_id
+                    else f"{route.name} has no vehicle. Choose a vehicle.",
                 )
             )
         if not route.loader_ids:

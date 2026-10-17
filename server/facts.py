@@ -16,7 +16,7 @@ FIELDS = {
     "person": ["available_from", "available_until", "can_drive", "holds_key"],
     "vehicle": ["available_from"],
     "place": ["opens_at", "needs_key", "one_vehicle_at_a_time"],
-    "delivery": ["arrives_at"],
+    "delivery": ["arrives_at", "place_id"],
     "route": [
         "driver_ids",
         "loader_ids",
@@ -36,6 +36,7 @@ LABELS = {
     "needs_key": "Needs a key",
     "one_vehicle_at_a_time": "One vehicle at a time",
     "arrives_at": "Delivery arrives at",
+    "place_id": "Place",
     "driver_ids": "Drivers (primary first)",
     "loader_ids": "Loaders (primary first)",
     "vehicle_id": "Vehicle",
@@ -156,10 +157,13 @@ def controls(plan: PlanMap, item: dict) -> list[dict]:
                 type="ordered_people",
                 options=[{"value": person.id, "label": person.name} for person in plan.people],
             )
-        elif field == "vehicle_id":
+        elif field in {"vehicle_id", "place_id"}:
             control.update(
                 type="select",
-                options=[{"value": vehicle.id, "label": vehicle.name} for vehicle in plan.vehicles],
+                options=[
+                    {"value": entity.id, "label": entity.name}
+                    for entity in (plan.vehicles if field == "vehicle_id" else plan.places)
+                ],
             )
         elif isinstance(value, bool):
             control.update(type="boolean")

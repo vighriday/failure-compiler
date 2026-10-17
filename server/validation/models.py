@@ -163,12 +163,13 @@ class PlanMap(BaseModel):
     places: list[MapPlace]
     deliveries: list[MapDelivery]
     routes: list[MapRoute]
-    finish_time: int
+    finish_time: int = 0
     finish_time_source: str = ""
     finish_time_guessed: bool = False
     problem_sizes: dict[str, int]
     questions: list[MapQuestion] = []
     fix_history: list[AppliedFix] = []
+    no_delivery_place_ids: list[str] = []
 
     @classmethod
     def from_truth_map(cls, data: PlanMapData) -> PlanMap:

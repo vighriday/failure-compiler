@@ -7,13 +7,13 @@ export type ReadingItem = {
   entity_id: string;
   field: string;
   statement: string;
-  source_line: string;
+  source_line: string | null;
   status: Status;
   guessed?: boolean;
   value?: number | boolean;
   correct_value?: number | boolean;
   choices?: number[];
-  original_statement?: string;
+  original_statement?: string | null;
   changed_by_fix?: number | null;
   controls: FactControl[];
 };
@@ -29,7 +29,10 @@ export type RuleQuestion = {
   id: string;
   item_id: string;
   question_text: string;
-  source_line?: string;
+  source_line?: string | null;
+  kind?: "missing_delivery" | "missing_assignment" | "missing_finish";
+  entity_id?: string;
+  field?: string;
   choices: string[];
 };
 

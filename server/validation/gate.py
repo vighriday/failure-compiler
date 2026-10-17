@@ -99,7 +99,7 @@ def _check_ids_and_references(reading: AIPlanReading) -> None:
                     field=f"{route.id}.loader_ids",
                     bad_value=person_id,
                 )
-        if route.vehicle_id not in ids_by_kind["vehicle"]:
+        if route.vehicle_id and route.vehicle_id not in ids_by_kind["vehicle"]:
             raise GateError(
                 f"Unknown vehicle id '{route.vehicle_id}' in {route.id} vehicle_id",
                 field=f"{route.id}.vehicle_id",
@@ -173,7 +173,7 @@ def normalise_reading_ids(reading: AIPlanReading) -> AIPlanReading:
                 route.model_copy(
                     update={
                         "id": id_map[route.id],
-                        "vehicle_id": id_map[route.vehicle_id],
+                        "vehicle_id": id_map.get(route.vehicle_id, route.vehicle_id),
                         "driver_ids": [id_map[item_id] for item_id in route.driver_ids],
                         "loader_ids": [id_map[item_id] for item_id in route.loader_ids],
                     }
@@ -248,7 +248,7 @@ def normalise_plan_map_ids(plan: PlanMap) -> PlanMap:
                     field=f"{route.id}.loader_ids",
                     bad_value=person_id,
                 )
-        if route.vehicle_id not in vehicles:
+        if route.vehicle_id and route.vehicle_id not in vehicles:
             raise GateError(
                 f"Unknown vehicle id '{route.vehicle_id}' in {route.id} vehicle_id",
                 field=f"{route.id}.vehicle_id",
@@ -282,7 +282,7 @@ def normalise_plan_map_ids(plan: PlanMap) -> PlanMap:
                 item.model_copy(
                     update={
                         "id": id_map[item.id],
-                        "vehicle_id": id_map[item.vehicle_id],
+                        "vehicle_id": id_map.get(item.vehicle_id, item.vehicle_id),
                         "driver_ids": [id_map[person_id] for person_id in item.driver_ids],
                         "loader_ids": [id_map[person_id] for person_id in item.loader_ids],
                     }

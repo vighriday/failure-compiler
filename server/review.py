@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from pydantic import TypeAdapter
 
 from server.facts import changed_by, controls, entity_for, loading_team, statement
+from server.rule_questions import answer_rule_question, sync_rule_questions
 from server.session import SESSIONS, remember_map
 from server.validation.gate import normalise_plan_map_ids
 from server.validation.models import PlanMap
@@ -47,6 +48,7 @@ def get_review(reading_id: str | None) -> Review:
 
 def snapshot(reading_id: str) -> dict:
     review = get_review(reading_id)
+    sync_rule_questions(review)
     issues = validate_plan_rules(review.plan)
     items = [
         {
@@ -63,7 +65,15 @@ def snapshot(reading_id: str) -> dict:
         "items": items,
         "questions": review.questions,
         "answers": review.answers,
-        "issues": [issue.__dict__ for issue in issues],
+        "issues": [
+            issue.__dict__
+            for issue in issues
+            if not any(
+                question.get("entity_id") == issue.item_id and question.get("field") == issue.field
+                for question in review.questions
+                if question.get("kind")
+            )
+        ],
         "valid": not issues,
         "unconfirmed_items": sum(item["status"] not in ACCEPTED for item in items),
         "open_questions": sum(q["id"] not in review.answers for q in review.questions),
@@ -121,6 +131,10 @@ def _correct(review: Review, item: dict, field_name: str, value: Any) -> None:
     before = (
         loading_team(candidate) if field_name == "loading_team" else getattr(target, field_name)
     )
+    if (field_name in {"driver_ids", "loader_ids", "vehicle_id"} and not before) or (
+        field_name == "finish_time" and before <= 0
+    ):
+        raise HTTPException(422, f"Add missing {field_name} through its rule question")
     expected = list[str] if isinstance(before, list) else type(before)
     value = TypeAdapter(expected).validate_python(value, strict=True)
     if isinstance(value, list) and (
@@ -155,6 +169,7 @@ def update_review(request: dict) -> dict:
     original = get_review(reading_id)
     # Transactional edits: a rejected action cannot partly mutate server review state.
     review = deepcopy(original)
+    sync_rule_questions(review)
     action = request.get("action")
     item = next((item for item in review.items if item["id"] == request.get("item_id")), None)
     if action == "confirm_all":
@@ -180,6 +195,11 @@ def update_review(request: dict) -> dict:
             review.out_of_date = True
         else:
             answer = request.get("value")
+            if question.get("kind", "").startswith("missing_"):
+                answer_rule_question(review, question, answer)
+                _sync_entity_statuses(review)
+                REVIEWS[reading_id] = review
+                return snapshot(reading_id)
             if not isinstance(answer, str) or answer not in question["choices"]:
                 raise HTTPException(422, f"Invalid answer {answer!r} for {question['id']}")
             if question["id"] == "ravi-van-loading-question":
@@ -227,6 +247,7 @@ def update_review(request: dict) -> dict:
 def confirm_review(request: dict) -> dict:
     reading_id = request.get("reading_id")
     review = get_review(reading_id)
+    sync_rule_questions(review)
     normalise_plan_map_ids(review.plan)
     missing = [item["id"] for item in review.items if item["status"] not in ACCEPTED]
     missing += [q["id"] for q in review.questions if q["id"] not in review.answers]

@@ -42,6 +42,7 @@ export default function FactEditor({ item, disabled, onCorrect, onConfirm }: Pro
     const options = control.type === "boolean" ? [{value: "true", label: "Yes"}, {value: "false", label: "No"}]
       : control.type === "number" ? Array.from({length: 48}, (_, index) => ({value: String((index + 1) * 5), label: `${(index + 1) * 5} minutes`})) : control.options ?? [];
     return <select aria-label={label} disabled={disabled} value={String(control.value)} onChange={(event) => onCorrect(control.field, control.type === "boolean" ? event.target.value === "true" : control.type === "number" ? Number(event.target.value) : event.target.value)}>
+      {control.type === "select" && !control.value && <option value="">Choose a value</option>}
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
     </select>;
   }

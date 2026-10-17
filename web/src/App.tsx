@@ -1,3 +1,4 @@
+import MissingFactQuestion from "./components/MissingFactQuestion";
 import { routeLabel } from "./lib/labels";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { confirmMap, readExample, updateMap } from "./api/client";
@@ -137,7 +138,7 @@ function App() {
   function confirmItem(item: ReadingItem) { void mutate("confirm_item", {item_id: item.id}).then((result) => { if (result) setEditing(null); }); }
   function applyCorrection(item: ReadingItem, field: string, value: unknown) { void mutate("correct", {item_id: item.id, field, value}); }
   function bulkConfirm() { void mutate("confirm_all"); }
-  function answerQuestion(question: RuleQuestion, choice: string) { void mutate("answer", {question_id: question.id, value: choice}); }
+  function answerQuestion(question: RuleQuestion, choice: unknown) { void mutate("answer", {question_id: question.id, value: choice}); }
   function resolveRoute(routeId: string, personId: string) {
     const route = planMap?.routes.find((candidate) => candidate.id === routeId);
     const row = items.find((candidate) => candidate.entity_id === routeId);
@@ -188,7 +189,7 @@ function App() {
                 <div className="question-body"><p>{question.question_text}</p>
                   {answers[question.id]
                     ? <div className="question-answer"><span className="answer-check"><Tick /></span> Confirmed: {answers[question.id]}<button type="button" className="quiet-link" disabled={pending > 0} onClick={() => void mutate("reopen_question", {question_id: question.id})}>Change</button></div>
-                    : <div className="choice-row">{question.choices.map((choice) => <button key={choice} type="button" className="choice-button" disabled={pending > 0} onClick={() => answerQuestion(question, choice)}>{choice}</button>)}</div>}
+                    : question.kind ? <MissingFactQuestion question={question} plan={planMap} disabled={pending > 0} onAnswer={(value) => answerQuestion(question, value)} /> : <div className="choice-row">{question.choices.map((choice) => <button key={choice} type="button" className="choice-button" disabled={pending > 0} onClick={() => answerQuestion(question, choice)}>{choice}</button>)}</div>}
                 </div>
               </div>
             ))}
@@ -208,12 +209,12 @@ function App() {
                   const changedBy = item.changed_by_fix;
                   const acceptedChange = changedBy ? planMap.fix_history?.[changedBy - 1] : undefined;
                   return (
-                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} key={item.id} tabIndex={0} onFocus={() => setActiveLine(item.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => setActiveLine(item.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
+                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} key={item.id} tabIndex={0} onFocus={() => setActiveLine(item.source_line ?? undefined)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => setActiveLine(item.source_line ?? undefined)} onMouseLeave={() => setActiveLine(undefined)}>
                       <div className="reading-copy">
                         <div className="statement-line">
                           {item.status === "corrected" ? <><del>{item.original_statement}</del><span>{item.statement}</span></> : <span>{item.statement}</span>}
                         </div>
-                        <button type="button" className="source-tag" onClick={() => setActiveLine(item.source_line)}>{item.source_line}</button>
+                        {item.source_line && <button type="button" className="source-tag" onClick={() => setActiveLine(item.source_line ?? undefined)}>{item.source_line}</button>}
                         {acceptedChange && <div className="fix-map-note">{acceptedChange.description}</div>}
                       </div>
                       <div className="reading-controls">
