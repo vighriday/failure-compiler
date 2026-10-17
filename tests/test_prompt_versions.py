@@ -6,8 +6,8 @@ from server.ai.prompts import READ_PROMPT_VERSION, READ_SYSTEM
 from tests.validation_helpers import truth_data
 
 
-def test_read_v2_is_generic_and_requires_complete_extraction_and_approximation_marks():
-    assert READ_PROMPT_VERSION == "read-v2"
+def test_read_prompt_is_generic_and_requires_complete_extraction_and_approximation_marks():
+    assert READ_PROMPT_VERSION == "read-v3"
     assert "every delivery or" in READ_SYSTEM and "arrival of supplies" in READ_SYSTEM
     assert "plan's own words for names" in READ_SYSTEM
     assert "approximate durations" in READ_SYSTEM and "affected entity guessed" in READ_SYSTEM
