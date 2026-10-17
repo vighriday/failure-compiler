@@ -6,10 +6,10 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-
 # ---------------------------------------------------------------------------
 # Checker entity shapes (what the solver reads)
 # ---------------------------------------------------------------------------
+
 
 class Person(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -53,13 +53,14 @@ class Route(BaseModel):
     load_minutes: int
     drive_minutes: int
     vehicle_id: str
-    driver_ids: list[str]   # primary first, then backups
-    loader_ids: list[str]   # primary first, then backups
+    driver_ids: list[str]  # primary first, then backups
+    loader_ids: list[str]  # primary first, then backups
 
 
 # ---------------------------------------------------------------------------
 # Truth map / checker input bundle
 # ---------------------------------------------------------------------------
+
 
 class PlanMapData(BaseModel):
     """The checker-input subset of a confirmed plan map.
@@ -68,6 +69,7 @@ class PlanMapData(BaseModel):
     reads.  It intentionally omits AI metadata, status marks, and correction
     history so the fingerprint is stable.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     people: list[Person]
@@ -83,11 +85,12 @@ class PlanMapData(BaseModel):
 # Scenario result (one cell in the grid)
 # ---------------------------------------------------------------------------
 
+
 class TimelineEvent(BaseModel):
     model_config = ConfigDict(extra="forbid")
     route_id: str
     event: str  # "load_start", "load_end", "drive_start", "drive_end", "not_delivered"
-    time: int   # minutes from midnight
+    time: int  # minutes from midnight
     person_id: str | None = None
     vehicle_id: str | None = None
 
@@ -95,9 +98,9 @@ class TimelineEvent(BaseModel):
 class ScenarioResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
     scenario_id: str
-    failures: list[str]          # problem ids applied in this scenario
-    state: str                   # "tick", "cross", "dim", "qmark"
-    dim_cause: str | None = None # problem id that already breaks it alone
+    failures: list[str]  # problem ids applied in this scenario
+    state: str  # "tick", "cross", "dim", "qmark"
+    dim_cause: str | None = None  # problem id that already breaks it alone
     lateness_minutes: int | None = None
     lower_bound_minutes: int | None = None  # known lower bound if qmark
     timeline: list[TimelineEvent] = []
@@ -121,13 +124,21 @@ class RunCount(BaseModel):
 # Fix operations and suggestions (slice 5 / 6)
 # ---------------------------------------------------------------------------
 
+
 class FixOperation(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-    op: Literal["add_driver", "replace_drivers", "add_loader", "replace_loaders",
-                "move_route", "set_person_availability", "set_vehicle_availability",
-                "give_spare_key"]
-    target_id: str   # entity id being changed
-    field: str       # field name being changed
+    op: Literal[
+        "add_driver",
+        "replace_drivers",
+        "add_loader",
+        "replace_loaders",
+        "move_route",
+        "set_person_availability",
+        "set_vehicle_availability",
+        "give_spare_key",
+    ]
+    target_id: str  # entity id being changed
+    field: str  # field name being changed
     value: str | int | bool | list[str]  # new value
 
 

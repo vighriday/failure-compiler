@@ -35,9 +35,15 @@ def count_results(results: list[ScenarioResult], total: int | None = None) -> Ru
     if pending:
         line += f", {pending} to go"
     return RunCount(
-        total=total, completed=len(results), weak_spots=weak_spots,
-        hidden_pairs=hidden_pairs, dimmed=dimmed, survived=survived,
-        unknown=unknown, pending=pending, line=line + ".",
+        total=total,
+        completed=len(results),
+        weak_spots=weak_spots,
+        hidden_pairs=hidden_pairs,
+        dimmed=dimmed,
+        survived=survived,
+        unknown=unknown,
+        pending=pending,
+        line=line + ".",
     )
 
 
@@ -45,7 +51,9 @@ def problem_labels(problems: list[dict]) -> list[dict]:
     """Labels use confirmed sizes and names, including when the map is edited."""
     labels = []
     for problem in problems:
-        name = problem["label"].split(" absent")[0] if problem["type_id"] == "volunteer_absent" else ""
+        name = (
+            problem["label"].split(" absent")[0] if problem["type_id"] == "volunteer_absent" else ""
+        )
         if problem["type_id"] == "volunteer_leaves_early":
             name = problem["label"].split(" leaves early")[0]
             label = f"{name} leaves {problem['size']} min early"
@@ -79,8 +87,15 @@ def run_tests(map: str = Query(...), reduced_motion: bool = False) -> StreamingR
     scenarios = singles + pairs
 
     def events() -> Iterator[str]:
-        yield _event("start", fingerprint=map, total=len(scenarios), problems=problems,
-                     scenarios=[{"scenario_id": s["scenario_id"], "failures": s["failures"]} for s in scenarios])
+        yield _event(
+            "start",
+            fingerprint=map,
+            total=len(scenarios),
+            problems=problems,
+            scenarios=[
+                {"scenario_id": s["scenario_id"], "failures": s["failures"]} for s in scenarios
+            ],
+        )
         started = time.monotonic()
         cached = session.results
         source = cached if cached is not None else iter_checker(plan)
@@ -92,10 +107,16 @@ def run_tests(map: str = Query(...), reduced_motion: bool = False) -> StreamingR
                 delay = len(completed) / len(scenarios) * 3 - (time.monotonic() - started)
                 if delay > 0:
                     time.sleep(delay)
-            yield _event("result", result=result.model_dump(mode="json"),
-                         count=count_results(completed, len(scenarios)).model_dump())
+            yield _event(
+                "result",
+                result=result.model_dump(mode="json"),
+                count=count_results(completed, len(scenarios)).model_dump(),
+            )
         session.results = completed
         yield _event("complete", count=count_results(completed).model_dump())
 
-    return StreamingResponse(events(), media_type="text/event-stream",
-                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )

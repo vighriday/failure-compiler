@@ -17,11 +17,35 @@ FALLBACK_MODEL = "gemini-3.8-flash"
 # (or None for "absent").
 
 PROBLEM_TYPES: list[dict] = [
-    {"id": "volunteer_absent",       "label": "{name} absent",                "applies_to": "person",   "has_size": False},
-    {"id": "volunteer_leaves_early", "label": "{name} leaves early ({size}m)","applies_to": "person",   "has_size": True, "default_size": 90},
-    {"id": "vehicle_returns_late",   "label": "{name} returns late ({size}m)","applies_to": "vehicle",  "has_size": True, "default_size": 30},
-    {"id": "supply_delivery_late",   "label": "{name} arrives late ({size}m)","applies_to": "delivery", "has_size": True, "default_size": 45},
-    {"id": "place_blocked",          "label": "{name} blocked ({size}m)",     "applies_to": "place",    "has_size": True, "default_size": 30},
+    {"id": "volunteer_absent", "label": "{name} absent", "applies_to": "person", "has_size": False},
+    {
+        "id": "volunteer_leaves_early",
+        "label": "{name} leaves early ({size}m)",
+        "applies_to": "person",
+        "has_size": True,
+        "default_size": 90,
+    },
+    {
+        "id": "vehicle_returns_late",
+        "label": "{name} returns late ({size}m)",
+        "applies_to": "vehicle",
+        "has_size": True,
+        "default_size": 30,
+    },
+    {
+        "id": "supply_delivery_late",
+        "label": "{name} arrives late ({size}m)",
+        "applies_to": "delivery",
+        "has_size": True,
+        "default_size": 45,
+    },
+    {
+        "id": "place_blocked",
+        "label": "{name} blocked ({size}m)",
+        "applies_to": "place",
+        "has_size": True,
+        "default_size": 30,
+    },
 ]
 
 SIZE_PRESETS = [15, 30, 45, 60, 90]

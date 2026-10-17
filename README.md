@@ -566,7 +566,8 @@ failure-compiler/
 |---|---|
 | `POST /api/read-plan` | Returns the hand-written example reading with no AI call. Live plan reading is planned for slice 6. |
 | `POST /api/validate-map` | Runs the rules after every correction, so the screen updates straight away |
-| `POST /api/confirm-map` | Checks everything again and returns the fingerprint |
+| `POST /api/update-map` | Applies constrained corrections and review actions to the server's own reading draft |
+| `POST /api/confirm-map` | Checks the server's confirmations, answers and rules, then returns the fingerprint |
 | `GET /api/run-tests` | Streams each result as it finishes (server-sent events) |
 | `POST /api/suggest-fixes` | Loads placeholder explanations and suggestions, then gates, scores and caches the fixes. Live AI is planned for slice 6. |
 | `POST /api/apply-fix` | Applies an accepted fix, records the before and after fingerprints, re-tests |
@@ -617,7 +618,7 @@ The app looks like a coordinator's run sheet, not a tech dashboard: warm paper, 
 - Example mode makes **no AI calls**.
 - Planned live-AI mode will send plan text to the selected provider. The current app makes no provider requests. The example plan is fictional.
 - `.env` is ignored by Git. Provider keys are not loaded or used by the current build.
-- Nothing is saved. Closing the tab ends the session.
+- Maps, review drafts and results stay in server memory until the server restarts. Nothing is written to a database. Closing the tab does not clear server memory.
 
 ---
 

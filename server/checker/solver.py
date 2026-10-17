@@ -14,7 +14,7 @@ from __future__ import annotations
 from ortools.sat.python import cp_model
 
 from server.config import NOT_DELIVERED_HORIZON_PADDING, SOLVER_MAX_DETERMINISTIC_TIME, SOLVER_SEED
-from server.models import Person, Place, PlanMapData, Route, TimelineEvent, Vehicle
+from server.models import PlanMapData, TimelineEvent
 
 
 def solve_scenario(
@@ -46,16 +46,22 @@ def solve_scenario(
     people_by_id: dict[str, dict] = {}
     for p in plan.people:
         d = {
-            "id": p.id, "name": p.name, "can_drive": p.can_drive,
-            "available_from": p.available_from, "available_until": p.available_until,
-            "holds_key": p.holds_key, "absent": False,
+            "id": p.id,
+            "name": p.name,
+            "can_drive": p.can_drive,
+            "available_from": p.available_from,
+            "available_until": p.available_until,
+            "holds_key": p.holds_key,
+            "absent": False,
         }
         if p.id in disabled_entities:
             mods = disabled_entities[p.id]
             if mods.get("absent"):
                 d["absent"] = True
             if "leaves_early" in mods:
-                d["available_until"] = max(d["available_from"], d["available_until"] - mods["leaves_early"])
+                d["available_until"] = max(
+                    d["available_from"], d["available_until"] - mods["leaves_early"]
+                )
         people_by_id[p.id] = d
 
     vehicles_by_id: dict[str, dict] = {}
@@ -79,9 +85,12 @@ def solve_scenario(
     places_by_id: dict[str, dict] = {}
     for pl in plan.places:
         d = {
-            "id": pl.id, "name": pl.name, "opens_at": pl.opens_at,
+            "id": pl.id,
+            "name": pl.name,
+            "opens_at": pl.opens_at,
             "one_vehicle_at_a_time": pl.one_vehicle_at_a_time,
-            "needs_key": pl.needs_key, "blocked_until": pl.opens_at,
+            "needs_key": pl.needs_key,
+            "blocked_until": pl.opens_at,
         }
         if pl.id in disabled_entities:
             mods = disabled_entities[pl.id]
@@ -129,12 +138,14 @@ def solve_scenario(
 
         # Check which drivers and loaders are actually available
         available_drivers = [
-            did for did in r.driver_ids
-            if did in people_by_id and not people_by_id[did]["absent"] and people_by_id[did]["can_drive"]
+            did
+            for did in r.driver_ids
+            if did in people_by_id
+            and not people_by_id[did]["absent"]
+            and people_by_id[did]["can_drive"]
         ]
         available_loaders = [
-            lid for lid in r.loader_ids
-            if lid in people_by_id and not people_by_id[lid]["absent"]
+            lid for lid in r.loader_ids if lid in people_by_id and not people_by_id[lid]["absent"]
         ]
 
         vehicle_data = vehicles_by_id.get(r.vehicle_id)
@@ -162,7 +173,7 @@ def solve_scenario(
         rv["drive_start"] = drive_start
         rv["drive_end"] = drive_end
 
-        # If delivered: load_end = load_start + load_minutes, drive_end = drive_start + drive_minutes
+        # If delivered, each task's end equals its start plus its duration.
         # drive_start >= load_end
         model.add(load_end == load_start + r.load_minutes).only_enforce_if(is_delivered)
         model.add(drive_end == drive_start + r.drive_minutes).only_enforce_if(is_delivered)
@@ -218,7 +229,9 @@ def solve_scenario(
 
         # Lateness: max(0, drive_end - finish_time) * households if delivered,
         #           not_delivered_penalty if not delivered
-        lateness = model.new_int_var(0, r.households * not_delivered_penalty_per_household, f"lateness_{r.id}")
+        lateness = model.new_int_var(
+            0, r.households * not_delivered_penalty_per_household, f"lateness_{r.id}"
+        )
         rv["lateness"] = lateness
 
         # If delivered, lateness = max(0, drive_end - finish_time) * households
@@ -227,9 +240,7 @@ def solve_scenario(
         model.add(over >= 0)
         # over <= drive_end - finish_time is not needed; minimisation will push it down
 
-        delivered_lateness = model.new_int_var(
-            0, r.households * horizon, f"del_lateness_{r.id}"
-        )
+        delivered_lateness = model.new_int_var(0, r.households * horizon, f"del_lateness_{r.id}")
         # delivered_lateness = over * households
         model.add(delivered_lateness == over * r.households).only_enforce_if(is_delivered)
         model.add(delivered_lateness == 0).only_enforce_if(is_delivered.negated())
@@ -285,7 +296,6 @@ def solve_scenario(
             continue
         is_del = rv["is_delivered"]
         # The vehicle is busy from load_start to drive_end
-        total_duration = route.load_minutes + route.drive_minutes
         # Use a variable-size interval from load_start to drive_end
         size_var = model.new_int_var(0, horizon, f"veh_size_{route.id}")
         model.add(size_var == rv["drive_end"] - rv["load_start"]).only_enforce_if(is_del)
@@ -359,18 +369,26 @@ def solve_scenario(
                 # Route was forced not-delivered
                 total_lateness += rv["lateness"]
                 not_delivered_routes.append(route.name)
-                timeline_events.append(TimelineEvent(
-                    route_id=route.id, event="not_delivered", time=0,
-                ))
+                timeline_events.append(
+                    TimelineEvent(
+                        route_id=route.id,
+                        event="not_delivered",
+                        time=0,
+                    )
+                )
                 continue
 
             is_del_val = solver.value(rv["is_delivered"])
             if not is_del_val:
                 total_lateness += route.households * not_delivered_penalty_per_household
                 not_delivered_routes.append(route.name)
-                timeline_events.append(TimelineEvent(
-                    route_id=route.id, event="not_delivered", time=0,
-                ))
+                timeline_events.append(
+                    TimelineEvent(
+                        route_id=route.id,
+                        event="not_delivered",
+                        time=0,
+                    )
+                )
                 continue
 
             ls = solver.value(rv["load_start"])
@@ -391,16 +409,38 @@ def solve_scenario(
                     assigned_loader = lid
                     break
 
-            timeline_events.extend([
-                TimelineEvent(route_id=route.id, event="load_start", time=ls,
-                              person_id=assigned_loader, vehicle_id=route.vehicle_id),
-                TimelineEvent(route_id=route.id, event="load_end", time=le,
-                              person_id=assigned_loader, vehicle_id=route.vehicle_id),
-                TimelineEvent(route_id=route.id, event="drive_start", time=ds,
-                              person_id=assigned_driver, vehicle_id=route.vehicle_id),
-                TimelineEvent(route_id=route.id, event="drive_end", time=de,
-                              person_id=assigned_driver, vehicle_id=route.vehicle_id),
-            ])
+            timeline_events.extend(
+                [
+                    TimelineEvent(
+                        route_id=route.id,
+                        event="load_start",
+                        time=ls,
+                        person_id=assigned_loader,
+                        vehicle_id=route.vehicle_id,
+                    ),
+                    TimelineEvent(
+                        route_id=route.id,
+                        event="load_end",
+                        time=le,
+                        person_id=assigned_loader,
+                        vehicle_id=route.vehicle_id,
+                    ),
+                    TimelineEvent(
+                        route_id=route.id,
+                        event="drive_start",
+                        time=ds,
+                        person_id=assigned_driver,
+                        vehicle_id=route.vehicle_id,
+                    ),
+                    TimelineEvent(
+                        route_id=route.id,
+                        event="drive_end",
+                        time=de,
+                        person_id=assigned_driver,
+                        vehicle_id=route.vehicle_id,
+                    ),
+                ]
+            )
 
             route_lateness_minutes = max(0, de - finish_time)
             if route_lateness_minutes > 0:
@@ -416,9 +456,7 @@ def solve_scenario(
         # Build human cost string
         cost_parts = []
         if not_delivered_routes:
-            nd_households = sum(
-                r.households for r in routes if r.name in not_delivered_routes
-            )
+            nd_households = sum(r.households for r in routes if r.name in not_delivered_routes)
             cost_parts.append(
                 f"{'Routes ' if len(not_delivered_routes) > 1 else 'Route '}"
                 f"{', '.join(not_delivered_routes)}: {nd_households} households not delivered"
@@ -440,7 +478,7 @@ def solve_scenario(
     elif status == cp_model.FEASIBLE:
         # Feasible but not proven optimal -> question mark
         best = solver.objective_value
-        return "qmark", int(best), [], f"Solver found a solution but could not prove optimality"
+        return "qmark", int(best), [], "Solver found a solution but could not prove optimality"
 
     else:
         # Should not happen with our "not delivered" penalty making everything feasible

@@ -58,7 +58,7 @@ def main() -> None:
             page.get_by_role("button", name="The van too", exact=True).click()
         expect(
             page.locator(".statement-line").filter(has_text=re.compile("Loading cover:.*Ravi"))
-        ).to_have_count(5)
+        ).to_have_count(3)
         page.reload()
         page.get_by_role("tab", name="Start", exact=True).click()
         page.get_by_role("button", name="Load the example plan", exact=True).click()

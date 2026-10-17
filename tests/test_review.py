@@ -117,6 +117,22 @@ def test_ai_integer_fields_reject_coercion(value):
         validate_ai_reading(payload)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("can_drive", "true"),
+        ("can_drive", 1),
+        ("holds_key", "false"),
+        ("guessed", 0),
+    ],
+)
+def test_ai_boolean_fields_reject_coercion(field, value):
+    payload = ai_reading_payload()
+    payload["people"][0][field] = value
+    with pytest.raises(GateError, match=field):
+        validate_ai_reading(payload)
+
+
 def test_duplicate_ids_are_a_named_422_at_http_boundary():
     reading = draft()
     plan = reading["plan_map"]
