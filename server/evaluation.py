@@ -12,10 +12,6 @@ from server.validation.models import PlanMap
 COLLECTIONS = ("people", "vehicles", "places", "deliveries", "routes")
 
 
-def _word(value: str) -> str:
-    return re.sub(r"[^a-z0-9]", "", value.casefold())
-
-
 def route_letter(entity) -> str:
     for value in (entity.name, entity.id):
         match = re.fullmatch(r"(?:route[\s_-]*)?([a-z])", value.casefold())
@@ -27,15 +23,28 @@ def route_letter(entity) -> str:
 def align_entities(plan: PlanMap, truth: PlanMap) -> tuple[PlanMap, dict, list[dict]]:
     """Align roles without changing any measured values or borrowing missing truth entities.
 
-    Route letters identify routes. A unique loading place/delivery aligns by role. Vehicles
-    align by existing identity or the routes they serve; people by identity or ordered driver
-    roles. Ambiguity is reported rather than resolved by maximising the score.
+    Route letters identify routes. The loading place aligns by its exclusive-loading role.
+    Vehicles align by the routes they serve; people by primary driver, key-holder or ordered
+    driver roles. Existing identities are retained. Labels are never scored or used to choose
+    a match. Ambiguity is reported rather than resolved by maximising the score.
     """
     mapping, unmatched = {}, []
     for collection in ("routes", "people", "vehicles", "places", "deliveries"):
         actual, expected = getattr(plan, collection), getattr(truth, collection)
         used = set()
-        for entity in actual:
+        entities = actual
+        if collection == "people":
+            # Resolve distinctive roles before a lone remaining backup volunteer.
+            entities = sorted(
+                actual,
+                key=lambda person: (
+                    not (
+                        person.holds_key
+                        or any(route.driver_ids[:1] == [person.id] for route in plan.routes)
+                    )
+                ),
+            )
+        for entity in entities:
             candidates = [target for target in expected if target.id == entity.id]
             if collection == "routes":
                 candidates = [
@@ -43,10 +52,8 @@ def align_entities(plan: PlanMap, truth: PlanMap) -> tuple[PlanMap, dict, list[d
                     for target in expected
                     if route_letter(entity) and route_letter(entity) == route_letter(target)
                 ]
-            if not candidates:
-                candidates = [
-                    target for target in expected if _word(target.name) == _word(entity.name)
-                ]
+            if not candidates and collection == "places" and entity.one_vehicle_at_a_time:
+                candidates = [target for target in expected if target.one_vehicle_at_a_time]
             if (
                 not candidates
                 and collection in {"places", "deliveries"}
@@ -70,11 +77,27 @@ def align_entities(plan: PlanMap, truth: PlanMap) -> tuple[PlanMap, dict, list[d
                     return sorted(result)
 
                 signature = roles(entity, plan.routes, True)
-                candidates = [
-                    target
-                    for target in expected
-                    if signature and signature == roles(target, truth.routes, False)
-                ]
+                primary = [role for role in signature if role[1] == 0]
+                if collection == "people" and primary:
+                    candidates = [
+                        target
+                        for target in expected
+                        if primary
+                        == [role for role in roles(target, truth.routes, False) if role[1] == 0]
+                    ]
+                if not candidates and collection == "people" and entity.holds_key:
+                    candidates = [target for target in expected if target.holds_key]
+                if not candidates:
+                    candidates = [
+                        target
+                        for target in expected
+                        if signature and signature == roles(target, truth.routes, False)
+                    ]
+            if not candidates and len(actual) == len(expected):
+                remaining = [target for target in expected if target.id not in used]
+                # Only one remaining identity is unambiguous. Never discard an extra entity.
+                if len(remaining) == 1:
+                    candidates = remaining
             candidates = [target for target in candidates if target.id not in used]
             if len(candidates) == 1:
                 mapping[entity.id] = candidates[0].id
@@ -194,10 +217,12 @@ def compare_reading(plan: PlanMap, truth: PlanMap) -> dict:
         for target in getattr(truth, collection)
         if entity.id == target.id and entity.name != target.name
     ]
+    compared_fields = len(wanted.keys() | actual.keys())
     return {
         "aligned_field_matches": matches,
         "truth_fields": len(wanted),
-        "aligned_field_match_percent": round(100 * matches / len(wanted), 2),
+        "compared_fields": compared_fields,
+        "aligned_field_match_percent": round(100 * matches / compared_fields, 2),
         "checker_matches": len(expected_results) - len(different),
         "checker_total": len(expected_results),
         "different_scenarios": different,

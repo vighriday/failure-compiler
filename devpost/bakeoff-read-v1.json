@@ -250,14 +250,14 @@
         }
       ],
       "alignment": {
-        "route-route-a": "route-a",
-        "route-route-b": "route-b",
-        "route-route-c": "route-c",
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
         "person-joel": "person-joel",
         "person-ravi": "person-ravi",
-        "person-maya": "person-maya",
         "person-sam": "person-sam",
         "person-anita": "person-anita",
+        "person-maya": "person-maya",
         "vehicle-car": "vehicle-car",
         "vehicle-van": "vehicle-van",
         "place-hall": "place-loading-area"
@@ -268,7 +268,8 @@
           "id": "delivery-supplies",
           "reason": "Missing role"
         }
-      ]
+      ],
+      "compared_fields": 50
     },
     {
       "provider": "groq",
@@ -509,20 +510,21 @@
         }
       ],
       "alignment": {
-        "route-route-a": "route-a",
-        "route-route-b": "route-b",
-        "route-route-c": "route-c",
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
         "person-joel": "person-joel",
         "person-ravi": "person-ravi",
-        "person-maya": "person-maya",
         "person-sam": "person-sam",
         "person-anita": "person-anita",
+        "person-maya": "person-maya",
         "vehicle-car": "vehicle-car",
         "vehicle-van": "vehicle-van",
         "place-hall": "place-loading-area",
         "delivery-supply-truck": "delivery-supplies"
       },
-      "unmatched_roles": []
+      "unmatched_roles": [],
+      "compared_fields": 50
     },
     {
       "provider": "groq",
@@ -773,14 +775,14 @@
         }
       ],
       "alignment": {
-        "route-route-a": "route-a",
-        "route-route-b": "route-b",
-        "route-route-c": "route-c",
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
         "person-joel": "person-joel",
         "person-ravi": "person-ravi",
-        "person-maya": "person-maya",
         "person-sam": "person-sam",
         "person-anita": "person-anita",
+        "person-maya": "person-maya",
         "vehicle-car": "vehicle-car",
         "vehicle-van": "vehicle-van",
         "place-hall": "place-loading-area"
@@ -791,7 +793,8 @@
           "id": "delivery-supplies",
           "reason": "Missing role"
         }
-      ]
+      ],
+      "compared_fields": 50
     },
     {
       "provider": "gemini",
@@ -1213,20 +1216,21 @@
         }
       ],
       "alignment": {
-        "route-route-a": "route-a",
-        "route-route-b": "route-b",
-        "route-route-c": "route-c",
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
         "person-joel": "person-joel",
         "person-ravi": "person-ravi",
-        "person-maya": "person-maya",
         "person-sam": "person-sam",
         "person-anita": "person-anita",
+        "person-maya": "person-maya",
         "vehicle-car": "vehicle-car",
         "vehicle-van": "vehicle-van",
         "place-loading-bay": "place-loading-area",
         "delivery-supply-truck": "delivery-supplies"
       },
-      "unmatched_roles": []
+      "unmatched_roles": [],
+      "compared_fields": 50
     },
     {
       "provider": "gemini",
@@ -1625,20 +1629,21 @@
         }
       ],
       "alignment": {
-        "route-route-a": "route-a",
-        "route-route-b": "route-b",
-        "route-route-c": "route-c",
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
         "person-joel": "person-joel",
         "person-ravi": "person-ravi",
-        "person-maya": "person-maya",
         "person-sam": "person-sam",
         "person-anita": "person-anita",
+        "person-maya": "person-maya",
         "vehicle-car": "vehicle-car",
         "vehicle-van": "vehicle-van",
         "place-loading-bay": "place-loading-area",
         "delivery-supply-truck": "delivery-supplies"
       },
-      "unmatched_roles": []
+      "unmatched_roles": [],
+      "compared_fields": 50
     },
     {
       "provider": "gemini",
@@ -2045,20 +2050,21 @@
         }
       ],
       "alignment": {
-        "route-route-a": "route-a",
-        "route-route-b": "route-b",
-        "route-route-c": "route-c",
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
         "person-joel": "person-joel",
         "person-ravi": "person-ravi",
-        "person-maya": "person-maya",
         "person-sam": "person-sam",
         "person-anita": "person-anita",
+        "person-maya": "person-maya",
         "vehicle-car": "vehicle-car",
         "vehicle-van": "vehicle-van",
         "place-loading-bay": "place-loading-area",
         "delivery-supply-truck": "delivery-supplies"
       },
-      "unmatched_roles": []
+      "unmatched_roles": [],
+      "compared_fields": 50
     }
   ],
   "winner": "gemini",
@@ -2077,5 +2083,6 @@
       "consistency_variance": 3.5555555555555554,
       "total_tokens": 10282
     }
-  ]
+  ],
+  "rescored_at": "2026-10-17T16:30:23.686012+00:00"
 }
