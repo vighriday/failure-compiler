@@ -585,8 +585,8 @@ failure-compiler/
 | Server | [FastAPI](https://fastapi.tiangolo.com/), built-in server-sent events | Live streaming without another library |
 | Data shapes and gate | [Pydantic v2](https://docs.pydantic.dev/latest/) | One strict definition of every shape |
 | Python | 3.12 with [uv](https://docs.astral.sh/uv/) | Identical installs on Windows, macOS and Linux |
-| AI, first choice (planned) | [Groq](https://console.groq.com/docs/structured-outputs) | Model and structured-output support will be verified in slice 6 |
-| AI, fallback (planned) | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Provider integration and fallback will be verified in slice 6 |
+| AI, first choice (live UI pending) | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Won the 17 October read-v3 bake-off: 43/100 mean exact results, 90.57% aligned fields |
+| AI, fallback (live UI pending) | [Groq](https://console.groq.com/docs/structured-outputs) | Strict-schema adapter verified; primary order follows the bake-off |
 | Frontend | React, Vite, TypeScript (strict) | The grid, panel, preview and report share a lot of state |
 | Styling | Plain CSS variables, no UI kit | A coordinator's run sheet, not a stock dashboard |
 | Type | [IBM Plex Sans and Mono](https://github.com/IBM/plex), self-hosted | Mono for times and counts so the numbers line up |

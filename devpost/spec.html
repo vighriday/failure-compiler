@@ -397,7 +397,7 @@
 <section id="plain">
   <h2>How This Works, In Plain Language</h2>
   <p>The app is a browser page talking to a small Python server running on your laptop. The server binds to 127.0.0.1 only, because it holds AI keys in memory.</p>
-  <p>When you paste a plan, the server sends it to an AI (Groq first, Gemini as a fallback). The AI reads messy text and returns a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. The AI returns an <code>AIPlanReading</code>. The server wraps it into a <code>PlanMap</code>, adding its own metadata. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.</p>
+  <p>When you paste a plan, the server sends it to an AI (Gemini first, Groq as a fallback). The AI reads messy text and returns a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. The AI returns an <code>AIPlanReading</code>. The server wraps it into a <code>PlanMap</code>, adding its own metadata. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.</p>
   <p>That description comes back as JSON and the server runs it through a strict format check before it touches anything else. This is the core learning goal made concrete: <strong>the AI produces output, the gate decides whether it is usable, and nothing downstream ever sees an unchecked map.</strong></p>
   <p>The browser calls <code>POST /api/validate-map</code> on every correction (debounced, fast, same Python code that runs at Confirm). Rules are implemented once, in Python. No TypeScript reimplementation.</p>
   <p>The checker is a constraint solver (CP-SAT). Singles run first. Any pair that contains a broken single is marked dimmed without solving. For remaining pairs, the solver finds the best possible schedule using only the people and vehicles the plan names. Zero lateness proved = tick. Minimum above zero proved = cross, with that minimum as the human cost. Some scenarios leave a route with no driver or the loading area with no key holder; rather than failing with no number, every route may be "not delivered," carrying a penalty larger than any possible lateness (households times the full horizon). The solver always returns a number. Deterministic time limit hit = question mark, never a pass.</p>
@@ -434,14 +434,14 @@
       <line x1="445" y1="64" x2="350" y2="92" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
       <!-- Groq -->
       <rect x="445" y="18" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5"/>
-      <text x="519" y="40" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">Groq (primary)</text>
+      <text x="519" y="40" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">Gemini (primary)</text>
       <text x="519" y="57" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gpt-oss-120b</text>
       <!-- Arrow server to Gemini -->
       <line x1="350" y1="110" x2="445" y2="100" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrd)"/>
       <line x1="445" y1="112" x2="350" y2="122" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrd)"/>
       <!-- Gemini -->
       <rect x="445" y="80" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 3"/>
-      <text x="519" y="101" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" fill="#1A1A18">Gemini (fallback)</text>
+      <text x="519" y="101" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" fill="#1A1A18">Groq (fallback)</text>
       <text x="519" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gemini-3.8-flash</text>
       <!-- Arrow server to CP-SAT -->
       <line x1="350" y1="138" x2="445" y2="158" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
@@ -825,7 +825,7 @@ gate_reason:         str | None</code></pre>
     <tbody>
       <tr><td><code>test_example_locked.py</code></td><td>Checker on truth map vs expected-results.json; no question marks</td><td>No</td></tr>
       <tr><td><code>test_checker_monotone.py</code></td><td>Every pair's lateness &ge; each of its singles'</td><td>No</td></tr>
-      <tr><td><code>test_reading_matches_truth.py</code></td><td>Reading + scripted corrections == truth map</td><td>No (uses fixture)</td></tr>
+      <tr><td><code>test_reading_matches_truth.py</code></td><td>Planned after the correction checkpoint: reading + review controls, aligned checker inputs and all 100 full results match truth; names excluded</td><td>No (uses fixture)</td></tr>
       <tr><td><code>test_format_gate.py</code></td><td>Bad JSON, extra fields, unknown names all rejected with specific reasons</td><td>No</td></tr>
       <tr><td><code>test_rules.py</code></td><td>Rules engine including the cascade test</td><td>No</td></tr>
       <tr><td><code>test_determinism.py</code></td><td>Same truth map run twice; identical results</td><td>No</td></tr>
@@ -833,8 +833,8 @@ gate_reason:         str | None</code></pre>
   </table>
 
   <div class="card" style="font-size:13.5px;margin-top:12px;">
-    <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. For each, normalises the ids, then compares the raw reading against <code>example-truth.json</code> field by field - reporting the percentage that match and a list of mismatches. Scores the raw reading quality; does not apply scripted corrections. The more accurate provider becomes primary. Result recorded as a comment in <code>server/config.py</code>.</p>
-    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py</strong> is separate: it loads <code>example-reading.json</code>, applies the scripted demo corrections, and asserts the result equals <code>example-truth.json</code>. This validates that the chosen provider's saved reading plus the demo's known corrections produce the truth map.</p>
+    <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input including extra inputs, and runs the truth map's 100 scenarios on the aligned reading. Ranking is exact full-result matches, aligned fields, consistency, then tokens. No corrections are applied; raw responses and failed attempts are preserved. Every prompt version and its scores are logged in <code>ai-reading-review.md</code>. The dated winner becomes primary in <code>server/config.py</code>.</p>
+    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py</strong> is planned after the correction checkpoint: load the unedited <code>example-reading.json</code>, apply scripted corrections and additions through review controls, align entities by type and role, then compare every checker input and all 100 full scenario results against <code>example-truth.json</code>. Names are labels and are excluded. Extra or missing checker entities must not be silently discarded.</p>
   </div>
 </section>
 
@@ -924,7 +924,7 @@ gate_reason:         str | None</code></pre>
 <section id="services">
   <h2>External Services and Dependencies</h2>
 
-  <h3>Groq - Primary AI provider</h3>
+  <h3>Groq - Fallback AI provider</h3>
   <div class="card" style="font-size:13.5px;">
     Endpoint: <code>POST https://api.groq.com/openai/v1/chat/completions</code><br>
     Auth: <code>Authorization: Bearer $GROQ_API_KEY</code><br>
@@ -933,7 +933,7 @@ gate_reason:         str | None</code></pre>
     Docs: <a href="https://console.groq.com/docs/openai">console.groq.com/docs/openai</a>
   </div>
 
-  <h3>Gemini - Fallback AI provider</h3>
+  <h3>Gemini - Primary AI provider</h3>
   <div class="card" style="font-size:13.5px;">
     SDK: <code>google-genai</code> (official) &middot; Model: <code>gemini-3.8-flash</code><br>
     Structured output: follows current <code>google-genai</code> Interactions API. Verify the exact parameter name against the installed SDK version at build time.<br>
@@ -1047,7 +1047,7 @@ gate_reason:         str | None</code></pre>
   <ul>
     <li><strong>Gemini structured output parameter name.</strong> Verify the exact parameter against the installed <code>google-genai</code> SDK version at build time. Record the finding as a comment in <code>gemini_provider.py</code>.</li>
     <li><strong><code>openapi-typescript</code> generation step</strong> is manual for the PoC.</li>
-    <li><strong>Bakeoff result</strong> (primary provider) not yet determined. Run <code>scripts/bakeoff.py</code> early in the build; record in <code>server/config.py</code>.</li>
+    <li><strong>Bakeoff result:</strong> Gemini is primary after the 17 October 2026 read-v3 comparison: 43/100 mean exact results and 90.57% aligned fields; Groq has 12/100 and 82%. See <code>server/config.py</code> and <code>ai-reading-review.md</code>.</li>
   </ul>
 </section>
 

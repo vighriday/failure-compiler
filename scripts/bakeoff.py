@@ -51,6 +51,9 @@ def main():
     parser.add_argument(
         "--rescore", type=Path, help="Score saved raw calls without calling a provider"
     )
+    parser.add_argument(
+        "--resume", type=Path, help="Retry saved provider errors, never successful readings"
+    )
     args = parser.parse_args()
     values = dotenv_values(ROOT / ".env")
     keys = {"groq": values.get("GROQ_API_KEY"), "gemini": values.get("GEMINI_API_KEY")}
@@ -63,8 +66,65 @@ def main():
             json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
 
+    if args.resume:
+        report = json.loads(args.resume.read_text(encoding="utf-8"))
+        for index, row in enumerate(report["readings"]):
+            if not row.get("error"):
+                continue
+            attempts = row.get("attempts", [])
+            provider_error = any(
+                attempt.get("error") in {"timeout", "rate_limited", "server_error"}
+                for attempt in attempts
+            )
+            provider_error |= any(
+                candidate.get("finish_reason") == "MAX_TOKENS"
+                for attempt in attempts
+                for candidate in attempt.get("raw", {}).get("response", {}).get("candidates", [])
+            )
+            if not provider_error:
+                continue
+            print(f"Retry provider error: {row['provider']} run {row['reading']}", flush=True)
+            if row["provider"] == "groq":
+                wait_for_groq()
+            try:
+                result = read_plan(text, keys, provider=row["provider"])
+                plan = plan_map_from_reading(
+                    result.reading,
+                    provider=result.raw.provider,
+                    model=result.raw.model,
+                    timestamp=result.raw.timestamp,
+                )
+                replacement = {
+                    "provider": row["provider"],
+                    "reading": row["reading"],
+                    "raw": result.raw.record(),
+                    "attempts": result.attempts,
+                    **compare(plan),
+                }
+                print(f"  {replacement['checker_matches']}/100 exact results", flush=True)
+            except AIError as error:
+                replacement = {
+                    "provider": row["provider"],
+                    "reading": row["reading"],
+                    "error": error.code,
+                    "reason": str(error),
+                    "attempts": getattr(error, "attempts", []),
+                }
+            replacement["previous_attempts"] = [
+                *row.get("previous_attempts", []),
+                {k: v for k, v in row.items() if k != "previous_attempts"},
+            ]
+            report["readings"][index] = replacement
+            save()
+        report["ranking"] = rank_providers(report["readings"])
+        report["winner"] = report["ranking"][0]["provider"] if report["ranking"] else None
+        save()
+        print(json.dumps(report["ranking"], indent=2))
+        return
+
     if args.rescore:
         saved = json.loads(args.rescore.read_text(encoding="utf-8"))
+        report = {**saved, "readings": [], "rescored_at": datetime.now(UTC).isoformat()}
         for row in saved["readings"]:
             if "raw" not in row:
                 report["readings"].append(row)
@@ -76,10 +136,7 @@ def main():
             )
             report["readings"].append(
                 {
-                    "provider": row["provider"],
-                    "reading": row["reading"],
-                    "raw": raw,
-                    "attempts": row["attempts"],
+                    **row,
                     **compare(plan),
                 }
             )

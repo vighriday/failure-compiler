@@ -4,7 +4,9 @@ import logging
 from datetime import UTC, datetime
 
 from server.ai.types import AIError, ProviderResponse
-from server.config import FALLBACK_MODEL
+from server.config import PROVIDER_MODELS
+
+MODEL = PROVIDER_MODELS["gemini"]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,12 +26,15 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
             ),
         ) as client:
             result = client.models.generate_content(
-                model=FALLBACK_MODEL,
+                model=MODEL,
                 contents=user,
                 config=types.GenerateContentConfig(
                     system_instruction=system,
                     temperature=0,
-                    max_output_tokens=6000,
+                    # Thinking and JSON share this budget. 6,000 truncated structured
+                    # responses with MAX_TOKENS in the read-v2 bake-off.
+                    max_output_tokens=16384,
+                    thinking_config=types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW),
                     response_mime_type="application/json",
                     response_json_schema=schema,
                 ),
@@ -59,7 +64,7 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
     usage = result.usage_metadata
     record = ProviderResponse(
         "gemini",
-        FALLBACK_MODEL,
+        MODEL,
         version,
         datetime.now(UTC).isoformat(),
         result.text or "",
@@ -70,7 +75,7 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
     )
     LOGGER.info(
         "AI tokens provider=gemini model=%s prompt=%s input=%d output=%d total=%d",
-        FALLBACK_MODEL,
+        MODEL,
         version,
         record.input_tokens,
         record.output_tokens,

@@ -16,7 +16,7 @@ from server.ai.prompts import (
     numbered_plan,
 )
 from server.ai.types import AIError, AIFixResponse, ProviderResponse, compact_schema
-from server.config import PROBLEM_TYPES
+from server.config import FALLBACK_PROVIDER, PRIMARY_PROVIDER, PROBLEM_TYPES
 from server.validation.gate import GateError, validate_ai_reading
 from server.validation.models import AIPlanReading
 
@@ -45,7 +45,7 @@ def _call(
     provider: str | None,
 ) -> tuple[ProviderResponse, object, list[dict]]:
     attempts = []
-    for name in [provider] if provider else ["groq", "gemini"]:
+    for name in [provider] if provider else [PRIMARY_PROVIDER, FALLBACK_PROVIDER]:
         if name not in {"groq", "gemini"}:
             raise AIError("provider_error", "Unknown AI provider.", status=422)
         key = keys.get(name)

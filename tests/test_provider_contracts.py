@@ -30,6 +30,7 @@ def test_groq_uses_strict_schema_low_reasoning_and_no_sdk_retry(monkeypatch, cap
             "system", "plan", {"type": "object"}, "private-key", "read-v1"
         )
     assert calls[0]["response_format"]["json_schema"]["strict"] is True
+    assert calls[0]["model"] == "openai/gpt-oss-120b"
     assert calls[0]["reasoning_effort"] == "low"
     assert calls[0]["max_completion_tokens"] <= 4096
     assert result.raw_text == '{"ok":true}'
@@ -73,8 +74,10 @@ def test_gemini_uses_installed_schema_field_and_exactly_one_sdk_attempt(monkeypa
             "system", "plan", {"type": "object"}, "private-key", "read-v1"
         )
     config = calls[0]["config"]
+    assert calls[0]["model"] == "gemini-3.8-flash"
     assert config.response_mime_type == "application/json"
     assert config.response_json_schema == {"type": "object"}
     assert config.response_schema is None
+    assert config.thinking_config.thinking_level.value == "LOW"
     assert result.output_tokens == 170
     assert "total=270" in caplog.text and "private-key" not in caplog.text

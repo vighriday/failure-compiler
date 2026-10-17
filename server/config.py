@@ -3,14 +3,21 @@
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
-# AI providers; retain the requested primary even when the bake-off winner differs.
+# AI providers; ranked by complete checker equivalence, fields, consistency, tokens.
 # ---------------------------------------------------------------------------
-PRIMARY_PROVIDER = "groq"
-PRIMARY_MODEL = "openai/gpt-oss-120b"
-FALLBACK_PROVIDER = "gemini"
-FALLBACK_MODEL = "gemini-3.8-flash"
+PROVIDER_MODELS = {"groq": "openai/gpt-oss-120b", "gemini": "gemini-3.8-flash"}
+PRIMARY_PROVIDER = "gemini"
+PRIMARY_MODEL = PROVIDER_MODELS[PRIMARY_PROVIDER]
+FALLBACK_PROVIDER = "groq"
+FALLBACK_MODEL = PROVIDER_MODELS[FALLBACK_PROVIDER]
 BAKEOFF_DATE = "2026-10-17"
-BAKEOFF_WINNER = "gemini"  # 58.06% mean fields; Groq 46.24%. See devpost/bakeoff.json.
+BAKEOFF_WINNER = PRIMARY_PROVIDER
+# read-v3, three runs each: Gemini 43/100 exact results, 90.57% fields;
+# Groq 12/100, 82%. Full results include schedules. devpost/bakeoff-read-v3.json.
+BAKEOFF_SCORES = {
+    "gemini": {"checker_mean": 43.0, "aligned_field_mean": 90.57, "total_tokens": 7470},
+    "groq": {"checker_mean": 12.0, "aligned_field_mean": 82.0, "total_tokens": 10775},
+}
 
 # ---------------------------------------------------------------------------
 # Problem-type taxonomy (fixed list)

@@ -2,13 +2,13 @@
 
 ## Status
 
-Hardening is complete. Work resumed under the revised seven-part instruction: compare aligned checker inputs and full outcomes, treat names as labels, and add missing facts only through rule questions. The earlier stop and its raw output are retained below as history. No example fixture has yet been replaced. Slice 7 has not started.
+Hardening is complete. The revised seven-part instruction is in progress: aligned checker inputs and full outcomes, names as labels, missing facts through rule questions, and a new three-run provider comparison. The read-v3 bake-off is complete. Gemini is now primary: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. The earlier stop and its raw output are retained below as history. No example fixture has yet been replaced. Slice 7 has not started.
 
 The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. Live HTTP/UI integration, session keys, live fix suggestions and the real-reading screenshots are still pending. The running app continues to use its labelled hand-written example.
 
 ## Original exact-name bake-off (superseded measurement)
 
-All six calls passed the format gate. Responses were retained without editing; see [bakeoff.json](bakeoff.json) for each response, source lines, guessed marks, mismatch list, metadata and token usage. The primary remains Groq as requested. Gemini's higher mean is recorded as the bake-off winner in `server/config.py` with today's date.
+All six calls passed the format gate. Responses were retained without editing; see [bakeoff.json](bakeoff.json) for each response, source lines, guessed marks, mismatch list, metadata and token usage. At this earlier checkpoint Groq remained primary; the revised instruction below supersedes that choice.
 
 | Provider | Reading 1 | Reading 2 | Reading 3 | Mean field match | Total tokens |
 | --- | --- | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ The comparison checks 62 truth fields after the existing ID normalisation, prese
 
 Groq calls were spaced by at least 61 seconds during the bake-off, and each used fewer than 3,500 tokens. Installed SDKs: Groq 1.7.0 and google-genai 2.31.0. Offline tests check Groq's strict schema and low reasoning, disabled SDK retries, Gemini's `response_mime_type` plus `response_json_schema`, the token reservation, and key-free logs.
 
-## One-shot primary example reading
+## Earlier one-shot primary example reading (read-v1, historical)
 
 This was a separate, successful Groq call after the bake-off, using 3,418 tokens. It was not rerun. The raw record, attempt log and full comparison are saved locally, under ignored `devpost/screens/live-candidates/`:
 
@@ -49,7 +49,7 @@ The reading matched 28 of 62 expected fields (45.16%). The current time pickers 
 
 The missing delivery is a substantive missing checker input; this is more than a display-label mismatch. No names, entities, model constraints or raw responses were changed to make the comparison pass.
 
-## Verification and remaining work
+## Verification at the earlier stop (historical)
 
 - 100 offline tests pass; Ruff reports zero issues.
 - Hardening's production build and both browser regressions pass, including the unchanged example story and post-run re-confirmation.
@@ -65,7 +65,26 @@ The revised measurement aligns entity identities by type and role, ignores displ
 | --- | --- | --- | --- | --- |
 | read-v1, rescored saved responses | Groq | 84%, 88%, 84% | 18, 18, 18 | 10,282 |
 | read-v1, rescored saved responses | Gemini | 96%, 96%, 96% | 33, 48, 48 | 13,047 |
-| read-v2 | Groq | Pending the new bake-off | Pending | Pending |
-| read-v2 | Gemini | Pending the new bake-off | Pending | Pending |
+| read-v2 | Groq | 73.21%, 73.68%, 73.68% | 17, 18, 18 | 11,643 |
+| read-v2 | Gemini | 96%, provider error, provider error | 48, unavailable, unavailable | 4,212 for the successful run |
+| read-v3 | Groq | 82%, 82%, 82% | 12, 12, 12 | 10,775 |
+| read-v3 | Gemini | 90.57%, 90.57%, 90.57% | 48, 33, 48 | 7,470 |
 
 No new provider calls were made to rescore `read-v1`; [bakeoff-read-v1.json](bakeoff-read-v1.json) preserves the raw records and the new scores. `read-v2` asks for every person, vehicle, place, route and supply arrival, keeps the plan's own names, and marks approximate durations as guessed. Example names, times and preset numbers are absent from the system prompt. Test settings are supplied separately from application configuration. `fix-v1` is unchanged; it contains generic operation instructions and has not yet been called for the new real example.
+
+### Generic revisions and provider settings
+
+`read-v2` confused outbound household routes with incoming supplies in Groq's output. Its Gemini campaign had one successful reading; the other two slots hit truncation (`MAX_TOKENS`) and HTTP 503/504 failures, including retries. [bakeoff-read-v2.json](bakeoff-read-v2.json) retains each attempt under `previous_attempts`. Increasing Gemini's shared thinking/output limit from 6,000 to 16,384 did not complete that campaign. Incomplete providers are excluded from ranking; errors are not treated as successful zero-score readings. The table counts tokens only for scored successful responses; failed HTTP calls have no returned token usage.
+
+`read-v3` adds generic distinctions between distribution vehicles, incoming supply deliveries and outbound household routes. It contains no example-specific facts. Gemini uses LOW thinking and a 16,384 output limit, with one SDK attempt; Groq retains low reasoning and its conservative token reservation. No successful response was rerun. Gemini run 2 initially returned HTTP 503; its single retry and original failure are both saved in [bakeoff-read-v3.json](bakeoff-read-v3.json). Provider settings are part of this campaign, so the difference from earlier versions is not attributed to prompt wording alone.
+
+All saved campaigns use the same final evaluator: route letters, primary-driver/key-holder roles, vehicle use and the exclusive-loading place identify corresponding entities. Names are not compared or used to choose a match. Ambiguous or extra entities stay visible. Field-score denominators include the union of truth and extracted checker fields, so extra entities lower the score. Each reading runs the truth map's 100 scenarios; this is a common comparison matrix, not a claim that a reading with extra entities generates only 100 scenarios itself.
+
+### Selected primary, 17 October 2026
+
+| Rank | Provider | Mean exact results / 100 | Mean aligned fields | Consistency variance | Successful-run tokens |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Gemini / gemini-3.8-flash | 43 | 90.57% | 50 | 7,470 |
+| 2 | Groq / openai/gpt-oss-120b | 12 | 82% | 0 | 10,775 |
+
+Ranking follows the requested order: exact full-result equivalence, aligned fields, consistency, tokens. The variance is the sum of population variances of those two scores across three runs. Gemini wins on the first criterion. Run 2 puts Ravi first in Route A's loading list; the other runs put Joel first. Assignment order is meaningful, and full schedule equality is intentionally included in the score. `server/config.py` records the date, winner and scores; the adapter reads that order, and each provider keeps its own model ID when primary and fallback switch.

@@ -11,6 +11,33 @@ from server.validation.models import AIPlanReading
 from tests.validation_helpers import ROOT, ai_reading_payload
 
 
+@pytest.fixture(autouse=True)
+def configured_order(monkeypatch):
+    monkeypatch.setattr(adapter, "PRIMARY_PROVIDER", "groq")
+    monkeypatch.setattr(adapter, "FALLBACK_PROVIDER", "gemini")
+
+
+def test_default_order_follows_the_configured_winner(monkeypatch):
+    called = []
+    monkeypatch.setattr(adapter, "PRIMARY_PROVIDER", "gemini")
+    monkeypatch.setattr(adapter, "FALLBACK_PROVIDER", "groq")
+
+    def primary(*args):
+        called.append("gemini")
+        raise AIError("server_error", "Controlled failure")
+
+    def fallback(*args):
+        called.append("groq")
+        return reading_response()
+
+    monkeypatch.setattr(adapter.gemini_provider, "generate", primary)
+    monkeypatch.setattr(adapter.groq_provider, "generate", fallback)
+    adapter.read_plan(
+        (ROOT / "fixtures/example-plan.txt").read_text(), {"gemini": "secret", "groq": "secret"}
+    )
+    assert called == ["gemini", "groq"]
+
+
 @pytest.mark.parametrize("model", [AIPlanReading, AIFixResponse])
 def test_every_schema_object_is_closed_and_requires_all_fields(model):
     def visit(value):

@@ -7,7 +7,9 @@ import time
 from datetime import UTC, datetime
 
 from server.ai.types import AIError, ProviderResponse
-from server.config import PRIMARY_MODEL
+from server.config import PROVIDER_MODELS
+
+MODEL = PROVIDER_MODELS["groq"]
 
 LOGGER = logging.getLogger(__name__)
 _LOCK = threading.Lock()
@@ -44,7 +46,7 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
         _NEXT_CALL = time.monotonic() + 61
     try:
         result = Groq(api_key=key, max_retries=0, timeout=45).chat.completions.create(
-            model=PRIMARY_MODEL,
+            model=MODEL,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
             response_format={
                 "type": "json_schema",
@@ -83,7 +85,7 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
     usage = result.usage
     record = ProviderResponse(
         "groq",
-        PRIMARY_MODEL,
+        MODEL,
         version,
         datetime.now(UTC).isoformat(),
         result.choices[0].message.content or "",
@@ -94,7 +96,7 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
     )
     LOGGER.info(
         "AI tokens provider=groq model=%s prompt=%s input=%d output=%d total=%d",
-        PRIMARY_MODEL,
+        MODEL,
         version,
         record.input_tokens,
         record.output_tokens,

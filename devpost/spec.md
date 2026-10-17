@@ -9,7 +9,7 @@ status: approved
 
 The app is a browser page talking to a small Python server running on your laptop. The server binds to 127.0.0.1 only, because it holds AI keys in memory.
 
-When you paste a plan, the server sends it to an AI (Groq first, Gemini as a fallback). The AI's only job at that point is to read messy text and return a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. That description comes back as JSON, and the server runs it through a strict format check before it touches anything else. If the JSON is wrong in any way - a missing field, an extra field, a name that does not exist - it gets rejected and you are told exactly why. This is the core learning goal made concrete: the AI produces output, the gate decides whether it is usable, and nothing downstream ever sees an unchecked map.
+When you paste a plan, the server sends it to an AI (Gemini first, Groq as a fallback). The AI's only job at that point is to read messy text and return a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. That description comes back as JSON, and the server runs it through a strict format check before it touches anything else. If the JSON is wrong in any way - a missing field, an extra field, a name that does not exist - it gets rejected and you are told exactly why. This is the core learning goal made concrete: the AI produces output, the gate decides whether it is usable, and nothing downstream ever sees an unchecked map.
 
 The AI returns an `AIPlanReading`. The server wraps it into a `PlanMap`, adding its own metadata: which provider answered, per-item status, and correction history. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.
 
@@ -496,7 +496,7 @@ No database. Confirmed maps, test results, and fix suggestion results are held i
 
 `test_checker_monotone.py`: on the example map, asserts that every pair's lateness is at least each of its singles'.
 
-`test_reading_matches_truth.py`: loads `fixtures/example-reading.json`, applies the scripted demo corrections (defined inline in the test), and asserts the result equals `fixtures/example-truth.json`. This validates that the saved reading plus the demo's known corrections produce the truth map - separate from bakeoff, which scores raw reading quality.
+`test_reading_matches_truth.py`: loads the unedited `fixtures/example-reading.json`, applies scripted corrections and additions through the review controls, aligns entities by type and role, then compares every checker input and all 100 full scenario results with `fixtures/example-truth.json`. Names are labels and are excluded. This planned test can be added when the one-shot reading passes the correction checkpoint; extra or missing checker entities must not be silently discarded.
 
 `test_format_gate.py`: bad JSON, extra fields, unknown names, wrong types - all rejected with a specific reason.
 
@@ -504,7 +504,7 @@ No database. Confirmed maps, test results, and fix suggestion results are held i
 
 `test_determinism.py`: runs the example truth map twice and compares every result.
 
-`bakeoff.py`: runs the example plan through both providers three times. For each, normalises the ids and compares the raw reading against `example-truth.json` field by field, reporting the percentage of fields that match and a list of mismatches. Does not apply scripted corrections - the bakeoff scores the raw reading quality. The more accurate provider becomes primary. Result recorded as a comment in `server/config.py`.
+`bakeoff.py`: runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input (including extra inputs), and runs the truth map's 100 scenarios on the aligned reading. It ranks providers by exact full-result matches, aligned field match, consistency, then tokens. It applies no corrections and preserves raw responses and failed attempts. Every prompt version and its scores are logged in `ai-reading-review.md`; the winner becomes primary in `server/config.py` with the date and scores.
 
 ## File Structure
 
@@ -589,7 +589,7 @@ failure-compiler/
 
 ## External Services and Dependencies
 
-### Groq - Primary AI provider
+### Groq - Fallback AI provider
 - Endpoint: `POST https://api.groq.com/openai/v1/chat/completions`
 - Auth: `Authorization: Bearer $GROQ_API_KEY`
 - Structured output: `response_format: { type: "json_schema", json_schema: { strict: true, schema: <AIPlanReading JSON schema> } }`
@@ -597,7 +597,7 @@ failure-compiler/
 - Docs: https://console.groq.com/docs/openai
 - Key: `GROQ_API_KEY` in `.env`
 
-### Gemini - Fallback AI provider
+### Gemini - Primary AI provider
 - SDK: `google-genai` (official)
 - Model: `gemini-3.8-flash`
 - Structured output: follows current `google-genai` Interactions API. Verify the exact structured-output parameter against the installed SDK version at build time.
@@ -680,4 +680,4 @@ Verified by: `test_rules.py` includes a case where a person's `can_drive` is set
 
 - **Gemini structured output parameter name.** The `google-genai` Interactions API parameter for structured output (whether it is `response_schema`, `response_format`, or another key) should be verified against the installed SDK version early in the build, not assumed. Record the finding as a comment in `gemini_provider.py`.
 - **`openapi-typescript` generation step** is manual for the PoC. A CI step would catch drift; out of scope.
-- **Bakeoff result** (primary provider) not yet determined. Determined by running `scripts/bakeoff.py` once during early build; recorded in `server/config.py`.
+- **Bakeoff result:** Gemini is primary after the 17 October 2026 read-v3 comparison: 43/100 mean exact results and 90.57% aligned fields; Groq has 12/100 and 82%. See `server/config.py` and `ai-reading-review.md`.
