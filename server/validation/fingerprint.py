@@ -16,7 +16,18 @@ def fingerprint_plan_map(plan: PlanMap | PlanMapData) -> str:
         plan = PlanMap.from_truth_map(plan)
     data = normalise_plan_map_ids(plan).checker_data()
     payload = data.model_dump(mode="json")
+    # Single-location/delivery roles have equivalent identities across independent readings.
+    role_ids = {
+        item["id"]: f"{collection}-{index}"
+        for collection in ("places", "deliveries")
+        for index, item in enumerate(sorted(payload[collection], key=lambda item: item["id"]))
+    }
     for collection in ("people", "vehicles", "places", "deliveries", "routes"):
+        for item in payload[collection]:
+            item.pop("name")
+            item["id"] = role_ids.get(item["id"], item["id"])
+            if "place_id" in item:
+                item["place_id"] = role_ids.get(item["place_id"], item["place_id"])
         payload[collection] = sorted(payload[collection], key=lambda item: item["id"])
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

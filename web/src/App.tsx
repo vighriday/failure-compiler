@@ -1,3 +1,4 @@
+import { routeLabel } from "./lib/labels";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { confirmMap, readExample, updateMap } from "./api/client";
 import type { ExampleReading, PlanMap, ReadingItem, RuleQuestion, ReviewState, Status } from "./types";
@@ -176,7 +177,7 @@ function App() {
             <div className="section-kicker">THE PLAN AT A GLANCE</div>
             <h2>Every job has a person and a backup</h2>
             <p>This is how the plan looks today.</p>
-            <div className="job-checks">{planMap.routes.map((route) => { const vehicle = planMap.vehicles.find((candidate) => candidate.id === route.vehicle_id)?.name.toLowerCase(); const drivers = route.driver_ids.map((id: string) => planMap.people.find((person: Record<string, any>) => person.id === id)?.name).filter(Boolean); return <div className="job-check" key={route.id}><Tick /><span>Route {route.name} · {vehicle} · {drivers[0] ?? "No driver"}, backups {drivers.slice(1).join(" and ")}</span></div>; })}</div>
+            <div className="job-checks">{planMap.routes.map((route) => { const vehicle = planMap.vehicles.find((candidate) => candidate.id === route.vehicle_id)?.name; const drivers = route.driver_ids.map((id: string) => planMap.people.find((person: Record<string, any>) => person.id === id)?.name).filter(Boolean); return <div className="job-check" key={route.id}><Tick /><span>{routeLabel(route.name)} · {vehicle} · {drivers[0] ?? "No driver"}, backups {drivers.slice(1).join(" and ")}</span></div>; })}</div>
           </section>
 
           <section className="questions-section">
@@ -193,7 +194,7 @@ function App() {
             ))}
             {issues.filter((issue) => issue.field === "driver_ids").map((issue, index) => {
               const route = planMap.routes.find((candidate) => candidate.id === issue.item_id);
-              return route ? <div className="question-card rule-question" key={`${issue.item_id}-${index}`}><div className="question-icon">?</div><div className="question-body"><p>Route {route.name} needs a driver who can drive. {issue.message}. Who drives Route {route.name}?</p><select disabled={pending > 0} aria-label={`Choose a driver for route ${route.name}`} value="" onChange={(event) => resolveRoute(route.id, event.target.value)}><option value="">Choose a driver</option>{planMap.people.filter((person) => person.can_drive).map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></div></div> : null;
+              return route ? <div className="question-card rule-question" key={`${issue.item_id}-${index}`}><div className="question-icon">?</div><div className="question-body"><p>{routeLabel(route.name)} needs a driver who can drive. {issue.message}. Who drives {routeLabel(route.name)}?</p><select disabled={pending > 0} aria-label={`Choose a driver for route ${route.name}`} value="" onChange={(event) => resolveRoute(route.id, event.target.value)}><option value="">Choose a driver</option>{planMap.people.filter((person) => person.can_drive).map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></div></div> : null;
             })}
             {issues.length > 0 && <div className="rule-summary"><span className="rule-symbol">!</span><span>{issues.map((issue) => issue.message).join(" · ")}</span></div>}
           </section>

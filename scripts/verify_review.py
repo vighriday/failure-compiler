@@ -56,7 +56,7 @@ def main():
         for number in (1, 2, 3):
             expect(page.get_by_text(f"changed by Fix {number}", exact=True).first).to_be_visible()
         expect(page.locator(".job-checks")).to_contain_text(
-            "Route A · car · Ravi, backups Maya and Joel and Sam"
+            "Route A · Car · Ravi, backups Maya and Joel and Sam"
         )
         expect(page.locator('[data-item-id="route-c"]')).to_contain_text(
             "Loading cover: Anita, Maya, Joel and Sam"
@@ -64,7 +64,7 @@ def main():
         page.screenshot(path=str(SCREENS / "hardening-current-facts.png"), full_page=True)
         van = page.locator('[data-item-id="van"]')
         van.get_by_role("button", name="Correct", exact=True).click()
-        van.get_by_label(re.compile("Correction for The van")).fill("09:35")
+        van.get_by_label(re.compile("Correction for (The )?[Vv]an")).fill("09:35")
         expect(page.locator(".outdated-notice")).to_contain_text("Out of date")
         expect(page.get_by_role("button", name="Confirm plan", exact=True)).to_be_disabled()
         pending = page.get_by_role("button", name="Confirm", exact=True)

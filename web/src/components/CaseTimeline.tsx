@@ -1,3 +1,4 @@
+import { routeLabel } from "../lib/labels";
 import type { PlanMap, ScenarioResult } from "../types";
 
 export default function CaseTimeline({ plan, result, reasons }: { plan: PlanMap; result: ScenarioResult; reasons: Record<string, string> }) {
@@ -20,8 +21,8 @@ export default function CaseTimeline({ plan, result, reasons }: { plan: PlanMap;
         const drive = events.find((event) => event.event === "drive_start");
         const driveEnd = events.find((event) => event.event === "drive_end");
         const missing = events.some((event) => event.event === "not_delivered");
-        const vehicle = plan.vehicles.find((vehicle) => vehicle.id === route.vehicle_id)?.name.toLowerCase();
-        return <g key={route.id}><text x="0" y={y + 29} className="timeline-route">Route {route.name}</text><text x="0" y={y + 47} className="timeline-time">{vehicle}</text><line x1="94" x2="496" y1={y + 60} y2={y + 60} className="lane-rule" />
+        const vehicle = plan.vehicles.find((vehicle) => vehicle.id === route.vehicle_id)?.name;
+        return <g key={route.id}><text x="0" y={y + 29} className="timeline-route">{routeLabel(route.name)}</text><text x="0" y={y + 47} className="timeline-time">{vehicle}</text><line x1="94" x2="496" y1={y + 60} y2={y + 60} className="lane-rule" />
           {missing ? <><line x1="94" x2="496" y1={y + 29} y2={y + 29} className="missing-lane" /><text x="99" y={y + 48} className="missing-note">{summary(reasons[route.id] ?? "")}</text></> : <>
             {load && loadEnd && <><text x={x(load.time)} y={y + 12} className="load-person">Load: {name(load.person_id)}</text><rect x={x(load.time)} y={y + 19} width={Math.max(2, x(loadEnd.time) - x(load.time))} height="10" className="load-bar" /></>}
             {drive && driveEnd && <><rect x={x(drive.time)} y={y + 33} width={Math.max(2, x(driveEnd.time) - x(drive.time))} height="19" className={driveEnd.time > plan.finish_time ? "drive-bar late-bar" : "drive-bar"} /><text x={(x(drive.time) + x(driveEnd.time)) / 2} y={y + 47} textAnchor="middle" className="drive-person">Drive: {name(drive.person_id)}</text></>}

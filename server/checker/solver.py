@@ -14,6 +14,7 @@ from __future__ import annotations
 from ortools.sat.python import cp_model
 
 from server.config import NOT_DELIVERED_HORIZON_PADDING, SOLVER_MAX_DETERMINISTIC_TIME, SOLVER_SEED
+from server.labels import route_label, route_letters
 from server.models import PlanMapData, TimelineEvent
 
 
@@ -368,7 +369,7 @@ def solve_scenario(
             if "is_delivered" not in rv:
                 # Route was forced not-delivered
                 total_lateness += rv["lateness"]
-                not_delivered_routes.append(route.name)
+                not_delivered_routes.append(route.id)
                 timeline_events.append(
                     TimelineEvent(
                         route_id=route.id,
@@ -381,7 +382,7 @@ def solve_scenario(
             is_del_val = solver.value(rv["is_delivered"])
             if not is_del_val:
                 total_lateness += route.households * not_delivered_penalty_per_household
-                not_delivered_routes.append(route.name)
+                not_delivered_routes.append(route.id)
                 timeline_events.append(
                     TimelineEvent(
                         route_id=route.id,
@@ -446,7 +447,7 @@ def solve_scenario(
             if route_lateness_minutes > 0:
                 total_lateness += route_lateness_minutes * route.households
                 late_routes.append(
-                    f"Route {route.name}: {route.households} households, "
+                    f"{route_label(route.name)}: {route.households} households, "
                     f"{route_lateness_minutes} minutes late"
                 )
 
@@ -456,10 +457,12 @@ def solve_scenario(
         # Build human cost string
         cost_parts = []
         if not_delivered_routes:
-            nd_households = sum(r.households for r in routes if r.name in not_delivered_routes)
+            undelivered = [route for route in routes if route.id in not_delivered_routes]
+            nd_households = sum(route.households for route in undelivered)
             cost_parts.append(
                 f"{'Routes ' if len(not_delivered_routes) > 1 else 'Route '}"
-                f"{', '.join(not_delivered_routes)}: {nd_households} households not delivered"
+                f"{route_letters([route.name for route in undelivered])}: "
+                f"{nd_households} households not delivered"
             )
             # Add reason if loading area can't open
             if loading_place.get("needs_key"):

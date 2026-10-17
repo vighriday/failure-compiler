@@ -24,6 +24,10 @@ def remember_map(plan: PlanMap, results: list[ScenarioResult] | None = None) -> 
     if fingerprint not in SESSIONS:
         SESSIONS[fingerprint] = MapSession(plan.model_copy(deep=True), results)
     else:
+        # Equivalent inputs can carry different labels or role IDs in a new reading.
+        # Regenerate presentation/results rather than pairing old IDs with new metadata.
+        if SESSIONS[fingerprint].plan.checker_data() != plan.checker_data():
+            SESSIONS[fingerprint].results = None
         SESSIONS[fingerprint].plan = plan.model_copy(deep=True)
         if results is not None:
             SESSIONS[fingerprint].results = results

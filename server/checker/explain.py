@@ -1,6 +1,7 @@
 """Explain the confirmed inputs and optimal schedule without changing the solver."""
 
 from server.checker.scenarios import _instantiate_problems
+from server.labels import route_label
 from server.models import PlanMapData, ScenarioResult
 
 
@@ -101,7 +102,10 @@ def route_reasons(plan: PlanMapData, result: ScenarioResult) -> dict[str, str]:
                     )
                     if begin and end and begin.time <= ready < end.time:
                         verb = "loading" if job == "load" else "driving"
-                        return f"{person.name} {verb} Route {other.name} until {clock(end.time)}"
+                        return (
+                            f"{person.name} {verb} {route_label(other.name)} "
+                            f"until {clock(end.time)}"
+                        )
             return f"{person.name} available until {clock(until)}"
 
         verb = "back" if vehicle.available_from > min(p.opens_at for p in plan.places) else "free"
@@ -117,7 +121,7 @@ def route_reasons(plan: PlanMapData, result: ScenarioResult) -> dict[str, str]:
             facts.append("Loading team gone.")
         loaders = ", ".join(person_fact(pid) for pid in route.loader_ids)
         drivers = ", ".join(person_fact(pid) for pid in route.driver_ids)
-        facts.append(f"Loaders for Route {route.name}: {loaders}.")
-        facts.append(f"Drivers for Route {route.name}: {drivers}.")
+        facts.append(f"Loaders for {route_label(route.name)}: {loaders}.")
+        facts.append(f"Drivers for {route_label(route.name)}: {drivers}.")
         reasons[route.id] = " ".join(facts)
     return reasons

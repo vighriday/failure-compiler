@@ -126,6 +126,8 @@ def _check_ids_and_references(reading: AIPlanReading) -> None:
 def _slug(kind: str, name: str) -> str:
     ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     value = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
+    while value.startswith(kind + "-"):
+        value = value[len(kind) + 1 :]
     if not value:
         raise GateError(
             f"Cannot normalise an empty {kind} name", field=f"{kind}.name", bad_value=name
@@ -212,7 +214,12 @@ def normalise_plan_map_ids(plan: PlanMap) -> PlanMap:
                     f"Duplicate id '{entity.id}'", field=f"{kind}s.id", bad_value=entity.id
                 )
             raw_ids.add(entity.id)
-            stable_id = _slug(kind, entity.name)
+            # Existing typed IDs are identities. A later label edit must never rename them.
+            stable_id = (
+                _slug(kind, entity.id[len(kind) + 1 :])
+                if entity.id.startswith(kind + "-")
+                else _slug(kind, entity.name)
+            )
             if stable_id in stable_ids:
                 raise GateError(
                     f"Duplicate normalised id '{stable_id}'",

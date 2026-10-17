@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from server.labels import route_label
 from server.validation.models import PlanMap
 
 COLLECTIONS = {
@@ -109,24 +110,24 @@ def statement(plan: PlanMap, item: dict) -> str:
     if kind == "route":
         if field in {"load_minutes", "drive_minutes"}:
             task = "loading" if field == "load_minutes" else "drive"
-            return f"Route {entity.name}'s {task} takes {getattr(entity, field)} minutes."
+            return f"{route_label(entity.name)}'s {task} takes {getattr(entity, field)} minutes."
         if field == "loading":
             return (
-                f"Route {entity.name} takes {entity.load_minutes} minutes to load; "
+                f"{route_label(entity.name)} takes {entity.load_minutes} minutes to load; "
                 f"loading cover: {names(plan, entity.loader_ids)}."
             )
         vehicle = next(
-            (v.name.lower() for v in plan.vehicles if v.id == entity.vehicle_id), entity.vehicle_id
+            (v.name for v in plan.vehicles if v.id == entity.vehicle_id), entity.vehicle_id
         )
         drivers = entity.driver_ids
         return (
-            f"Route {entity.name} serves {entity.households} households by {vehicle}; "
+            f"{route_label(entity.name)} serves {entity.households} households by {vehicle}; "
             f"{names(plan, drivers[:1])} drives"
             + (f", with {names(plan, drivers[1:])} as backups" if len(drivers) > 1 else "")
             + f". Loading cover: {names(plan, entity.loader_ids)}."
         )
     if kind == "vehicle":
-        return f"The {entity.name.lower()} is available from {clock(entity.available_from)}."
+        return f"{entity.name} is available from {clock(entity.available_from)}."
     if kind == "place":
         if field == "one_vehicle_at_a_time":
             return (
