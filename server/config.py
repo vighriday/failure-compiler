@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
-# AI providers (slice 6 will populate these; placeholders for now)
+# AI providers; retain the requested primary even when the bake-off winner differs.
 # ---------------------------------------------------------------------------
 PRIMARY_PROVIDER = "groq"
 PRIMARY_MODEL = "openai/gpt-oss-120b"
 FALLBACK_PROVIDER = "gemini"
 FALLBACK_MODEL = "gemini-3.8-flash"
+BAKEOFF_DATE = "2026-10-17"
+BAKEOFF_WINNER = "gemini"  # 58.06% mean fields; Groq 46.24%. See devpost/bakeoff.json.
 
 # ---------------------------------------------------------------------------
 # Problem-type taxonomy (fixed list)
