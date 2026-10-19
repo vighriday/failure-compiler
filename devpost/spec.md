@@ -217,6 +217,8 @@ The checker evaluates “Add Maya as backup driver for Route C” and turns it d
 
 ### How the checker decides
 
+After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time from timelines without trading away the proven verdict. Both passes share the deterministic solver budget. If the earliest schedule cannot be proved, the result is a question mark. Small-model presolve probing is disabled to keep the full example run below three seconds.
+
 - Proven zero lateness: **tick.** Zero is the floor; finding zero proves the plan survives.
 - Proven minimum above zero: **cross.** The minimum is the human cost - e.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Proved optimal.
 - **Not delivered** routes use a penalty lateness of households times the full horizon (finish time plus 180 minutes), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area" Still a cross; tick and question mark keep their meaning.

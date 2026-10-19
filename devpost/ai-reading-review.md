@@ -8,6 +8,12 @@ The provider adapter, strict schemas, versioned prompts, raw-response recording,
 
 ## Verdict-only re-score, 19 October 2026
 
+### Natural schedules verified before further fix capture
+
+The solver now proves the best lateness first, fixes that objective value, and minimises the sum of load/drive starts in a second pass. The unchanged `test_example_locked` and determinism test pass, as does a direct earliest-start regression. No truth or expected verdict was regenerated. Exact optimisation is retained; disabling small-model presolve probing removes overhead.
+
+Five before runs took 5.716 seconds on the first call (including lazy solver import), then 1.376/1.447/1.425/1.850 seconds, a warm median of **1.436 seconds**. Six final after runs took **2.547/1.621/1.773/1.587/1.702/1.644 seconds**, a warm median of **1.644 seconds** and maximum **2.547 seconds including first-call import**. Every final complete 100-scenario run is below three seconds; all verdicts equal the saved before run. First-call import timings also depend on local filesystem caches, so they are reported separately. Local evidence: `devpost/screens/solver-before.json` and `solver-after.json`.
+
 Checker equivalence is exact agreement on **state, lateness_minutes and human_cost** for each of the truth map's 100 scenarios, matching the fields locked by `expected-results.json`. Timelines, chosen people, diagnostic bounds, dim-cause metadata and fingerprints are excluded. Common labels are used only when rendering human-cost text for comparison. Aligned field comparison treats `loader_ids` as sets and keeps `driver_ids` in primary-first order. Fingerprints use the same loader-set semantics without changing the displayed list.
 
 Every saved campaign was re-scored offline, including the original `bakeoff.json`. Each report retains its previous scores and ranking in `measurement_history`; `raw`, provider attempt logs and failed-call history are unchanged. No provider call or prompt revision was made.

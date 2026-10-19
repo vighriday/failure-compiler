@@ -1,4 +1,4 @@
-"""CP-SAT solver: one run per scenario.
+"""CP-SAT solver: prove lateness, then find the earliest equally good schedule.
 
 Models the plan as a scheduling problem where the solver minimises total
 households-times-minutes-late.  Routes that cannot run (no available driver,
@@ -325,39 +325,52 @@ def solve_scenario(
         if len(loading_intervals) > 1:
             model.add_no_overlap(loading_intervals)
 
-    # Minimise total lateness
-    if all_lateness_terms:
-        # Separate constant terms from variable terms
-        constant_sum = 0
-        variable_terms = []
-        for term in all_lateness_terms:
-            if isinstance(term, int):
-                constant_sum += term
-            else:
-                variable_terms.append(term)
-
-        if variable_terms:
-            total = model.new_int_var(
-                0,
-                sum(r.households for r in routes) * (horizon + not_delivered_penalty_per_household),
-                "total_lateness",
-            )
-            model.add(total == sum(variable_terms) + constant_sum)
-            model.minimize(total)
-        # If only constants, there's nothing to optimise
-    else:
-        total = model.new_int_var(0, 0, "total_lateness")
-        model.minimize(total)
+    # First prove the best lateness, including fixed not-delivered penalties.
+    total_lateness_objective = sum(all_lateness_terms)
+    model.minimize(total_lateness_objective)
 
     # Solve
     solver = cp_model.CpSolver()
     solver.parameters.max_deterministic_time = SOLVER_MAX_DETERMINISTIC_TIME
     solver.parameters.random_seed = SOLVER_SEED
     solver.parameters.num_workers = 1
+    # Probing adds overhead to these small scheduling models. Disabling that
+    # presolve search keeps both exact optimisation passes within the example budget.
+    solver.parameters.cp_model_probing_level = 0
 
     status = solver.solve(model)
 
     if status == cp_model.OPTIMAL:
+        # Equally good primary solutions can otherwise leave tasks idle for hours.
+        # Hold the proven cost fixed before minimising loading and driving starts.
+        # This chooses a natural timeline without trading away the primary result.
+        best_lateness = int(round(solver.objective_value))
+        model.add(total_lateness_objective == best_lateness)
+        starts = [
+            rv[field]
+            for rv in route_vars.values()
+            if "is_delivered" in rv
+            for field in ("load_start", "drive_start")
+        ]
+        if starts:
+            model.minimize(sum(starts))
+            for index, value in enumerate(solver.response_proto.solution):
+                model.add_hint(model.get_int_var_from_proto_index(index), value)
+            earliest_solver = cp_model.CpSolver()
+            earliest_solver.parameters.copy_from(solver.parameters)
+            earliest_solver.parameters.max_deterministic_time = max(
+                0, SOLVER_MAX_DETERMINISTIC_TIME - solver.response_proto.deterministic_time
+            )
+            earliest_status = earliest_solver.solve(model)
+            if earliest_status != cp_model.OPTIMAL:
+                return (
+                    "qmark",
+                    best_lateness,
+                    [],
+                    "Best lateness proven, but the solver could not prove the earliest schedule",
+                )
+            solver = earliest_solver
+
         # Compute total lateness from solution
         total_lateness = 0
         late_routes: list[str] = []

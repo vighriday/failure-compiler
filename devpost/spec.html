@@ -667,6 +667,7 @@
   <p style="font-size:13px;color:var(--ink-mid);">The checker evaluates “Add Maya as backup driver for Route C” and turns it down because the gap is loading, not driving. Its reason is “Van back 10:45. Loading team gone.”</p>
 
   <h3>How the checker decides</h3>
+  <p>After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time without trading away the proven verdict. Both passes share the deterministic solver budget. If the earliest schedule cannot be proved, the result is a question mark. Small-model presolve probing is disabled to keep the full example below three seconds.</p>
   <div class="card" style="font-size:13.5px;">
     <p><span class="badge badge-tick">tick</span> <strong>Proven zero lateness.</strong> Zero is the floor; finding zero proves the plan genuinely survives.</p>
     <p style="margin-top:8px;"><span class="badge badge-cross">cross</span> <strong>Proven minimum above zero.</strong> That minimum is the human cost, proved optimal. E.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Routes that cannot run (no driver, loading area cannot open) use a "not delivered" penalty of households times the full horizon (finish time + 180 min), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"</p>
