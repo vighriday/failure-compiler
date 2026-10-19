@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from dotenv import dotenv_values
@@ -60,7 +61,14 @@ def main():
     parser.add_argument(
         "--score-only", action="store_true", help="Reuse recorded responses; no AI calls"
     )
+    parser.add_argument(
+        "--retry-failed",
+        action="store_true",
+        help="Retry saved transient failures once; retain prior attempts and reuse successes",
+    )
     args = parser.parse_args()
+    if args.score_only and args.retry_failed:
+        parser.error("score-only cannot request retries")
     logger = logging.getLogger("server.ai")
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
@@ -90,9 +98,27 @@ def main():
             continue
         case_id = result.scenario_id
         captured = captures["cases"].get(case_id)
-        if captured is None:
+        retry = (
+            args.retry_failed
+            and captured is not None
+            and "error" in captured
+            and captured.get("attempts")
+            and all(
+                attempt.get("error") in {"server_error", "timeout", "rate_limited"}
+                for attempt in captured["attempts"]
+            )
+        )
+        if captured is None or retry:
             if args.score_only:
                 raise SystemExit(f"No saved response for {case_id}; score-only makes no AI call.")
+            previous = (
+                [
+                    *captured.get("previous_attempts", []),
+                    {key: value for key, value in captured.items() if key != "previous_attempts"},
+                ]
+                if retry
+                else []
+            )
             context = context_for(plan, result, results)
             print(f"Capturing {case_id} from {PRIMARY_PROVIDER}", flush=True)
             try:
@@ -109,6 +135,9 @@ def main():
                     "attempts": getattr(error, "attempts", []),
                     "context": context,
                 }
+            captured["recorded_at"] = datetime.now(UTC).isoformat()
+            if previous:
+                captured["previous_attempts"] = previous
             captures["cases"][case_id] = captured
             save(target, captures)  # Save before scoring or making another call.
         if "error" in captured:
