@@ -362,14 +362,10 @@ def solve_scenario(
                 0, SOLVER_MAX_DETERMINISTIC_TIME - solver.response_proto.deterministic_time
             )
             earliest_status = earliest_solver.solve(model)
-            if earliest_status != cp_model.OPTIMAL:
-                return (
-                    "qmark",
-                    best_lateness,
-                    [],
-                    "Best lateness proven, but the solver could not prove the earliest schedule",
-                )
-            solver = earliest_solver
+            if earliest_status in {cp_model.OPTIMAL, cp_model.FEASIBLE}:
+                solver = earliest_solver
+            # A scheduling-only timeout cannot invalidate proven lateness. If no
+            # secondary solution is available, retain the first valid solution.
 
         # Compute total lateness from solution
         total_lateness = 0

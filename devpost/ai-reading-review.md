@@ -10,7 +10,7 @@ The provider adapter, strict schemas, versioned prompts, raw-response recording,
 
 ### Natural schedules verified before further fix capture
 
-The solver now proves the best lateness first, fixes that objective value, and minimises the sum of load/drive starts in a second pass. The unchanged `test_example_locked` and determinism test pass, as does a direct earliest-start regression. No truth or expected verdict was regenerated. Exact optimisation is retained; disabling small-model presolve probing removes overhead.
+The solver now proves the best lateness first, fixes that objective value, and minimises the sum of load/drive starts in a second pass. The unchanged `test_example_locked` and determinism test pass, as does a direct earliest-start regression. A secondary scheduling timeout retains the proven verdict and best valid timeline; it cannot turn a proved result into a question mark. A regression covers that distinction. No truth or expected verdict was regenerated. Exact optimisation is retained; disabling small-model presolve probing removes overhead.
 
 Five before runs took 5.716 seconds on the first call (including lazy solver import), then 1.376/1.447/1.425/1.850 seconds, a warm median of **1.436 seconds**. Six final after runs took **2.547/1.621/1.773/1.587/1.702/1.644 seconds**, a warm median of **1.644 seconds** and maximum **2.547 seconds including first-call import**. Every final complete 100-scenario run is below three seconds; all verdicts equal the saved before run. First-call import timings also depend on local filesystem caches, so they are reported separately. Local evidence: `devpost/screens/solver-before.json` and `solver-after.json`.
 
