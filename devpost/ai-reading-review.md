@@ -2,7 +2,7 @@
 
 ## Status
 
-Hardening and revised parts 1 to 5 are complete. The read-v3 bake-off selected Gemini: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. Following the user's continuation, a reversible place-identity question resolves the extra Hall explicitly. The same one-shot reading now reaches 100% checker-input agreement, 100/100 full-result matches and 100 actual scenarios through the UI. The raw reading is promoted as-is, with correction actions saved separately. The earlier stop evidence is retained below. Slice 6 remains unchecked while live integration and suggestion review are pending; slice 7 has not started.
+Hardening and revised parts 1 to 6 are complete. The read-v3 bake-off selected Gemini: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. Following the user's continuation, a reversible place-identity question resolves the extra Hall explicitly. The same one-shot reading now reaches 100% checker-input agreement, 100/100 full-result matches and 100 actual scenarios through the UI. The raw reading is promoted as-is, with correction actions saved separately. Part 7 was attempted on 19 October: Gemini returned HTTP 503 on every case, including one explicit retry per failed request. No suggestion response or checker verdict exists. The earlier stop evidence is retained below. Slice 6 remains unchecked while live integration and suggestion review are pending; slice 7 has not started.
 
 The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. The running app now uses the saved real reading and displays its provider/model. Live HTTP/UI integration, session keys and reviewed live fix suggestions remain pending; the existing fix suggestions are still labelled hand-written placeholders.
 
@@ -152,3 +152,18 @@ Playwright exercised the place picker, Change/undo, loader arrows, individual co
 - Saved `v2-verification.json`: all 11 browser checks pass at widths 1440/768/390/320, with no page errors. This includes scroll and animation recovery, keyboard navigation, all 105 illustrative sample cells, every driver rule picker, confirmation, live results and scored placeholder fixes. The actual reviewed example has 100 cells.
 - Existing story and re-confirmation browser proofs pass with the promoted reading. Submission assets are untouched; screenshots remain ignored.
 - No new reading or live fix call was made during verification. Real fix responses must be captured once per cross and remain uncommitted for the requested review.
+
+## Part 7: provider unavailable, 19 October 2026
+
+The confirmed reading passed part 6 before any fix request. The recorder then called the winning Gemini model once for each of the four crosses using unchanged `fix-v1`. Each request returned HTTP 503. One explicit retry per failed case returned the same error; the initial failures remain under `previous_attempts`. No successful response was repeated, and no other provider, model or prompt was substituted.
+
+| Broken case | Attempts | Provider result | Suggestions / checker verdicts |
+| --- | --- | --- | --- |
+| Joel absent | 2 | HTTP 503 both times | Unavailable |
+| Supply truck late + Ravi absent | 2 | HTTP 503 both times | Unavailable |
+| Van late + Anita leaves early | 2 | HTTP 503 both times | Unavailable |
+| Van late + Anita absent | 2 | HTTP 503 both times | Unavailable |
+
+`fix-v1` has no measurable suggestion score or returned token usage from these attempts. Failure contexts and attempt history are saved locally in ignored `devpost/screens/live-candidates/read-v3/example-fixes.json`; `fix-review.md` contains the full checkpoint report. No real suggestions were received, promoted or committed. The hand-written fixture remains clearly labelled as a placeholder. Do not describe it as the winner's output.
+
+The recording command reuses successful captures and never retries a saved failure by default. Its explicit `--retry-failed` option only permits recorded transient provider errors, preserves their history, and is incompatible with `--score-only`. Both recorder regressions pass, including no successful-call repetition or credential storage. Lint and format checks pass for the recorder. The next action is a failed-request retry after Gemini recovers, followed by gating and all-100 scoring, then the user's review before committing any returned suggestions. Live HTTP/UI integration and the rest of slice 6 remain pending.
