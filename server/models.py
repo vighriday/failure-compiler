@@ -54,7 +54,7 @@ class Route(BaseModel):
     drive_minutes: int
     vehicle_id: str
     driver_ids: list[str]  # primary first, then backups
-    loader_ids: list[str]  # primary first, then backups
+    loader_ids: list[str]  # eligible people, with no assignment priority
 
 
 # ---------------------------------------------------------------------------

@@ -26,6 +26,8 @@ def fingerprint_plan_map(plan: PlanMap | PlanMapData) -> str:
         for item in payload[collection]:
             item.pop("name")
             item["id"] = role_ids.get(item["id"], item["id"])
+            if "loader_ids" in item:
+                item["loader_ids"] = sorted(set(item["loader_ids"]))
             if "place_id" in item:
                 item["place_id"] = role_ids.get(item["place_id"], item["place_id"])
         payload[collection] = sorted(payload[collection], key=lambda item: item["id"])

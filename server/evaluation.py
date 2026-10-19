@@ -1,4 +1,4 @@
-"""Compare readings by aligned identities and complete checker outcomes, never display labels."""
+"""Compare aligned checker inputs and locked verdicts, never labels or schedules."""
 
 import re
 from statistics import pvariance
@@ -10,6 +10,18 @@ from server.ordering import canonical_order
 from server.validation.models import PlanMap
 
 COLLECTIONS = ("people", "vehicles", "places", "deliveries", "routes")
+VERDICT_FIELDS = frozenset({"state", "lateness_minutes", "human_cost"})
+MEASUREMENT_VERSION = "verdict-v1"
+
+
+def comparable_input(field: str, value):
+    """Loaders are eligible people; only driver lists have primary-first meaning."""
+    return sorted(set(value)) if field == "loader_ids" else value
+
+
+def checker_verdict(result: ScenarioResult) -> dict:
+    """The outcome contract locked by expected-results.json, excluding solver choices."""
+    return result.model_dump(include=VERDICT_FIELDS)
 
 
 def route_letter(entity) -> str:
@@ -136,7 +148,7 @@ def checker_fields(plan: PlanMap) -> dict:
         for entity in getattr(data, collection):
             fields.update(
                 {
-                    f"{collection}.{entity.id}.{field}": value
+                    f"{collection}.{entity.id}.{field}": comparable_input(field, value)
                     for field, value in entity.model_dump().items()
                     if field not in {"id", "name"}
                 }
@@ -208,7 +220,7 @@ def compare_reading(plan: PlanMap, truth: PlanMap) -> dict:
     different = [
         expected.scenario_id
         for expected, current in zip(expected_results, actual_results)
-        if expected != current
+        if checker_verdict(expected) != checker_verdict(current)
     ]
     name_differences = [
         {"collection": collection, "id": entity.id, "actual": entity.name, "expected": target.name}
@@ -219,6 +231,7 @@ def compare_reading(plan: PlanMap, truth: PlanMap) -> dict:
     ]
     compared_fields = len(wanted.keys() | actual.keys())
     return {
+        "measurement_version": MEASUREMENT_VERSION,
         "aligned_field_matches": matches,
         "truth_fields": len(wanted),
         "compared_fields": compared_fields,

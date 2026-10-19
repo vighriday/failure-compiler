@@ -65,22 +65,15 @@
           "status": "passed"
         }
       ],
-      "matches": 28,
-      "truth_fields": 62,
-      "field_match_percent": 45.16,
+      "truth_fields": 50,
       "mismatches": [
         {
-          "field": "deliveries.delivery-supply-truck.arrives_at",
+          "field": "deliveries.delivery-supplies.arrives_at",
           "expected": 540,
           "actual": "<missing>"
         },
         {
-          "field": "deliveries.delivery-supply-truck.name",
-          "expected": "Supply truck",
-          "actual": "<missing>"
-        },
-        {
-          "field": "deliveries.delivery-supply-truck.place_id",
+          "field": "deliveries.delivery-supplies.place_id",
           "expected": "place-loading-area",
           "actual": "<missing>"
         },
@@ -105,311 +98,95 @@
           "actual": 0
         },
         {
-          "field": "places.place-hall.name",
-          "expected": "<not in truth>",
-          "actual": "Hall"
-        },
-        {
-          "field": "places.place-hall.needs_key",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-hall.one_vehicle_at_a_time",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-hall.opens_at",
-          "expected": "<not in truth>",
-          "actual": 540
-        },
-        {
-          "field": "places.place-loading-area.name",
-          "expected": "Loading area",
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.needs_key",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.one_vehicle_at_a_time",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.opens_at",
-          "expected": 540,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.driver_ids",
-          "expected": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.households",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
           "field": "routes.route-a.loader_ids",
           "expected": [
+            "person-anita",
             "person-joel",
             "person-maya",
-            "person-anita",
             "person-ravi"
           ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.name",
-          "expected": "A",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.vehicle_id",
-          "expected": "vehicle-car",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.drive_minutes",
-          "expected": 35,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.driver_ids",
-          "expected": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.households",
-          "expected": 12,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.name",
-          "expected": "B",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.driver_ids",
-          "expected": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.households",
-          "expected": 8,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.name",
-          "expected": "C",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-route-a.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-a.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.households",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.loader_ids",
-          "expected": "<not in truth>",
           "actual": [
             "person-ravi"
           ]
+        }
+      ],
+      "measurement_version": "verdict-v1",
+      "aligned_field_matches": 43,
+      "compared_fields": 50,
+      "aligned_field_match_percent": 86.0,
+      "checker_matches": 87,
+      "checker_total": 100,
+      "different_scenarios": [
+        "volunteer_absent__person-ravi",
+        "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+        "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+        "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+        "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+        "volunteer_absent__person-ravi+place_blocked__place-loading-area"
+      ],
+      "naming_only": [
+        {
+          "collection": "vehicles",
+          "id": "vehicle-van",
+          "actual": "van",
+          "expected": "Van"
         },
         {
-          "field": "routes.route-route-a.name",
-          "expected": "<not in truth>",
-          "actual": "Route A"
+          "collection": "vehicles",
+          "id": "vehicle-car",
+          "actual": "car",
+          "expected": "Car"
         },
         {
-          "field": "routes.route-route-a.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-car"
+          "collection": "places",
+          "id": "place-loading-area",
+          "actual": "Hall",
+          "expected": "Loading area"
         },
         {
-          "field": "routes.route-route-b.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 35
+          "collection": "routes",
+          "id": "route-a",
+          "actual": "Route A",
+          "expected": "A"
         },
         {
-          "field": "routes.route-route-b.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ]
+          "collection": "routes",
+          "id": "route-b",
+          "actual": "Route B",
+          "expected": "B"
         },
         {
-          "field": "routes.route-route-b.households",
-          "expected": "<not in truth>",
-          "actual": 12
-        },
+          "collection": "routes",
+          "id": "route-c",
+          "actual": "Route C",
+          "expected": "C"
+        }
+      ],
+      "alignment": {
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
+        "person-joel": "person-joel",
+        "person-ravi": "person-ravi",
+        "person-sam": "person-sam",
+        "person-anita": "person-anita",
+        "person-maya": "person-maya",
+        "vehicle-car": "vehicle-car",
+        "vehicle-van": "vehicle-van",
+        "place-hall": "place-loading-area"
+      },
+      "unmatched_roles": [
         {
-          "field": "routes.route-route-b.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-b.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.name",
-          "expected": "<not in truth>",
-          "actual": "Route B"
-        },
-        {
-          "field": "routes.route-route-b.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "routes.route-route-c.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-c.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.households",
-          "expected": "<not in truth>",
-          "actual": 8
-        },
-        {
-          "field": "routes.route-route-c.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-c.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.name",
-          "expected": "<not in truth>",
-          "actual": "Route C"
-        },
-        {
-          "field": "routes.route-route-c.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "vehicles.vehicle-car.name",
-          "expected": "Car",
-          "actual": "car"
-        },
-        {
-          "field": "vehicles.vehicle-van.name",
-          "expected": "Van",
-          "actual": "van"
+          "collection": "deliveries",
+          "id": "delivery-supplies",
+          "reason": "Missing role"
         }
       ]
     },
@@ -477,15 +254,8 @@
           "status": "passed"
         }
       ],
-      "matches": 30,
-      "truth_fields": 62,
-      "field_match_percent": 48.39,
+      "truth_fields": 50,
       "mismatches": [
-        {
-          "field": "deliveries.delivery-supply-truck.place_id",
-          "expected": "place-loading-area",
-          "actual": "place-hall"
-        },
         {
           "field": "people.person-anita.available_from",
           "expected": 540,
@@ -507,313 +277,92 @@
           "actual": 0
         },
         {
-          "field": "places.place-hall.name",
-          "expected": "<not in truth>",
-          "actual": "Hall"
-        },
-        {
-          "field": "places.place-hall.needs_key",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-hall.one_vehicle_at_a_time",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-hall.opens_at",
-          "expected": "<not in truth>",
-          "actual": 540
-        },
-        {
-          "field": "places.place-loading-area.name",
-          "expected": "Loading area",
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.needs_key",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.one_vehicle_at_a_time",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.opens_at",
-          "expected": 540,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.driver_ids",
-          "expected": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.households",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
           "field": "routes.route-a.loader_ids",
           "expected": [
+            "person-anita",
             "person-joel",
             "person-maya",
-            "person-anita",
             "person-ravi"
           ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.name",
-          "expected": "A",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.vehicle_id",
-          "expected": "vehicle-car",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.drive_minutes",
-          "expected": 35,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.driver_ids",
-          "expected": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.households",
-          "expected": 12,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.name",
-          "expected": "B",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.driver_ids",
-          "expected": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.households",
-          "expected": 8,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.name",
-          "expected": "C",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-route-a.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-a.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.households",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.loader_ids",
-          "expected": "<not in truth>",
           "actual": [
             "person-ravi"
           ]
-        },
-        {
-          "field": "routes.route-route-a.name",
-          "expected": "<not in truth>",
-          "actual": "Route A"
-        },
-        {
-          "field": "routes.route-route-a.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-car"
-        },
-        {
-          "field": "routes.route-route-b.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 35
-        },
-        {
-          "field": "routes.route-route-b.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.households",
-          "expected": "<not in truth>",
-          "actual": 12
-        },
-        {
-          "field": "routes.route-route-b.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-b.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.name",
-          "expected": "<not in truth>",
-          "actual": "Route B"
-        },
-        {
-          "field": "routes.route-route-b.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "routes.route-route-c.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-c.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.households",
-          "expected": "<not in truth>",
-          "actual": 8
-        },
-        {
-          "field": "routes.route-route-c.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-c.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.name",
-          "expected": "<not in truth>",
-          "actual": "Route C"
-        },
-        {
-          "field": "routes.route-route-c.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "vehicles.vehicle-car.name",
-          "expected": "Car",
-          "actual": "car"
-        },
-        {
-          "field": "vehicles.vehicle-van.name",
-          "expected": "Van",
-          "actual": "van"
         }
-      ]
+      ],
+      "measurement_version": "verdict-v1",
+      "aligned_field_matches": 45,
+      "compared_fields": 50,
+      "aligned_field_match_percent": 90.0,
+      "checker_matches": 87,
+      "checker_total": 100,
+      "different_scenarios": [
+        "volunteer_absent__person-ravi",
+        "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+        "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+        "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+        "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+        "volunteer_absent__person-ravi+place_blocked__place-loading-area"
+      ],
+      "naming_only": [
+        {
+          "collection": "vehicles",
+          "id": "vehicle-van",
+          "actual": "van",
+          "expected": "Van"
+        },
+        {
+          "collection": "vehicles",
+          "id": "vehicle-car",
+          "actual": "car",
+          "expected": "Car"
+        },
+        {
+          "collection": "places",
+          "id": "place-loading-area",
+          "actual": "Hall",
+          "expected": "Loading area"
+        },
+        {
+          "collection": "routes",
+          "id": "route-a",
+          "actual": "Route A",
+          "expected": "A"
+        },
+        {
+          "collection": "routes",
+          "id": "route-b",
+          "actual": "Route B",
+          "expected": "B"
+        },
+        {
+          "collection": "routes",
+          "id": "route-c",
+          "actual": "Route C",
+          "expected": "C"
+        }
+      ],
+      "alignment": {
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
+        "person-joel": "person-joel",
+        "person-ravi": "person-ravi",
+        "person-sam": "person-sam",
+        "person-anita": "person-anita",
+        "person-maya": "person-maya",
+        "vehicle-car": "vehicle-car",
+        "vehicle-van": "vehicle-van",
+        "place-hall": "place-loading-area",
+        "delivery-supply-truck": "delivery-supplies"
+      },
+      "unmatched_roles": []
     },
     {
       "provider": "groq",
@@ -879,22 +428,15 @@
           "status": "passed"
         }
       ],
-      "matches": 28,
-      "truth_fields": 62,
-      "field_match_percent": 45.16,
+      "truth_fields": 50,
       "mismatches": [
         {
-          "field": "deliveries.delivery-supply-truck.arrives_at",
+          "field": "deliveries.delivery-supplies.arrives_at",
           "expected": 540,
           "actual": "<missing>"
         },
         {
-          "field": "deliveries.delivery-supply-truck.name",
-          "expected": "Supply truck",
-          "actual": "<missing>"
-        },
-        {
-          "field": "deliveries.delivery-supply-truck.place_id",
+          "field": "deliveries.delivery-supplies.place_id",
           "expected": "place-loading-area",
           "actual": "<missing>"
         },
@@ -919,311 +461,95 @@
           "actual": 0
         },
         {
-          "field": "places.place-hall.name",
-          "expected": "<not in truth>",
-          "actual": "Hall"
-        },
-        {
-          "field": "places.place-hall.needs_key",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-hall.one_vehicle_at_a_time",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-hall.opens_at",
-          "expected": "<not in truth>",
-          "actual": 540
-        },
-        {
-          "field": "places.place-loading-area.name",
-          "expected": "Loading area",
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.needs_key",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.one_vehicle_at_a_time",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.opens_at",
-          "expected": 540,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.driver_ids",
-          "expected": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.households",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
           "field": "routes.route-a.loader_ids",
           "expected": [
+            "person-anita",
             "person-joel",
             "person-maya",
-            "person-anita",
             "person-ravi"
           ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.name",
-          "expected": "A",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.vehicle_id",
-          "expected": "vehicle-car",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.drive_minutes",
-          "expected": 35,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.driver_ids",
-          "expected": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.households",
-          "expected": 12,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.name",
-          "expected": "B",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.driver_ids",
-          "expected": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.households",
-          "expected": 8,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.name",
-          "expected": "C",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-route-a.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-a.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.households",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.loader_ids",
-          "expected": "<not in truth>",
           "actual": [
             "person-ravi"
           ]
+        }
+      ],
+      "measurement_version": "verdict-v1",
+      "aligned_field_matches": 43,
+      "compared_fields": 50,
+      "aligned_field_match_percent": 86.0,
+      "checker_matches": 87,
+      "checker_total": 100,
+      "different_scenarios": [
+        "volunteer_absent__person-ravi",
+        "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+        "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+        "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+        "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+        "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+        "volunteer_absent__person-ravi+place_blocked__place-loading-area"
+      ],
+      "naming_only": [
+        {
+          "collection": "vehicles",
+          "id": "vehicle-van",
+          "actual": "van",
+          "expected": "Van"
         },
         {
-          "field": "routes.route-route-a.name",
-          "expected": "<not in truth>",
-          "actual": "Route A"
+          "collection": "vehicles",
+          "id": "vehicle-car",
+          "actual": "car",
+          "expected": "Car"
         },
         {
-          "field": "routes.route-route-a.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-car"
+          "collection": "places",
+          "id": "place-loading-area",
+          "actual": "Hall",
+          "expected": "Loading area"
         },
         {
-          "field": "routes.route-route-b.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 35
+          "collection": "routes",
+          "id": "route-a",
+          "actual": "Route A",
+          "expected": "A"
         },
         {
-          "field": "routes.route-route-b.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ]
+          "collection": "routes",
+          "id": "route-b",
+          "actual": "Route B",
+          "expected": "B"
         },
         {
-          "field": "routes.route-route-b.households",
-          "expected": "<not in truth>",
-          "actual": 12
-        },
+          "collection": "routes",
+          "id": "route-c",
+          "actual": "Route C",
+          "expected": "C"
+        }
+      ],
+      "alignment": {
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
+        "person-joel": "person-joel",
+        "person-ravi": "person-ravi",
+        "person-sam": "person-sam",
+        "person-anita": "person-anita",
+        "person-maya": "person-maya",
+        "vehicle-car": "vehicle-car",
+        "vehicle-van": "vehicle-van",
+        "place-hall": "place-loading-area"
+      },
+      "unmatched_roles": [
         {
-          "field": "routes.route-route-b.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-b.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.name",
-          "expected": "<not in truth>",
-          "actual": "Route B"
-        },
-        {
-          "field": "routes.route-route-b.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "routes.route-route-c.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-c.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.households",
-          "expected": "<not in truth>",
-          "actual": 8
-        },
-        {
-          "field": "routes.route-route-c.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-c.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.name",
-          "expected": "<not in truth>",
-          "actual": "Route C"
-        },
-        {
-          "field": "routes.route-route-c.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "vehicles.vehicle-car.name",
-          "expected": "Car",
-          "actual": "car"
-        },
-        {
-          "field": "vehicles.vehicle-van.name",
-          "expected": "Van",
-          "actual": "van"
+          "collection": "deliveries",
+          "id": "delivery-supplies",
+          "reason": "Missing role"
         }
       ]
     },
@@ -1516,316 +842,56 @@
           "status": "passed"
         }
       ],
-      "matches": 36,
-      "truth_fields": 62,
-      "field_match_percent": 58.06,
-      "mismatches": [
+      "truth_fields": 50,
+      "mismatches": [],
+      "measurement_version": "verdict-v1",
+      "aligned_field_matches": 50,
+      "compared_fields": 50,
+      "aligned_field_match_percent": 100.0,
+      "checker_matches": 100,
+      "checker_total": 100,
+      "different_scenarios": [],
+      "naming_only": [
         {
-          "field": "deliveries.delivery-supply-truck.place_id",
-          "expected": "place-loading-area",
-          "actual": "place-loading-bay"
+          "collection": "places",
+          "id": "place-loading-area",
+          "actual": "Loading bay",
+          "expected": "Loading area"
         },
         {
-          "field": "places.place-loading-area.name",
-          "expected": "Loading area",
-          "actual": "<missing>"
+          "collection": "routes",
+          "id": "route-a",
+          "actual": "Route A",
+          "expected": "A"
         },
         {
-          "field": "places.place-loading-area.needs_key",
-          "expected": true,
-          "actual": "<missing>"
+          "collection": "routes",
+          "id": "route-b",
+          "actual": "Route B",
+          "expected": "B"
         },
         {
-          "field": "places.place-loading-area.one_vehicle_at_a_time",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.opens_at",
-          "expected": 540,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-bay.name",
-          "expected": "<not in truth>",
-          "actual": "Loading bay"
-        },
-        {
-          "field": "places.place-loading-bay.needs_key",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-loading-bay.one_vehicle_at_a_time",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-loading-bay.opens_at",
-          "expected": "<not in truth>",
-          "actual": 540
-        },
-        {
-          "field": "routes.route-a.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.driver_ids",
-          "expected": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.households",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-maya",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.name",
-          "expected": "A",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.vehicle_id",
-          "expected": "vehicle-car",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.drive_minutes",
-          "expected": 35,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.driver_ids",
-          "expected": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.households",
-          "expected": 12,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.name",
-          "expected": "B",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.driver_ids",
-          "expected": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.households",
-          "expected": 8,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.name",
-          "expected": "C",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-route-a.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-a.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.households",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.name",
-          "expected": "<not in truth>",
-          "actual": "Route A"
-        },
-        {
-          "field": "routes.route-route-a.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-car"
-        },
-        {
-          "field": "routes.route-route-b.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 35
-        },
-        {
-          "field": "routes.route-route-b.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.households",
-          "expected": "<not in truth>",
-          "actual": 12
-        },
-        {
-          "field": "routes.route-route-b.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-b.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.name",
-          "expected": "<not in truth>",
-          "actual": "Route B"
-        },
-        {
-          "field": "routes.route-route-b.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "routes.route-route-c.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-c.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.households",
-          "expected": "<not in truth>",
-          "actual": 8
-        },
-        {
-          "field": "routes.route-route-c.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-c.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.name",
-          "expected": "<not in truth>",
-          "actual": "Route C"
-        },
-        {
-          "field": "routes.route-route-c.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
+          "collection": "routes",
+          "id": "route-c",
+          "actual": "Route C",
+          "expected": "C"
         }
-      ]
+      ],
+      "alignment": {
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
+        "person-joel": "person-joel",
+        "person-ravi": "person-ravi",
+        "person-sam": "person-sam",
+        "person-anita": "person-anita",
+        "person-maya": "person-maya",
+        "vehicle-car": "vehicle-car",
+        "vehicle-van": "vehicle-van",
+        "place-loading-bay": "place-loading-area",
+        "delivery-supply-truck": "delivery-supplies"
+      },
+      "unmatched_roles": []
     },
     {
       "provider": "gemini",
@@ -2108,316 +1174,56 @@
           "status": "passed"
         }
       ],
-      "matches": 36,
-      "truth_fields": 62,
-      "field_match_percent": 58.06,
-      "mismatches": [
+      "truth_fields": 50,
+      "mismatches": [],
+      "measurement_version": "verdict-v1",
+      "aligned_field_matches": 50,
+      "compared_fields": 50,
+      "aligned_field_match_percent": 100.0,
+      "checker_matches": 100,
+      "checker_total": 100,
+      "different_scenarios": [],
+      "naming_only": [
         {
-          "field": "deliveries.delivery-supply-truck.place_id",
-          "expected": "place-loading-area",
-          "actual": "place-loading-bay"
+          "collection": "places",
+          "id": "place-loading-area",
+          "actual": "Loading bay",
+          "expected": "Loading area"
         },
         {
-          "field": "places.place-loading-area.name",
-          "expected": "Loading area",
-          "actual": "<missing>"
+          "collection": "routes",
+          "id": "route-a",
+          "actual": "Route A",
+          "expected": "A"
         },
         {
-          "field": "places.place-loading-area.needs_key",
-          "expected": true,
-          "actual": "<missing>"
+          "collection": "routes",
+          "id": "route-b",
+          "actual": "Route B",
+          "expected": "B"
         },
         {
-          "field": "places.place-loading-area.one_vehicle_at_a_time",
-          "expected": true,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-area.opens_at",
-          "expected": 540,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-bay.name",
-          "expected": "<not in truth>",
-          "actual": "Loading bay"
-        },
-        {
-          "field": "places.place-loading-bay.needs_key",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-loading-bay.one_vehicle_at_a_time",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-loading-bay.opens_at",
-          "expected": "<not in truth>",
-          "actual": 540
-        },
-        {
-          "field": "routes.route-a.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.driver_ids",
-          "expected": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.households",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-maya",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.name",
-          "expected": "A",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.vehicle_id",
-          "expected": "vehicle-car",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.drive_minutes",
-          "expected": 35,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.driver_ids",
-          "expected": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.households",
-          "expected": 12,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.name",
-          "expected": "B",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.driver_ids",
-          "expected": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.households",
-          "expected": 8,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.name",
-          "expected": "C",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-route-a.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-a.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.households",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-a.name",
-          "expected": "<not in truth>",
-          "actual": "Route A"
-        },
-        {
-          "field": "routes.route-route-a.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-car"
-        },
-        {
-          "field": "routes.route-route-b.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 35
-        },
-        {
-          "field": "routes.route-route-b.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.households",
-          "expected": "<not in truth>",
-          "actual": 12
-        },
-        {
-          "field": "routes.route-route-b.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-b.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-b.name",
-          "expected": "<not in truth>",
-          "actual": "Route B"
-        },
-        {
-          "field": "routes.route-route-b.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "routes.route-route-c.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-c.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.households",
-          "expected": "<not in truth>",
-          "actual": 8
-        },
-        {
-          "field": "routes.route-route-c.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-c.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-route-c.name",
-          "expected": "<not in truth>",
-          "actual": "Route C"
-        },
-        {
-          "field": "routes.route-route-c.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
+          "collection": "routes",
+          "id": "route-c",
+          "actual": "Route C",
+          "expected": "C"
         }
-      ]
+      ],
+      "alignment": {
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
+        "person-joel": "person-joel",
+        "person-ravi": "person-ravi",
+        "person-sam": "person-sam",
+        "person-anita": "person-anita",
+        "person-maya": "person-maya",
+        "vehicle-car": "vehicle-car",
+        "vehicle-van": "vehicle-van",
+        "place-loading-bay": "place-loading-area",
+        "delivery-supply-truck": "delivery-supplies"
+      },
+      "unmatched_roles": []
     },
     {
       "provider": "gemini",
@@ -2708,321 +1514,2073 @@
           "status": "passed"
         }
       ],
-      "matches": 36,
-      "truth_fields": 62,
-      "field_match_percent": 58.06,
-      "mismatches": [
+      "truth_fields": 50,
+      "mismatches": [],
+      "measurement_version": "verdict-v1",
+      "aligned_field_matches": 50,
+      "compared_fields": 50,
+      "aligned_field_match_percent": 100.0,
+      "checker_matches": 100,
+      "checker_total": 100,
+      "different_scenarios": [],
+      "naming_only": [
         {
-          "field": "deliveries.delivery-supply-truck.place_id",
-          "expected": "place-loading-area",
-          "actual": "place-loading-bay"
+          "collection": "places",
+          "id": "place-loading-area",
+          "actual": "Loading bay",
+          "expected": "Loading area"
         },
         {
-          "field": "places.place-loading-area.name",
-          "expected": "Loading area",
-          "actual": "<missing>"
+          "collection": "routes",
+          "id": "route-a",
+          "actual": "Route A",
+          "expected": "A"
         },
         {
-          "field": "places.place-loading-area.needs_key",
-          "expected": true,
-          "actual": "<missing>"
+          "collection": "routes",
+          "id": "route-b",
+          "actual": "Route B",
+          "expected": "B"
         },
         {
-          "field": "places.place-loading-area.one_vehicle_at_a_time",
-          "expected": true,
-          "actual": "<missing>"
-        },
+          "collection": "routes",
+          "id": "route-c",
+          "actual": "Route C",
+          "expected": "C"
+        }
+      ],
+      "alignment": {
+        "route-a": "route-a",
+        "route-b": "route-b",
+        "route-c": "route-c",
+        "person-joel": "person-joel",
+        "person-ravi": "person-ravi",
+        "person-sam": "person-sam",
+        "person-anita": "person-anita",
+        "person-maya": "person-maya",
+        "vehicle-car": "vehicle-car",
+        "vehicle-van": "vehicle-van",
+        "place-loading-bay": "place-loading-area",
+        "delivery-supply-truck": "delivery-supplies"
+      },
+      "unmatched_roles": []
+    }
+  ],
+  "winner": "gemini",
+  "rescored_at": "2026-10-19T14:34:59.161101+00:00",
+  "measurement_history": [
+    {
+      "measurement_version": "full-result-or-exact-name-legacy",
+      "ranking": null,
+      "winner": "gemini",
+      "mean_field_match_percent": {
+        "groq": 46.24,
+        "gemini": 58.06
+      },
+      "readings": [
         {
-          "field": "places.place-loading-area.opens_at",
-          "expected": 540,
-          "actual": "<missing>"
-        },
-        {
-          "field": "places.place-loading-bay.name",
-          "expected": "<not in truth>",
-          "actual": "Loading bay"
-        },
-        {
-          "field": "places.place-loading-bay.needs_key",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-loading-bay.one_vehicle_at_a_time",
-          "expected": "<not in truth>",
-          "actual": true
-        },
-        {
-          "field": "places.place-loading-bay.opens_at",
-          "expected": "<not in truth>",
-          "actual": 540
-        },
-        {
-          "field": "routes.route-a.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.driver_ids",
-          "expected": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.households",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-maya",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.name",
-          "expected": "A",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-a.vehicle_id",
-          "expected": "vehicle-car",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.drive_minutes",
-          "expected": 35,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.driver_ids",
-          "expected": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.households",
-          "expected": 12,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.name",
-          "expected": "B",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-b.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.drive_minutes",
-          "expected": 60,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.driver_ids",
-          "expected": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.households",
-          "expected": 8,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.load_minutes",
-          "expected": 10,
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.name",
-          "expected": "C",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-c.vehicle_id",
-          "expected": "vehicle-van",
-          "actual": "<missing>"
-        },
-        {
-          "field": "routes.route-route-a.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-a.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-ravi",
-            "person-maya",
-            "person-joel"
+          "provider": "groq",
+          "reading": 1,
+          "matches": 28,
+          "truth_fields": 62,
+          "field_match_percent": 45.16,
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supply-truck.arrives_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "deliveries.delivery-supply-truck.name",
+              "expected": "Supply truck",
+              "actual": "<missing>"
+            },
+            {
+              "field": "deliveries.delivery-supply-truck.place_id",
+              "expected": "place-loading-area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "people.person-anita.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-maya.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-ravi.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-sam.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "places.place-hall.name",
+              "expected": "<not in truth>",
+              "actual": "Hall"
+            },
+            {
+              "field": "places.place-hall.needs_key",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-hall.one_vehicle_at_a_time",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-hall.opens_at",
+              "expected": "<not in truth>",
+              "actual": 540
+            },
+            {
+              "field": "places.place-loading-area.name",
+              "expected": "Loading area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.needs_key",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.one_vehicle_at_a_time",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.opens_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.driver_ids",
+              "expected": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.households",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.name",
+              "expected": "A",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.vehicle_id",
+              "expected": "vehicle-car",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.drive_minutes",
+              "expected": 35,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.driver_ids",
+              "expected": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.households",
+              "expected": 12,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.name",
+              "expected": "B",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.driver_ids",
+              "expected": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.households",
+              "expected": 8,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.name",
+              "expected": "C",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-route-a.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-a.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.households",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.name",
+              "expected": "<not in truth>",
+              "actual": "Route A"
+            },
+            {
+              "field": "routes.route-route-a.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-car"
+            },
+            {
+              "field": "routes.route-route-b.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 35
+            },
+            {
+              "field": "routes.route-route-b.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.households",
+              "expected": "<not in truth>",
+              "actual": 12
+            },
+            {
+              "field": "routes.route-route-b.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-b.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.name",
+              "expected": "<not in truth>",
+              "actual": "Route B"
+            },
+            {
+              "field": "routes.route-route-b.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "routes.route-route-c.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-c.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.households",
+              "expected": "<not in truth>",
+              "actual": 8
+            },
+            {
+              "field": "routes.route-route-c.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-c.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.name",
+              "expected": "<not in truth>",
+              "actual": "Route C"
+            },
+            {
+              "field": "routes.route-route-c.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "vehicles.vehicle-car.name",
+              "expected": "Car",
+              "actual": "car"
+            },
+            {
+              "field": "vehicles.vehicle-van.name",
+              "expected": "Van",
+              "actual": "van"
+            }
           ]
         },
         {
-          "field": "routes.route-route-a.households",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-a.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya",
-            "person-ravi"
+          "provider": "groq",
+          "reading": 2,
+          "matches": 30,
+          "truth_fields": 62,
+          "field_match_percent": 48.39,
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supply-truck.place_id",
+              "expected": "place-loading-area",
+              "actual": "place-hall"
+            },
+            {
+              "field": "people.person-anita.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-maya.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-ravi.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-sam.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "places.place-hall.name",
+              "expected": "<not in truth>",
+              "actual": "Hall"
+            },
+            {
+              "field": "places.place-hall.needs_key",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-hall.one_vehicle_at_a_time",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-hall.opens_at",
+              "expected": "<not in truth>",
+              "actual": 540
+            },
+            {
+              "field": "places.place-loading-area.name",
+              "expected": "Loading area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.needs_key",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.one_vehicle_at_a_time",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.opens_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.driver_ids",
+              "expected": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.households",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.name",
+              "expected": "A",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.vehicle_id",
+              "expected": "vehicle-car",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.drive_minutes",
+              "expected": 35,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.driver_ids",
+              "expected": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.households",
+              "expected": 12,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.name",
+              "expected": "B",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.driver_ids",
+              "expected": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.households",
+              "expected": 8,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.name",
+              "expected": "C",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-route-a.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-a.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.households",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.name",
+              "expected": "<not in truth>",
+              "actual": "Route A"
+            },
+            {
+              "field": "routes.route-route-a.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-car"
+            },
+            {
+              "field": "routes.route-route-b.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 35
+            },
+            {
+              "field": "routes.route-route-b.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.households",
+              "expected": "<not in truth>",
+              "actual": 12
+            },
+            {
+              "field": "routes.route-route-b.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-b.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.name",
+              "expected": "<not in truth>",
+              "actual": "Route B"
+            },
+            {
+              "field": "routes.route-route-b.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "routes.route-route-c.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-c.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.households",
+              "expected": "<not in truth>",
+              "actual": 8
+            },
+            {
+              "field": "routes.route-route-c.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-c.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.name",
+              "expected": "<not in truth>",
+              "actual": "Route C"
+            },
+            {
+              "field": "routes.route-route-c.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "vehicles.vehicle-car.name",
+              "expected": "Car",
+              "actual": "car"
+            },
+            {
+              "field": "vehicles.vehicle-van.name",
+              "expected": "Van",
+              "actual": "van"
+            }
           ]
         },
         {
-          "field": "routes.route-route-a.name",
-          "expected": "<not in truth>",
-          "actual": "Route A"
-        },
-        {
-          "field": "routes.route-route-a.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-car"
-        },
-        {
-          "field": "routes.route-route-b.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 35
-        },
-        {
-          "field": "routes.route-route-b.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-sam",
-            "person-anita",
-            "person-ravi"
+          "provider": "groq",
+          "reading": 3,
+          "matches": 28,
+          "truth_fields": 62,
+          "field_match_percent": 45.16,
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supply-truck.arrives_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "deliveries.delivery-supply-truck.name",
+              "expected": "Supply truck",
+              "actual": "<missing>"
+            },
+            {
+              "field": "deliveries.delivery-supply-truck.place_id",
+              "expected": "place-loading-area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "people.person-anita.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-maya.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-ravi.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-sam.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "places.place-hall.name",
+              "expected": "<not in truth>",
+              "actual": "Hall"
+            },
+            {
+              "field": "places.place-hall.needs_key",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-hall.one_vehicle_at_a_time",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-hall.opens_at",
+              "expected": "<not in truth>",
+              "actual": 540
+            },
+            {
+              "field": "places.place-loading-area.name",
+              "expected": "Loading area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.needs_key",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.one_vehicle_at_a_time",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.opens_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.driver_ids",
+              "expected": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.households",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.name",
+              "expected": "A",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.vehicle_id",
+              "expected": "vehicle-car",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.drive_minutes",
+              "expected": 35,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.driver_ids",
+              "expected": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.households",
+              "expected": 12,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.name",
+              "expected": "B",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.driver_ids",
+              "expected": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.households",
+              "expected": 8,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.name",
+              "expected": "C",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-route-a.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-a.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.households",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.name",
+              "expected": "<not in truth>",
+              "actual": "Route A"
+            },
+            {
+              "field": "routes.route-route-a.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-car"
+            },
+            {
+              "field": "routes.route-route-b.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 35
+            },
+            {
+              "field": "routes.route-route-b.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.households",
+              "expected": "<not in truth>",
+              "actual": 12
+            },
+            {
+              "field": "routes.route-route-b.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-b.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.name",
+              "expected": "<not in truth>",
+              "actual": "Route B"
+            },
+            {
+              "field": "routes.route-route-b.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "routes.route-route-c.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-c.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.households",
+              "expected": "<not in truth>",
+              "actual": 8
+            },
+            {
+              "field": "routes.route-route-c.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-c.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.name",
+              "expected": "<not in truth>",
+              "actual": "Route C"
+            },
+            {
+              "field": "routes.route-route-c.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "vehicles.vehicle-car.name",
+              "expected": "Car",
+              "actual": "car"
+            },
+            {
+              "field": "vehicles.vehicle-van.name",
+              "expected": "Van",
+              "actual": "van"
+            }
           ]
         },
         {
-          "field": "routes.route-route-b.households",
-          "expected": "<not in truth>",
-          "actual": 12
-        },
-        {
-          "field": "routes.route-route-b.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-b.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
+          "provider": "gemini",
+          "reading": 1,
+          "matches": 36,
+          "truth_fields": 62,
+          "field_match_percent": 58.06,
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supply-truck.place_id",
+              "expected": "place-loading-area",
+              "actual": "place-loading-bay"
+            },
+            {
+              "field": "places.place-loading-area.name",
+              "expected": "Loading area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.needs_key",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.one_vehicle_at_a_time",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.opens_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-bay.name",
+              "expected": "<not in truth>",
+              "actual": "Loading bay"
+            },
+            {
+              "field": "places.place-loading-bay.needs_key",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-loading-bay.one_vehicle_at_a_time",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-loading-bay.opens_at",
+              "expected": "<not in truth>",
+              "actual": 540
+            },
+            {
+              "field": "routes.route-a.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.driver_ids",
+              "expected": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.households",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.name",
+              "expected": "A",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.vehicle_id",
+              "expected": "vehicle-car",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.drive_minutes",
+              "expected": 35,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.driver_ids",
+              "expected": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.households",
+              "expected": 12,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.name",
+              "expected": "B",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.driver_ids",
+              "expected": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.households",
+              "expected": 8,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.name",
+              "expected": "C",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-route-a.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-a.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.households",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.name",
+              "expected": "<not in truth>",
+              "actual": "Route A"
+            },
+            {
+              "field": "routes.route-route-a.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-car"
+            },
+            {
+              "field": "routes.route-route-b.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 35
+            },
+            {
+              "field": "routes.route-route-b.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.households",
+              "expected": "<not in truth>",
+              "actual": 12
+            },
+            {
+              "field": "routes.route-route-b.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-b.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.name",
+              "expected": "<not in truth>",
+              "actual": "Route B"
+            },
+            {
+              "field": "routes.route-route-b.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "routes.route-route-c.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-c.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.households",
+              "expected": "<not in truth>",
+              "actual": 8
+            },
+            {
+              "field": "routes.route-route-c.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-c.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.name",
+              "expected": "<not in truth>",
+              "actual": "Route C"
+            },
+            {
+              "field": "routes.route-route-c.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            }
           ]
         },
         {
-          "field": "routes.route-route-b.name",
-          "expected": "<not in truth>",
-          "actual": "Route B"
-        },
-        {
-          "field": "routes.route-route-b.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
-        },
-        {
-          "field": "routes.route-route-c.drive_minutes",
-          "expected": "<not in truth>",
-          "actual": 60
-        },
-        {
-          "field": "routes.route-route-c.driver_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-anita",
-            "person-sam",
-            "person-ravi"
+          "provider": "gemini",
+          "reading": 2,
+          "matches": 36,
+          "truth_fields": 62,
+          "field_match_percent": 58.06,
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supply-truck.place_id",
+              "expected": "place-loading-area",
+              "actual": "place-loading-bay"
+            },
+            {
+              "field": "places.place-loading-area.name",
+              "expected": "Loading area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.needs_key",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.one_vehicle_at_a_time",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.opens_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-bay.name",
+              "expected": "<not in truth>",
+              "actual": "Loading bay"
+            },
+            {
+              "field": "places.place-loading-bay.needs_key",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-loading-bay.one_vehicle_at_a_time",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-loading-bay.opens_at",
+              "expected": "<not in truth>",
+              "actual": 540
+            },
+            {
+              "field": "routes.route-a.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.driver_ids",
+              "expected": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.households",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.name",
+              "expected": "A",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.vehicle_id",
+              "expected": "vehicle-car",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.drive_minutes",
+              "expected": 35,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.driver_ids",
+              "expected": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.households",
+              "expected": 12,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.name",
+              "expected": "B",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.driver_ids",
+              "expected": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.households",
+              "expected": 8,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.name",
+              "expected": "C",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-route-a.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-a.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.households",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.name",
+              "expected": "<not in truth>",
+              "actual": "Route A"
+            },
+            {
+              "field": "routes.route-route-a.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-car"
+            },
+            {
+              "field": "routes.route-route-b.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 35
+            },
+            {
+              "field": "routes.route-route-b.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.households",
+              "expected": "<not in truth>",
+              "actual": 12
+            },
+            {
+              "field": "routes.route-route-b.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-b.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.name",
+              "expected": "<not in truth>",
+              "actual": "Route B"
+            },
+            {
+              "field": "routes.route-route-b.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "routes.route-route-c.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-c.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.households",
+              "expected": "<not in truth>",
+              "actual": 8
+            },
+            {
+              "field": "routes.route-route-c.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-c.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.name",
+              "expected": "<not in truth>",
+              "actual": "Route C"
+            },
+            {
+              "field": "routes.route-route-c.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            }
           ]
         },
         {
-          "field": "routes.route-route-c.households",
-          "expected": "<not in truth>",
-          "actual": 8
-        },
-        {
-          "field": "routes.route-route-c.load_minutes",
-          "expected": "<not in truth>",
-          "actual": 10
-        },
-        {
-          "field": "routes.route-route-c.loader_ids",
-          "expected": "<not in truth>",
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
+          "provider": "gemini",
+          "reading": 3,
+          "matches": 36,
+          "truth_fields": 62,
+          "field_match_percent": 58.06,
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supply-truck.place_id",
+              "expected": "place-loading-area",
+              "actual": "place-loading-bay"
+            },
+            {
+              "field": "places.place-loading-area.name",
+              "expected": "Loading area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.needs_key",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.one_vehicle_at_a_time",
+              "expected": true,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-area.opens_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "places.place-loading-bay.name",
+              "expected": "<not in truth>",
+              "actual": "Loading bay"
+            },
+            {
+              "field": "places.place-loading-bay.needs_key",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-loading-bay.one_vehicle_at_a_time",
+              "expected": "<not in truth>",
+              "actual": true
+            },
+            {
+              "field": "places.place-loading-bay.opens_at",
+              "expected": "<not in truth>",
+              "actual": 540
+            },
+            {
+              "field": "routes.route-a.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.driver_ids",
+              "expected": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.households",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.name",
+              "expected": "A",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-a.vehicle_id",
+              "expected": "vehicle-car",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.drive_minutes",
+              "expected": 35,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.driver_ids",
+              "expected": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.households",
+              "expected": 12,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.name",
+              "expected": "B",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-b.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.drive_minutes",
+              "expected": 60,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.driver_ids",
+              "expected": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.households",
+              "expected": 8,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.load_minutes",
+              "expected": 10,
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.name",
+              "expected": "C",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-c.vehicle_id",
+              "expected": "vehicle-van",
+              "actual": "<missing>"
+            },
+            {
+              "field": "routes.route-route-a.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-a.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-ravi",
+                "person-maya",
+                "person-joel"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.households",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-a.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-a.name",
+              "expected": "<not in truth>",
+              "actual": "Route A"
+            },
+            {
+              "field": "routes.route-route-a.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-car"
+            },
+            {
+              "field": "routes.route-route-b.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 35
+            },
+            {
+              "field": "routes.route-route-b.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-sam",
+                "person-anita",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.households",
+              "expected": "<not in truth>",
+              "actual": 12
+            },
+            {
+              "field": "routes.route-route-b.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-b.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-b.name",
+              "expected": "<not in truth>",
+              "actual": "Route B"
+            },
+            {
+              "field": "routes.route-route-b.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            },
+            {
+              "field": "routes.route-route-c.drive_minutes",
+              "expected": "<not in truth>",
+              "actual": 60
+            },
+            {
+              "field": "routes.route-route-c.driver_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-anita",
+                "person-sam",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.households",
+              "expected": "<not in truth>",
+              "actual": 8
+            },
+            {
+              "field": "routes.route-route-c.load_minutes",
+              "expected": "<not in truth>",
+              "actual": 10
+            },
+            {
+              "field": "routes.route-route-c.loader_ids",
+              "expected": "<not in truth>",
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-route-c.name",
+              "expected": "<not in truth>",
+              "actual": "Route C"
+            },
+            {
+              "field": "routes.route-route-c.vehicle_id",
+              "expected": "<not in truth>",
+              "actual": "vehicle-van"
+            }
           ]
-        },
-        {
-          "field": "routes.route-route-c.name",
-          "expected": "<not in truth>",
-          "actual": "Route C"
-        },
-        {
-          "field": "routes.route-route-c.vehicle_id",
-          "expected": "<not in truth>",
-          "actual": "vehicle-van"
         }
       ]
     }
   ],
-  "winner": "gemini",
-  "mean_field_match_percent": {
-    "groq": 46.24,
-    "gemini": 58.06
-  }
+  "measurement_version": "verdict-v1",
+  "ranking": [
+    {
+      "provider": "gemini",
+      "checker_mean": 100.0,
+      "aligned_field_mean": 100.0,
+      "consistency_variance": 0.0,
+      "total_tokens": 13047
+    },
+    {
+      "provider": "groq",
+      "checker_mean": 87.0,
+      "aligned_field_mean": 87.33333333333333,
+      "consistency_variance": 3.5555555555555554,
+      "total_tokens": 10282
+    }
+  ]
 }

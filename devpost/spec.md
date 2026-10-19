@@ -210,7 +210,7 @@ Implements `prd.md > Features and Behavior`, `prd.md > The Checker's Three Hones
 - **Vehicles:** available from a time. One route at a time.
 - **Places:** one vehicle loading at a time. The loading area has an `opens_at` time (planned loading start). It can only be used from the later of `opens_at` and the earliest time a key holder is present (if `needs_key` is true). "Place blocked" means blocked from `opens_at` for the chosen minutes.
 - **Deliveries:** loading cannot start before the delivery arrives.
-- **Routes:** households, `load_minutes` (needs a loader present), `drive_minutes` (needs a driver and a vehicle). Jobs are filled only from `driver_ids` and `loader_ids` in the route - primary first, then listed backups. No one else may fill those jobs. Start times can move freely within people's and vehicles' availability windows.
+- **Routes:** households, `load_minutes` (needs a loader present), `drive_minutes` (needs a driver and a vehicle). Jobs are filled only from `driver_ids` and `loader_ids` in the route - drivers primary first, then listed backups; loader lists are eligible sets with no priority. No one else may fill those jobs. Start times can move freely within people's and vehicles' availability windows.
 - **Finish time:** soft deadline. The solver minimises total households-times-minutes-late.
 
 The checker evaluates “Add Maya as backup driver for Route C” and turns it down because the gap is loading, not driving. Its reason is “Van back 10:45. Loading team gone.”
@@ -353,7 +353,7 @@ AIRoute
   drive_minutes:  int
   vehicle_id:     str    # References a Vehicle id
   driver_ids:     list[str]   # Primary first, then backups. References Person ids.
-  loader_ids:     list[str]   # Primary first, then backups. References Person ids.
+  loader_ids:     list[str]   # Eligible set, with no priority. References Person ids.
   source_line:    str
   guessed:        bool
 
@@ -498,7 +498,7 @@ No database. Confirmed maps, test results, and fix suggestion results are held i
 
 `test_checker_monotone.py`: on the example map, asserts that every pair's lateness is at least each of its singles'.
 
-`test_reading_matches_truth.py`: loads the unedited `fixtures/example-reading.json`, checks its saved digest, applies the explicit actions from `example-corrections.json` through the review controls, aligns entities by type and role, then compares every checker input and all 100 full scenario results with `fixtures/example-truth.json`. Names are labels and are excluded. It also asserts that the actual map generates 100 scenarios; extra or missing checker entities must not be silently discarded.
+`test_reading_matches_truth.py`: loads the unedited `fixtures/example-reading.json`, checks its saved digest, applies the explicit actions from `example-corrections.json` through the review controls, aligns entities by type and role, then compares every checker input and all 100 locked scenario verdicts (`state`, `lateness_minutes`, `human_cost`) with `fixtures/example-truth.json`. Names are labels and are excluded. It also asserts that the actual map generates 100 scenarios; extra or missing checker entities must not be silently discarded.
 
 `test_format_gate.py`: bad JSON, extra fields, unknown names, wrong types - all rejected with a specific reason.
 
@@ -506,7 +506,7 @@ No database. Confirmed maps, test results, and fix suggestion results are held i
 
 `test_determinism.py`: runs the example truth map twice and compares every result.
 
-`bakeoff.py`: runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input (including extra inputs), and runs the truth map's 100 scenarios on the aligned reading. It ranks providers by exact full-result matches, aligned field match, consistency, then tokens. It applies no corrections and preserves raw responses and failed attempts. Every prompt version and its scores are logged in `ai-reading-review.md`; the winner becomes primary in `server/config.py` with the date and scores.
+`bakeoff.py`: runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input (including extra inputs), and runs the truth map's 100 scenarios on the aligned reading. It ranks providers by exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned field match, consistency, then tokens. It applies no corrections and preserves raw responses and failed attempts. Every prompt version and its scores are logged in `ai-reading-review.md`; the winner becomes primary in `server/config.py` with the date and scores.
 
 ## File Structure
 
@@ -682,4 +682,4 @@ Verified by: `test_rules.py` includes a case where a person's `can_drive` is set
 
 - **Gemini structured output parameter name, resolved.** The installed SDK supports `models.generate_content` with `response_mime_type` and `response_json_schema`. The finding is recorded in `gemini_provider.py` and covered by the provider tests.
 - **`openapi-typescript` generation step** is manual for the PoC. A CI step would catch drift; out of scope.
-- **Bakeoff result:** Gemini is primary after the 17 October 2026 read-v3 comparison: 43/100 mean exact results and 90.57% aligned fields; Groq has 12/100 and 82%. See `server/config.py` and `ai-reading-review.md`.
+- **Bakeoff result:** Gemini is primary after the 19 October 2026 read-v3 verdict-only re-score: 100/100 mean verdicts and 94.34% aligned fields; Groq has 55/100 and 84%. See `server/config.py` and `ai-reading-review.md`.

@@ -55,7 +55,9 @@ def test_extra_hall_cannot_be_silently_dropped_despite_matching_reference_result
     assert audit["after"]["checker_matches"] == 100
     assert audit["after"]["aligned_field_match_percent"] < 100
     assert audit["actual_scenario_count"] == 115
-    assert len(audit["fixed_by_control"]) == 1
+    assert not audit[
+        "fixed_by_control"
+    ]  # Reordering the same eligible loaders is not a correction.
     assert len(audit["corrected_plan"]["places"]) == 2
 
 
@@ -77,3 +79,13 @@ def test_explicit_place_identity_answer_reaches_all_inputs_and_actual_100_scenar
     assert audit["after"]["checker_matches"] == audit["actual_scenario_count"] == 100
     assert len(plan.places) == 2  # Original reading stays untouched.
     assert audit["actions"][0]["question_id"] == "rule-place-extra-identity"
+
+
+def test_audit_never_scripts_loader_reordering_as_a_correction():
+    plan = confirmed_truth_map()
+    for route in plan.routes:
+        route.loader_ids.reverse()
+    audit = correction_audit(plan)
+    assert audit["correctable"]
+    assert audit["scripted_corrections"] == []
+    assert audit["after"]["checker_matches"] == 100

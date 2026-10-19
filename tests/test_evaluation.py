@@ -1,10 +1,10 @@
-"""Names cannot inflate or lower the new measurement; full checker outcomes matter first."""
+"""Names and equal-quality schedules cannot change the locked verdict measurement."""
 
 from server.evaluation import align_entities, compare_reading, rank_providers
 from tests.validation_helpers import confirmed_truth_map
 
 
-def test_alignment_ignores_labels_and_compares_all_result_fields():
+def test_alignment_ignores_labels_and_compares_locked_verdict_fields():
     truth = confirmed_truth_map()
     reading = truth.model_copy(deep=True)
     reading.routes[0].id = "route-route-a"
@@ -16,6 +16,49 @@ def test_alignment_ignores_labels_and_compares_all_result_fields():
     assert result["checker_matches"] == result["checker_total"] == 100
     assert not result["mismatches"]
     assert len(result["naming_only"]) == 3
+
+
+def test_loader_order_is_a_set_input_but_driver_order_remains_significant():
+    truth = confirmed_truth_map()
+    reading = truth.model_copy(deep=True)
+    for route in reading.routes:
+        route.loader_ids.reverse()
+    result = compare_reading(reading, truth)
+    assert result["aligned_field_match_percent"] == 100
+    assert result["checker_matches"] == 100
+    reading.routes[0].driver_ids.reverse()
+    result = compare_reading(reading, truth)
+    assert result["aligned_field_match_percent"] < 100
+    assert any(row["field"] == "routes.route-a.driver_ids" for row in result["mismatches"])
+
+
+def test_schedule_metadata_is_excluded_but_each_locked_verdict_field_is_scored(monkeypatch):
+    from server import evaluation
+
+    truth = confirmed_truth_map()
+    results = evaluation.run_checker(truth.checker_data())
+    variants = [
+        result.model_copy(
+            update={
+                "timeline": [],
+                "dim_cause": "irrelevant diagnostic",
+                "lower_bound_minutes": 999,
+                "map_fingerprint": "different metadata",
+            }
+        )
+        for result in results
+    ]
+    monkeypatch.setattr(evaluation, "run_checker", lambda _: results)
+    monkeypatch.setattr(evaluation, "reference_results", lambda *_: variants)
+    assert compare_reading(truth, truth)["checker_matches"] == 100
+    for field, value in (
+        ("state", "qmark"),
+        ("lateness_minutes", 999),
+        ("human_cost", "Different"),
+    ):
+        variants[0] = results[0].model_copy(update={field: value})
+        assert compare_reading(truth, truth)["different_scenarios"] == [results[0].scenario_id]
+        variants[0] = results[0]
 
 
 def test_missing_delivery_is_not_borrowed_from_truth_and_all_100_are_run():

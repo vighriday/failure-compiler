@@ -10,27 +10,6 @@
         "choice": "Same place as another listing",
         "place_id": "place-loading-bay"
       }
-    },
-    {
-      "action": "correct",
-      "item_id": "route-a",
-      "field": "loader_ids",
-      "value": [
-        "person-joel",
-        "person-maya",
-        "person-anita",
-        "person-ravi"
-      ]
-    },
-    {
-      "action": "correct",
-      "item_id": "route-c",
-      "field": "loader_ids",
-      "value": [
-        "person-anita",
-        "person-maya",
-        "person-joel"
-      ]
     }
   ],
   "actions": [
@@ -41,27 +20,6 @@
         "choice": "Same place as another listing",
         "place_id": "place-loading-bay"
       }
-    },
-    {
-      "action": "correct",
-      "item_id": "route-a",
-      "field": "loader_ids",
-      "value": [
-        "person-joel",
-        "person-maya",
-        "person-anita",
-        "person-ravi"
-      ]
-    },
-    {
-      "action": "correct",
-      "item_id": "route-c",
-      "field": "loader_ids",
-      "value": [
-        "person-anita",
-        "person-maya",
-        "person-joel"
-      ]
     },
     {
       "action": "confirm_all"
@@ -113,6 +71,14 @@
     {
       "action": "confirm_item",
       "item_id": "route-a-driving"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-a"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-c"
     },
     {
       "action": "confirm_item",

@@ -3,20 +3,20 @@
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
-# AI providers; ranked by complete checker equivalence, fields, consistency, tokens.
+# AI providers; ranked by locked verdict equivalence, fields, consistency, tokens.
 # ---------------------------------------------------------------------------
 PROVIDER_MODELS = {"groq": "openai/gpt-oss-120b", "gemini": "gemini-3.8-flash"}
 PRIMARY_PROVIDER = "gemini"
 PRIMARY_MODEL = PROVIDER_MODELS[PRIMARY_PROVIDER]
 FALLBACK_PROVIDER = "groq"
 FALLBACK_MODEL = PROVIDER_MODELS[FALLBACK_PROVIDER]
-BAKEOFF_DATE = "2026-10-17"
+BAKEOFF_DATE = "2026-10-19"
 BAKEOFF_WINNER = PRIMARY_PROVIDER
-# read-v3, three runs each: Gemini 43/100 exact results, 90.57% fields;
-# Groq 12/100, 82%. Full results include schedules. devpost/bakeoff-read-v3.json.
+# Offline read-v3 re-score, three runs each: Gemini 100/100 verdicts, 94.34% fields;
+# Groq 55/100, 84%. Verdicts exclude timelines. devpost/bakeoff-read-v3.json.
 BAKEOFF_SCORES = {
-    "gemini": {"checker_mean": 43.0, "aligned_field_mean": 90.57, "total_tokens": 7470},
-    "groq": {"checker_mean": 12.0, "aligned_field_mean": 82.0, "total_tokens": 10775},
+    "gemini": {"checker_mean": 100.0, "aligned_field_mean": 94.34, "total_tokens": 7470},
+    "groq": {"checker_mean": 55.0, "aligned_field_mean": 84.0, "total_tokens": 10775},
 }
 
 # ---------------------------------------------------------------------------

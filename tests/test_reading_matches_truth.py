@@ -1,4 +1,4 @@
-"""Unedited winner output plus actual review actions matches every input and result."""
+"""Unedited winner output plus actual review actions matches inputs and locked verdicts."""
 
 import hashlib
 import json
@@ -25,13 +25,17 @@ def reviewed_example():
     record = json.loads(path.read_text())
     assert hashlib.sha256(record["raw_text"].encode()).hexdigest() == ledger["raw_text_sha256"]
     plan = plan_from_record(record)
+    original_loaders = {route.id: route.loader_ids[:] for route in plan.routes}
     items = items_for_plan(plan)
     state = create_review(plan, items, questions_for_plan(plan, items))
     for action in ledger["actions"]:
         update_review({"reading_id": state["reading_id"], **action})
     confirm_review({"reading_id": state["reading_id"]})
     assert len(plan.places) == 2  # The provider reading itself still contains the Hall.
-    return REVIEWS[state["reading_id"]].plan
+    reviewed = REVIEWS[state["reading_id"]].plan
+    assert {route.id: route.loader_ids for route in reviewed.routes} == original_loaders
+    assert not any(action.get("field") == "loader_ids" for action in ledger["actions"])
+    return reviewed
 
 
 def test_reading_matches_truth():

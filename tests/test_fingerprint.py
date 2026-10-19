@@ -52,7 +52,7 @@ def test_shuffled_ai_ids_normalise_to_the_truth_map_fingerprint() -> None:
             "people": renamed.people[2:] + renamed.people[:2],
             "vehicles": list(reversed(renamed.vehicles)),
             "routes": list(reversed(renamed.routes)),
-            # driver_ids and loader_ids retain their meaningful primary-first order.
+            # Driver order retains its meaningful primary-first order.
         }
     )
     normalised = normalise_plan_map_ids(varied_form)
@@ -65,6 +65,16 @@ def test_checker_input_change_changes_fingerprint() -> None:
     sizes["vehicle_returns_late"] = 45
     changed = truth.model_copy(update={"problem_sizes": sizes})
     assert fingerprint_plan_map(changed) != fingerprint_plan_map(truth)
+
+
+def test_loader_order_does_not_change_fingerprint_but_driver_order_does() -> None:
+    truth = confirmed_truth_map()
+    reordered = truth.model_copy(deep=True)
+    for route in reordered.routes:
+        route.loader_ids.reverse()
+    assert fingerprint_plan_map(reordered) == fingerprint_plan_map(truth)
+    reordered.routes[0].driver_ids.reverse()
+    assert fingerprint_plan_map(reordered) != fingerprint_plan_map(truth)
 
 
 def test_status_ai_metadata_and_source_lines_do_not_change_fingerprint() -> None:

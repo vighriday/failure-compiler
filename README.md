@@ -394,7 +394,7 @@ flowchart LR
 > Any "?" result is listed by name in the report and never counted as a pass. This version supports community distribution plans with up to 24 problems. It is a proof of concept, not a guarantee for real-world operations.
 
 > [!NOTE]
-> **Build status:** example mode uses one unedited saved Gemini reading. The review controls identify Hall as the same place as Loading bay and correct the loader order on Routes A and C. A regression verifies every checker input and all 100 results against the independent hand-checked truth map. Fix suggestions remain labelled placeholders until the real suggestions have been reviewed.
+> **Build status:** example mode uses one unedited saved Gemini reading. The review controls identify Hall as the same place as Loading bay. Loader order needs no correction: eligible loaders are compared as a set. A regression verifies every checker input and all 100 locked verdicts against the independent hand-checked truth map. Fix suggestions remain labelled placeholders until the real suggestions have been reviewed.
 
 ---
 
@@ -436,7 +436,7 @@ uv run -- python scripts/dev.py
 
 Open **http://localhost:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed.
 
-For the saved reading, answer the Hall question with **Same place as another listing**, choose **Loading bay**, and review its facts individually. Set Route A's loaders to **Joel, Maya, Anita, Ravi** and Route C's to **Anita, Maya, Joel** using the up arrows. Confirm guesses individually, answer the arrival questions after reviewing the associated facts, then confirm the plan. These steps produce the locked 100-scenario example.
+For the saved reading, answer the Hall question with **Same place as another listing**, choose **Loading bay**, and review its facts individually. Confirm guesses individually, answer the arrival questions after reviewing the associated facts, then confirm the plan. These steps produce the locked 100-scenario example.
 
 The launcher waits for the API health check and web page before printing both addresses. It allows up to 90 seconds for a cold start and names any server still starting. Keep that terminal open; press `Ctrl+C` to stop both servers. If a port is already in use, it stops without launching a duplicate.
 
@@ -587,7 +587,7 @@ failure-compiler/
 | Server | [FastAPI](https://fastapi.tiangolo.com/), built-in server-sent events | Live streaming without another library |
 | Data shapes and gate | [Pydantic v2](https://docs.pydantic.dev/latest/) | One strict definition of every shape |
 | Python | 3.12 with [uv](https://docs.astral.sh/uv/) | Identical installs on Windows, macOS and Linux |
-| AI, first choice (live UI pending) | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Won the 17 October read-v3 bake-off: 43/100 mean exact results, 90.57% aligned fields |
+| AI, first choice (live UI pending) | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Won the 19 October verdict-only re-score: 100/100 mean verdicts, 94.34% aligned fields |
 | AI, fallback (live UI pending) | [Groq](https://console.groq.com/docs/structured-outputs) | Strict-schema adapter verified; primary order follows the bake-off |
 | Frontend | React, Vite, TypeScript (strict) | The grid, panel, preview and report share a lot of state |
 | Styling | Plain CSS variables, no UI kit | A coordinator's run sheet, not a stock dashboard |

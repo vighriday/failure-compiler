@@ -660,7 +660,7 @@
     <li><strong>Vehicles:</strong> available from a time. One route at a time.</li>
     <li><strong>Places:</strong> one vehicle loading at a time. Each place has an <code>opens_at</code> time (planned loading start). The loading area can only be used from the later of <code>opens_at</code> and the earliest time a key holder is present (if <code>needs_key</code>). "Place blocked" means blocked from <code>opens_at</code> for the chosen minutes.</li>
     <li><strong>Deliveries:</strong> loading cannot start before the delivery arrives.</li>
-    <li><strong>Routes:</strong> households, <code>load_minutes</code> (needs a loader), <code>drive_minutes</code> (needs a driver and a vehicle). Jobs are filled <em>only</em> from <code>driver_ids</code> and <code>loader_ids</code> listed on the route - primary first, then listed backups. No one else may fill those jobs.</li>
+    <li><strong>Routes:</strong> households, <code>load_minutes</code> (needs a loader), <code>drive_minutes</code> (needs a driver and a vehicle). Jobs are filled <em>only</em> from <code>driver_ids</code> and <code>loader_ids</code> listed on the route - drivers primary first, then listed backups; loader lists are eligible sets with no priority. No one else may fill those jobs.</li>
     <li><strong>Start times</strong> can move freely within people's and vehicles' availability windows.</li>
     <li>Finish time is a soft deadline; the solver minimises total households-times-minutes-late.</li>
   </ul>
@@ -780,7 +780,7 @@ Vehicle         id, name, available_from
 Place           id, name, opens_at (planned loading start, minutes), one_vehicle_at_a_time (always true), needs_key
 Delivery        id, name, arrives_at (minutes), place_id
 Route           id, name, households, load_minutes, drive_minutes,
-                vehicle_id, driver_ids (primary first), loader_ids (primary first)</code></pre>
+                vehicle_id, driver_ids (primary first), loader_ids (eligible set, no priority)</code></pre>
   <p style="font-size:13px;color:var(--ink-mid);">Derived from <code>PlanMap</code> at run time. The checker may only assign jobs from <code>driver_ids</code> and <code>loader_ids</code> on each route.</p>
 
   <h3>ScenarioResult</h3>
@@ -826,7 +826,7 @@ gate_reason:         str | None</code></pre>
     <tbody>
       <tr><td><code>test_example_locked.py</code></td><td>Checker on truth map vs expected-results.json; no question marks</td><td>No</td></tr>
       <tr><td><code>test_checker_monotone.py</code></td><td>Every pair's lateness &ge; each of its singles'</td><td>No</td></tr>
-      <tr><td><code>test_reading_matches_truth.py</code></td><td>Unedited reading + explicit review actions: every aligned checker input and all 100 full results match truth; actual count 100, names excluded</td><td>No (uses fixture)</td></tr>
+      <tr><td><code>test_reading_matches_truth.py</code></td><td>Unedited reading + explicit review actions: every aligned checker input and all 100 locked verdicts match truth; actual count 100, names excluded</td><td>No (uses fixture)</td></tr>
       <tr><td><code>test_format_gate.py</code></td><td>Bad JSON, extra fields, unknown names all rejected with specific reasons</td><td>No</td></tr>
       <tr><td><code>test_rules.py</code></td><td>Rules engine including the cascade test</td><td>No</td></tr>
       <tr><td><code>test_determinism.py</code></td><td>Same truth map run twice; identical results</td><td>No</td></tr>
@@ -834,8 +834,8 @@ gate_reason:         str | None</code></pre>
   </table>
 
   <div class="card" style="font-size:13.5px;margin-top:12px;">
-    <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input including extra inputs, and runs the truth map's 100 scenarios on the aligned reading. Ranking is exact full-result matches, aligned fields, consistency, then tokens. No corrections are applied; raw responses and failed attempts are preserved. Every prompt version and its scores are logged in <code>ai-reading-review.md</code>. The dated winner becomes primary in <code>server/config.py</code>.</p>
-    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py:</strong> load the unedited <code>example-reading.json</code>, check its saved digest, apply explicit actions from <code>example-corrections.json</code> through review controls, align entities by type and role, then compare every checker input and all 100 full results against <code>example-truth.json</code>. The actual map must generate 100 scenarios. Names are labels and are excluded; extra or missing checker entities must not be silently discarded.</p>
+    <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input including extra inputs, and runs the truth map's 100 scenarios on the aligned reading. Ranking is exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned fields, consistency, then tokens. No corrections are applied; raw responses and failed attempts are preserved. Every prompt version and its scores are logged in <code>ai-reading-review.md</code>. The dated winner becomes primary in <code>server/config.py</code>.</p>
+    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py:</strong> load the unedited <code>example-reading.json</code>, check its saved digest, apply explicit actions from <code>example-corrections.json</code> through review controls, align entities by type and role, then compare every checker input and all 100 locked verdicts against <code>example-truth.json</code>. The actual map must generate 100 scenarios. Names are labels and are excluded; extra or missing checker entities must not be silently discarded.</p>
   </div>
 </section>
 
@@ -1048,7 +1048,7 @@ gate_reason:         str | None</code></pre>
   <ul>
     <li><strong>Gemini structured output parameter name, resolved.</strong> The installed SDK supports <code>models.generate_content</code> with <code>response_mime_type</code> and <code>response_json_schema</code>. The finding is recorded in <code>gemini_provider.py</code> and covered by the provider tests.</li>
     <li><strong><code>openapi-typescript</code> generation step</strong> is manual for the PoC.</li>
-    <li><strong>Bakeoff result:</strong> Gemini is primary after the 17 October 2026 read-v3 comparison: 43/100 mean exact results and 90.57% aligned fields; Groq has 12/100 and 82%. See <code>server/config.py</code> and <code>ai-reading-review.md</code>.</li>
+    <li><strong>Bakeoff result:</strong> Gemini is primary after the 19 October 2026 read-v3 verdict-only re-score: 100/100 mean verdicts and 94.34% aligned fields; Groq has 55/100 and 84%. See <code>server/config.py</code> and <code>ai-reading-review.md</code>.</li>
   </ul>
 </section>
 

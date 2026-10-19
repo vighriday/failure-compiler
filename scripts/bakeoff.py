@@ -16,7 +16,12 @@ sys.path.insert(0, str(ROOT))
 from server.ai.adapter import read_plan  # noqa: E402
 from server.ai.groq_provider import cooldown_seconds  # noqa: E402
 from server.ai.types import AIError  # noqa: E402
-from server.evaluation import checker_fields, compare_reading, rank_providers  # noqa: E402
+from server.evaluation import (  # noqa: E402
+    MEASUREMENT_VERSION,
+    checker_fields,
+    compare_reading,
+    rank_providers,
+)
 from server.models import PlanMapData  # noqa: E402
 from server.validation.gate import (  # noqa: E402
     plan_map_from_reading,
@@ -40,6 +45,48 @@ def wait_for_groq() -> None:
         print(f"Groq budget cooldown: {remaining:.0f}s", flush=True)
     while cooldown_seconds():
         time.sleep(min(5, cooldown_seconds()))
+
+
+def rescore_saved_report(saved: dict) -> dict:
+    """Re-evaluate recorded responses offline, retaining scores from superseded contracts."""
+    report = {**saved, "readings": [], "rescored_at": datetime.now(UTC).isoformat()}
+    measurement = saved.get("measurement_version", "full-result-or-exact-name-legacy")
+    if measurement != MEASUREMENT_VERSION:
+        history = {
+            "measurement_version": measurement,
+            "ranking": saved.get("ranking"),
+            "winner": saved.get("winner"),
+            "mean_field_match_percent": saved.get("mean_field_match_percent"),
+            "readings": [
+                {
+                    key: value
+                    for key, value in row.items()
+                    if key not in {"raw", "attempts", "previous_attempts", "measurement_history"}
+                }
+                for row in saved["readings"]
+            ],
+        }
+        report["measurement_history"] = [*saved.get("measurement_history", []), history]
+    for row in saved["readings"]:
+        if "raw" not in row:
+            report["readings"].append(row)
+            continue
+        raw = row["raw"]
+        reading = validate_ai_reading(raw["raw_text"])
+        plan = plan_map_from_reading(
+            reading, provider=raw["provider"], model=raw["model"], timestamp=raw["timestamp"]
+        )
+        current = {
+            key: value
+            for key, value in row.items()
+            if key not in {"matches", "field_match_percent"}
+        }
+        report["readings"].append({**current, **compare(plan)})
+    report.pop("mean_field_match_percent", None)
+    report["measurement_version"] = MEASUREMENT_VERSION
+    report["ranking"] = rank_providers(report["readings"])
+    report["winner"] = report["ranking"][0]["provider"] if report["ranking"] else None
+    return report
 
 
 def main():
@@ -124,24 +171,7 @@ def main():
 
     if args.rescore:
         saved = json.loads(args.rescore.read_text(encoding="utf-8"))
-        report = {**saved, "readings": [], "rescored_at": datetime.now(UTC).isoformat()}
-        for row in saved["readings"]:
-            if "raw" not in row:
-                report["readings"].append(row)
-                continue
-            raw = row["raw"]
-            reading = validate_ai_reading(raw["raw_text"])
-            plan = plan_map_from_reading(
-                reading, provider=raw["provider"], model=raw["model"], timestamp=raw["timestamp"]
-            )
-            report["readings"].append(
-                {
-                    **row,
-                    **compare(plan),
-                }
-            )
-        report["ranking"] = rank_providers(report["readings"])
-        report["winner"] = report["ranking"][0]["provider"] if report["ranking"] else None
+        report = rescore_saved_report(saved)
         save()
         print(json.dumps(report["ranking"], indent=2))
         return

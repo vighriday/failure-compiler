@@ -65,25 +65,13 @@
           "status": "passed"
         }
       ],
-      "aligned_field_matches": 42,
+      "aligned_field_matches": 43,
       "truth_fields": 50,
-      "aligned_field_match_percent": 84.0,
-      "checker_matches": 18,
+      "aligned_field_match_percent": 86.0,
+      "checker_matches": 87,
       "checker_total": 100,
       "different_scenarios": [
         "volunteer_absent__person-ravi",
-        "volunteer_absent__person-anita",
-        "volunteer_absent__person-maya",
-        "volunteer_absent__person-sam",
-        "volunteer_leaves_early__person-ravi",
-        "volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-sam",
-        "vehicle_returns_late__vehicle-van",
-        "vehicle_returns_late__vehicle-car",
-        "supply_delivery_late__delivery-supplies",
-        "place_blocked__place-loading-area",
         "volunteer_absent__person-ravi+volunteer_absent__person-joel",
         "volunteer_absent__person-ravi+volunteer_absent__person-anita",
         "volunteer_absent__person-ravi+volunteer_absent__person-maya",
@@ -95,64 +83,7 @@
         "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
         "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
         "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-ravi+place_blocked__place-loading-area",
-        "volunteer_absent__person-anita+volunteer_absent__person-sam",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-anita+place_blocked__place-loading-area",
-        "volunteer_absent__person-maya+volunteer_absent__person-sam",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-maya+place_blocked__place-loading-area",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-sam+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
-        "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
-        "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+        "volunteer_absent__person-ravi+place_blocked__place-loading-area"
       ],
       "mismatches": [
         {
@@ -188,26 +119,13 @@
         {
           "field": "routes.route-a.loader_ids",
           "expected": [
+            "person-anita",
             "person-joel",
             "person-maya",
-            "person-anita",
             "person-ravi"
           ],
           "actual": [
             "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
           ]
         }
       ],
@@ -269,7 +187,8 @@
           "reason": "Missing role"
         }
       ],
-      "compared_fields": 50
+      "compared_fields": 50,
+      "measurement_version": "verdict-v1"
     },
     {
       "provider": "groq",
@@ -335,25 +254,13 @@
           "status": "passed"
         }
       ],
-      "aligned_field_matches": 44,
+      "aligned_field_matches": 45,
       "truth_fields": 50,
-      "aligned_field_match_percent": 88.0,
-      "checker_matches": 18,
+      "aligned_field_match_percent": 90.0,
+      "checker_matches": 87,
       "checker_total": 100,
       "different_scenarios": [
         "volunteer_absent__person-ravi",
-        "volunteer_absent__person-anita",
-        "volunteer_absent__person-maya",
-        "volunteer_absent__person-sam",
-        "volunteer_leaves_early__person-ravi",
-        "volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-sam",
-        "vehicle_returns_late__vehicle-van",
-        "vehicle_returns_late__vehicle-car",
-        "supply_delivery_late__delivery-supplies",
-        "place_blocked__place-loading-area",
         "volunteer_absent__person-ravi+volunteer_absent__person-joel",
         "volunteer_absent__person-ravi+volunteer_absent__person-anita",
         "volunteer_absent__person-ravi+volunteer_absent__person-maya",
@@ -365,64 +272,7 @@
         "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
         "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
         "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-ravi+place_blocked__place-loading-area",
-        "volunteer_absent__person-anita+volunteer_absent__person-sam",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-anita+place_blocked__place-loading-area",
-        "volunteer_absent__person-maya+volunteer_absent__person-sam",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-maya+place_blocked__place-loading-area",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-sam+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
-        "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
-        "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+        "volunteer_absent__person-ravi+place_blocked__place-loading-area"
       ],
       "mismatches": [
         {
@@ -448,26 +298,13 @@
         {
           "field": "routes.route-a.loader_ids",
           "expected": [
+            "person-anita",
             "person-joel",
             "person-maya",
-            "person-anita",
             "person-ravi"
           ],
           "actual": [
             "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
           ]
         }
       ],
@@ -524,7 +361,8 @@
         "delivery-supply-truck": "delivery-supplies"
       },
       "unmatched_roles": [],
-      "compared_fields": 50
+      "compared_fields": 50,
+      "measurement_version": "verdict-v1"
     },
     {
       "provider": "groq",
@@ -590,25 +428,13 @@
           "status": "passed"
         }
       ],
-      "aligned_field_matches": 42,
+      "aligned_field_matches": 43,
       "truth_fields": 50,
-      "aligned_field_match_percent": 84.0,
-      "checker_matches": 18,
+      "aligned_field_match_percent": 86.0,
+      "checker_matches": 87,
       "checker_total": 100,
       "different_scenarios": [
         "volunteer_absent__person-ravi",
-        "volunteer_absent__person-anita",
-        "volunteer_absent__person-maya",
-        "volunteer_absent__person-sam",
-        "volunteer_leaves_early__person-ravi",
-        "volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-sam",
-        "vehicle_returns_late__vehicle-van",
-        "vehicle_returns_late__vehicle-car",
-        "supply_delivery_late__delivery-supplies",
-        "place_blocked__place-loading-area",
         "volunteer_absent__person-ravi+volunteer_absent__person-joel",
         "volunteer_absent__person-ravi+volunteer_absent__person-anita",
         "volunteer_absent__person-ravi+volunteer_absent__person-maya",
@@ -620,64 +446,7 @@
         "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
         "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
         "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-ravi+place_blocked__place-loading-area",
-        "volunteer_absent__person-anita+volunteer_absent__person-sam",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-anita+place_blocked__place-loading-area",
-        "volunteer_absent__person-maya+volunteer_absent__person-sam",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-maya+place_blocked__place-loading-area",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-sam+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
-        "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
-        "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+        "volunteer_absent__person-ravi+place_blocked__place-loading-area"
       ],
       "mismatches": [
         {
@@ -713,26 +482,13 @@
         {
           "field": "routes.route-a.loader_ids",
           "expected": [
+            "person-anita",
             "person-joel",
             "person-maya",
-            "person-anita",
             "person-ravi"
           ],
           "actual": [
             "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
           ]
         }
       ],
@@ -794,7 +550,8 @@
           "reason": "Missing role"
         }
       ],
-      "compared_fields": 50
+      "compared_fields": 50,
+      "measurement_version": "verdict-v1"
     },
     {
       "provider": "gemini",
@@ -1085,110 +842,13 @@
           "status": "passed"
         }
       ],
-      "aligned_field_matches": 48,
+      "aligned_field_matches": 50,
       "truth_fields": 50,
-      "aligned_field_match_percent": 96.0,
-      "checker_matches": 33,
+      "aligned_field_match_percent": 100.0,
+      "checker_matches": 100,
       "checker_total": 100,
-      "different_scenarios": [
-        "volunteer_absent__person-ravi",
-        "volunteer_absent__person-maya",
-        "volunteer_absent__person-sam",
-        "volunteer_leaves_early__person-ravi",
-        "volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-sam",
-        "vehicle_returns_late__vehicle-van",
-        "vehicle_returns_late__vehicle-car",
-        "supply_delivery_late__delivery-supplies",
-        "place_blocked__place-loading-area",
-        "volunteer_absent__person-ravi+volunteer_absent__person-sam",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-ravi+place_blocked__place-loading-area",
-        "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-maya+volunteer_absent__person-sam",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-maya+place_blocked__place-loading-area",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-sam+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
-        "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
-        "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
-      ],
-      "mismatches": [
-        {
-          "field": "routes.route-a.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-maya",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": [
-            "person-ravi",
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        }
-      ],
+      "different_scenarios": [],
+      "mismatches": [],
       "naming_only": [
         {
           "collection": "places",
@@ -1230,7 +890,8 @@
         "delivery-supply-truck": "delivery-supplies"
       },
       "unmatched_roles": [],
-      "compared_fields": 50
+      "compared_fields": 50,
+      "measurement_version": "verdict-v1"
     },
     {
       "provider": "gemini",
@@ -1513,95 +1174,13 @@
           "status": "passed"
         }
       ],
-      "aligned_field_matches": 48,
+      "aligned_field_matches": 50,
       "truth_fields": 50,
-      "aligned_field_match_percent": 96.0,
-      "checker_matches": 48,
+      "aligned_field_match_percent": 100.0,
+      "checker_matches": 100,
       "checker_total": 100,
-      "different_scenarios": [
-        "volunteer_absent__person-ravi",
-        "volunteer_absent__person-sam",
-        "volunteer_leaves_early__person-ravi",
-        "volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-sam",
-        "vehicle_returns_late__vehicle-van",
-        "vehicle_returns_late__vehicle-car",
-        "supply_delivery_late__delivery-supplies",
-        "place_blocked__place-loading-area",
-        "volunteer_absent__person-ravi+volunteer_absent__person-sam",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-ravi+place_blocked__place-loading-area",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-sam+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
-        "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
-        "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
-      ],
-      "mismatches": [
-        {
-          "field": "routes.route-a.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-maya",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        }
-      ],
+      "different_scenarios": [],
+      "mismatches": [],
       "naming_only": [
         {
           "collection": "places",
@@ -1643,7 +1222,8 @@
         "delivery-supply-truck": "delivery-supplies"
       },
       "unmatched_roles": [],
-      "compared_fields": 50
+      "compared_fields": 50,
+      "measurement_version": "verdict-v1"
     },
     {
       "provider": "gemini",
@@ -1934,95 +1514,13 @@
           "status": "passed"
         }
       ],
-      "aligned_field_matches": 48,
+      "aligned_field_matches": 50,
       "truth_fields": 50,
-      "aligned_field_match_percent": 96.0,
-      "checker_matches": 48,
+      "aligned_field_match_percent": 100.0,
+      "checker_matches": 100,
       "checker_total": 100,
-      "different_scenarios": [
-        "volunteer_absent__person-ravi",
-        "volunteer_absent__person-sam",
-        "volunteer_leaves_early__person-ravi",
-        "volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-sam",
-        "vehicle_returns_late__vehicle-van",
-        "vehicle_returns_late__vehicle-car",
-        "supply_delivery_late__delivery-supplies",
-        "place_blocked__place-loading-area",
-        "volunteer_absent__person-ravi+volunteer_absent__person-sam",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-ravi+place_blocked__place-loading-area",
-        "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
-        "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_absent__person-sam+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
-        "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
-        "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
-        "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
-        "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
-        "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
-        "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
-        "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
-        "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
-        "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
-        "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
-        "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
-      ],
-      "mismatches": [
-        {
-          "field": "routes.route-a.loader_ids",
-          "expected": [
-            "person-joel",
-            "person-maya",
-            "person-anita",
-            "person-ravi"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya",
-            "person-ravi"
-          ]
-        },
-        {
-          "field": "routes.route-c.loader_ids",
-          "expected": [
-            "person-anita",
-            "person-maya",
-            "person-joel"
-          ],
-          "actual": [
-            "person-joel",
-            "person-anita",
-            "person-maya"
-          ]
-        }
-      ],
+      "different_scenarios": [],
+      "mismatches": [],
       "naming_only": [
         {
           "collection": "places",
@@ -2064,25 +1562,1084 @@
         "delivery-supply-truck": "delivery-supplies"
       },
       "unmatched_roles": [],
-      "compared_fields": 50
+      "compared_fields": 50,
+      "measurement_version": "verdict-v1"
     }
   ],
   "winner": "gemini",
   "ranking": [
     {
       "provider": "gemini",
-      "checker_mean": 43.0,
-      "aligned_field_mean": 96.0,
-      "consistency_variance": 50.0,
+      "checker_mean": 100.0,
+      "aligned_field_mean": 100.0,
+      "consistency_variance": 0.0,
       "total_tokens": 13047
     },
     {
       "provider": "groq",
-      "checker_mean": 18.0,
-      "aligned_field_mean": 85.33333333333333,
+      "checker_mean": 87.0,
+      "aligned_field_mean": 87.33333333333333,
       "consistency_variance": 3.5555555555555554,
       "total_tokens": 10282
     }
   ],
-  "rescored_at": "2026-10-17T16:30:23.686012+00:00"
+  "rescored_at": "2026-10-19T14:34:09.927403+00:00",
+  "measurement_history": [
+    {
+      "measurement_version": "full-result-or-exact-name-legacy",
+      "ranking": [
+        {
+          "provider": "gemini",
+          "checker_mean": 43.0,
+          "aligned_field_mean": 96.0,
+          "consistency_variance": 50.0,
+          "total_tokens": 13047
+        },
+        {
+          "provider": "groq",
+          "checker_mean": 18.0,
+          "aligned_field_mean": 85.33333333333333,
+          "consistency_variance": 3.5555555555555554,
+          "total_tokens": 10282
+        }
+      ],
+      "winner": "gemini",
+      "mean_field_match_percent": null,
+      "readings": [
+        {
+          "provider": "groq",
+          "reading": 1,
+          "aligned_field_matches": 42,
+          "truth_fields": 50,
+          "aligned_field_match_percent": 84.0,
+          "checker_matches": 18,
+          "checker_total": 100,
+          "different_scenarios": [
+            "volunteer_absent__person-ravi",
+            "volunteer_absent__person-anita",
+            "volunteer_absent__person-maya",
+            "volunteer_absent__person-sam",
+            "volunteer_leaves_early__person-ravi",
+            "volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-sam",
+            "vehicle_returns_late__vehicle-van",
+            "vehicle_returns_late__vehicle-car",
+            "supply_delivery_late__delivery-supplies",
+            "place_blocked__place-loading-area",
+            "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+            "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+            "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+            "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+            "volunteer_absent__person-anita+volunteer_absent__person-sam",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-anita+place_blocked__place-loading-area",
+            "volunteer_absent__person-maya+volunteer_absent__person-sam",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-maya+place_blocked__place-loading-area",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-sam+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+            "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+            "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+          ],
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supplies.arrives_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "deliveries.delivery-supplies.place_id",
+              "expected": "place-loading-area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "people.person-anita.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-maya.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-ravi.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-sam.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": [
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            }
+          ],
+          "naming_only": [
+            {
+              "collection": "vehicles",
+              "id": "vehicle-van",
+              "actual": "van",
+              "expected": "Van"
+            },
+            {
+              "collection": "vehicles",
+              "id": "vehicle-car",
+              "actual": "car",
+              "expected": "Car"
+            },
+            {
+              "collection": "places",
+              "id": "place-loading-area",
+              "actual": "Hall",
+              "expected": "Loading area"
+            },
+            {
+              "collection": "routes",
+              "id": "route-a",
+              "actual": "Route A",
+              "expected": "A"
+            },
+            {
+              "collection": "routes",
+              "id": "route-b",
+              "actual": "Route B",
+              "expected": "B"
+            },
+            {
+              "collection": "routes",
+              "id": "route-c",
+              "actual": "Route C",
+              "expected": "C"
+            }
+          ],
+          "alignment": {
+            "route-a": "route-a",
+            "route-b": "route-b",
+            "route-c": "route-c",
+            "person-joel": "person-joel",
+            "person-ravi": "person-ravi",
+            "person-sam": "person-sam",
+            "person-anita": "person-anita",
+            "person-maya": "person-maya",
+            "vehicle-car": "vehicle-car",
+            "vehicle-van": "vehicle-van",
+            "place-hall": "place-loading-area"
+          },
+          "unmatched_roles": [
+            {
+              "collection": "deliveries",
+              "id": "delivery-supplies",
+              "reason": "Missing role"
+            }
+          ],
+          "compared_fields": 50
+        },
+        {
+          "provider": "groq",
+          "reading": 2,
+          "aligned_field_matches": 44,
+          "truth_fields": 50,
+          "aligned_field_match_percent": 88.0,
+          "checker_matches": 18,
+          "checker_total": 100,
+          "different_scenarios": [
+            "volunteer_absent__person-ravi",
+            "volunteer_absent__person-anita",
+            "volunteer_absent__person-maya",
+            "volunteer_absent__person-sam",
+            "volunteer_leaves_early__person-ravi",
+            "volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-sam",
+            "vehicle_returns_late__vehicle-van",
+            "vehicle_returns_late__vehicle-car",
+            "supply_delivery_late__delivery-supplies",
+            "place_blocked__place-loading-area",
+            "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+            "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+            "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+            "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+            "volunteer_absent__person-anita+volunteer_absent__person-sam",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-anita+place_blocked__place-loading-area",
+            "volunteer_absent__person-maya+volunteer_absent__person-sam",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-maya+place_blocked__place-loading-area",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-sam+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+            "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+            "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+          ],
+          "mismatches": [
+            {
+              "field": "people.person-anita.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-maya.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-ravi.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-sam.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": [
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            }
+          ],
+          "naming_only": [
+            {
+              "collection": "vehicles",
+              "id": "vehicle-van",
+              "actual": "van",
+              "expected": "Van"
+            },
+            {
+              "collection": "vehicles",
+              "id": "vehicle-car",
+              "actual": "car",
+              "expected": "Car"
+            },
+            {
+              "collection": "places",
+              "id": "place-loading-area",
+              "actual": "Hall",
+              "expected": "Loading area"
+            },
+            {
+              "collection": "routes",
+              "id": "route-a",
+              "actual": "Route A",
+              "expected": "A"
+            },
+            {
+              "collection": "routes",
+              "id": "route-b",
+              "actual": "Route B",
+              "expected": "B"
+            },
+            {
+              "collection": "routes",
+              "id": "route-c",
+              "actual": "Route C",
+              "expected": "C"
+            }
+          ],
+          "alignment": {
+            "route-a": "route-a",
+            "route-b": "route-b",
+            "route-c": "route-c",
+            "person-joel": "person-joel",
+            "person-ravi": "person-ravi",
+            "person-sam": "person-sam",
+            "person-anita": "person-anita",
+            "person-maya": "person-maya",
+            "vehicle-car": "vehicle-car",
+            "vehicle-van": "vehicle-van",
+            "place-hall": "place-loading-area",
+            "delivery-supply-truck": "delivery-supplies"
+          },
+          "unmatched_roles": [],
+          "compared_fields": 50
+        },
+        {
+          "provider": "groq",
+          "reading": 3,
+          "aligned_field_matches": 42,
+          "truth_fields": 50,
+          "aligned_field_match_percent": 84.0,
+          "checker_matches": 18,
+          "checker_total": 100,
+          "different_scenarios": [
+            "volunteer_absent__person-ravi",
+            "volunteer_absent__person-anita",
+            "volunteer_absent__person-maya",
+            "volunteer_absent__person-sam",
+            "volunteer_leaves_early__person-ravi",
+            "volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-sam",
+            "vehicle_returns_late__vehicle-van",
+            "vehicle_returns_late__vehicle-car",
+            "supply_delivery_late__delivery-supplies",
+            "place_blocked__place-loading-area",
+            "volunteer_absent__person-ravi+volunteer_absent__person-joel",
+            "volunteer_absent__person-ravi+volunteer_absent__person-anita",
+            "volunteer_absent__person-ravi+volunteer_absent__person-maya",
+            "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+            "volunteer_absent__person-anita+volunteer_absent__person-sam",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-anita+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-anita+place_blocked__place-loading-area",
+            "volunteer_absent__person-maya+volunteer_absent__person-sam",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-maya+place_blocked__place-loading-area",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-sam+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-anita+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+            "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+            "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+          ],
+          "mismatches": [
+            {
+              "field": "deliveries.delivery-supplies.arrives_at",
+              "expected": 540,
+              "actual": "<missing>"
+            },
+            {
+              "field": "deliveries.delivery-supplies.place_id",
+              "expected": "place-loading-area",
+              "actual": "<missing>"
+            },
+            {
+              "field": "people.person-anita.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-maya.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-ravi.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "people.person-sam.available_from",
+              "expected": 540,
+              "actual": 0
+            },
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": [
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            }
+          ],
+          "naming_only": [
+            {
+              "collection": "vehicles",
+              "id": "vehicle-van",
+              "actual": "van",
+              "expected": "Van"
+            },
+            {
+              "collection": "vehicles",
+              "id": "vehicle-car",
+              "actual": "car",
+              "expected": "Car"
+            },
+            {
+              "collection": "places",
+              "id": "place-loading-area",
+              "actual": "Hall",
+              "expected": "Loading area"
+            },
+            {
+              "collection": "routes",
+              "id": "route-a",
+              "actual": "Route A",
+              "expected": "A"
+            },
+            {
+              "collection": "routes",
+              "id": "route-b",
+              "actual": "Route B",
+              "expected": "B"
+            },
+            {
+              "collection": "routes",
+              "id": "route-c",
+              "actual": "Route C",
+              "expected": "C"
+            }
+          ],
+          "alignment": {
+            "route-a": "route-a",
+            "route-b": "route-b",
+            "route-c": "route-c",
+            "person-joel": "person-joel",
+            "person-ravi": "person-ravi",
+            "person-sam": "person-sam",
+            "person-anita": "person-anita",
+            "person-maya": "person-maya",
+            "vehicle-car": "vehicle-car",
+            "vehicle-van": "vehicle-van",
+            "place-hall": "place-loading-area"
+          },
+          "unmatched_roles": [
+            {
+              "collection": "deliveries",
+              "id": "delivery-supplies",
+              "reason": "Missing role"
+            }
+          ],
+          "compared_fields": 50
+        },
+        {
+          "provider": "gemini",
+          "reading": 1,
+          "aligned_field_matches": 48,
+          "truth_fields": 50,
+          "aligned_field_match_percent": 96.0,
+          "checker_matches": 33,
+          "checker_total": 100,
+          "different_scenarios": [
+            "volunteer_absent__person-ravi",
+            "volunteer_absent__person-maya",
+            "volunteer_absent__person-sam",
+            "volunteer_leaves_early__person-ravi",
+            "volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-sam",
+            "vehicle_returns_late__vehicle-van",
+            "vehicle_returns_late__vehicle-car",
+            "supply_delivery_late__delivery-supplies",
+            "place_blocked__place-loading-area",
+            "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+            "volunteer_absent__person-anita+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-maya+volunteer_absent__person-sam",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-maya+place_blocked__place-loading-area",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-sam+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-anita+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-maya+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-maya+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+            "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+            "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+          ],
+          "mismatches": [
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": [
+                "person-ravi",
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            }
+          ],
+          "naming_only": [
+            {
+              "collection": "places",
+              "id": "place-loading-area",
+              "actual": "Loading bay",
+              "expected": "Loading area"
+            },
+            {
+              "collection": "routes",
+              "id": "route-a",
+              "actual": "Route A",
+              "expected": "A"
+            },
+            {
+              "collection": "routes",
+              "id": "route-b",
+              "actual": "Route B",
+              "expected": "B"
+            },
+            {
+              "collection": "routes",
+              "id": "route-c",
+              "actual": "Route C",
+              "expected": "C"
+            }
+          ],
+          "alignment": {
+            "route-a": "route-a",
+            "route-b": "route-b",
+            "route-c": "route-c",
+            "person-joel": "person-joel",
+            "person-ravi": "person-ravi",
+            "person-sam": "person-sam",
+            "person-anita": "person-anita",
+            "person-maya": "person-maya",
+            "vehicle-car": "vehicle-car",
+            "vehicle-van": "vehicle-van",
+            "place-loading-bay": "place-loading-area",
+            "delivery-supply-truck": "delivery-supplies"
+          },
+          "unmatched_roles": [],
+          "compared_fields": 50
+        },
+        {
+          "provider": "gemini",
+          "reading": 2,
+          "aligned_field_matches": 48,
+          "truth_fields": 50,
+          "aligned_field_match_percent": 96.0,
+          "checker_matches": 48,
+          "checker_total": 100,
+          "different_scenarios": [
+            "volunteer_absent__person-ravi",
+            "volunteer_absent__person-sam",
+            "volunteer_leaves_early__person-ravi",
+            "volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-sam",
+            "vehicle_returns_late__vehicle-van",
+            "vehicle_returns_late__vehicle-car",
+            "supply_delivery_late__delivery-supplies",
+            "place_blocked__place-loading-area",
+            "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-sam+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+            "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+            "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+          ],
+          "mismatches": [
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            }
+          ],
+          "naming_only": [
+            {
+              "collection": "places",
+              "id": "place-loading-area",
+              "actual": "Loading bay",
+              "expected": "Loading area"
+            },
+            {
+              "collection": "routes",
+              "id": "route-a",
+              "actual": "Route A",
+              "expected": "A"
+            },
+            {
+              "collection": "routes",
+              "id": "route-b",
+              "actual": "Route B",
+              "expected": "B"
+            },
+            {
+              "collection": "routes",
+              "id": "route-c",
+              "actual": "Route C",
+              "expected": "C"
+            }
+          ],
+          "alignment": {
+            "route-a": "route-a",
+            "route-b": "route-b",
+            "route-c": "route-c",
+            "person-joel": "person-joel",
+            "person-ravi": "person-ravi",
+            "person-sam": "person-sam",
+            "person-anita": "person-anita",
+            "person-maya": "person-maya",
+            "vehicle-car": "vehicle-car",
+            "vehicle-van": "vehicle-van",
+            "place-loading-bay": "place-loading-area",
+            "delivery-supply-truck": "delivery-supplies"
+          },
+          "unmatched_roles": [],
+          "compared_fields": 50
+        },
+        {
+          "provider": "gemini",
+          "reading": 3,
+          "aligned_field_matches": 48,
+          "truth_fields": 50,
+          "aligned_field_match_percent": 96.0,
+          "checker_matches": 48,
+          "checker_total": 100,
+          "different_scenarios": [
+            "volunteer_absent__person-ravi",
+            "volunteer_absent__person-sam",
+            "volunteer_leaves_early__person-ravi",
+            "volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-sam",
+            "vehicle_returns_late__vehicle-van",
+            "vehicle_returns_late__vehicle-car",
+            "supply_delivery_late__delivery-supplies",
+            "place_blocked__place-loading-area",
+            "volunteer_absent__person-ravi+volunteer_absent__person-sam",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-ravi+place_blocked__place-loading-area",
+            "volunteer_absent__person-maya+volunteer_leaves_early__person-anita",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-ravi",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-joel",
+            "volunteer_absent__person-sam+volunteer_leaves_early__person-maya",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_absent__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_absent__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_absent__person-sam+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-joel",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-ravi+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-ravi+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-ravi+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-ravi+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-anita",
+            "volunteer_leaves_early__person-joel+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-joel+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-joel+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-joel+place_blocked__place-loading-area",
+            "volunteer_leaves_early__person-anita+volunteer_leaves_early__person-maya",
+            "volunteer_leaves_early__person-maya+volunteer_leaves_early__person-sam",
+            "volunteer_leaves_early__person-maya+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-van",
+            "volunteer_leaves_early__person-sam+vehicle_returns_late__vehicle-car",
+            "volunteer_leaves_early__person-sam+supply_delivery_late__delivery-supplies",
+            "volunteer_leaves_early__person-sam+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-van+vehicle_returns_late__vehicle-car",
+            "vehicle_returns_late__vehicle-van+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-van+place_blocked__place-loading-area",
+            "vehicle_returns_late__vehicle-car+supply_delivery_late__delivery-supplies",
+            "vehicle_returns_late__vehicle-car+place_blocked__place-loading-area",
+            "supply_delivery_late__delivery-supplies+place_blocked__place-loading-area"
+          ],
+          "mismatches": [
+            {
+              "field": "routes.route-a.loader_ids",
+              "expected": [
+                "person-joel",
+                "person-maya",
+                "person-anita",
+                "person-ravi"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya",
+                "person-ravi"
+              ]
+            },
+            {
+              "field": "routes.route-c.loader_ids",
+              "expected": [
+                "person-anita",
+                "person-maya",
+                "person-joel"
+              ],
+              "actual": [
+                "person-joel",
+                "person-anita",
+                "person-maya"
+              ]
+            }
+          ],
+          "naming_only": [
+            {
+              "collection": "places",
+              "id": "place-loading-area",
+              "actual": "Loading bay",
+              "expected": "Loading area"
+            },
+            {
+              "collection": "routes",
+              "id": "route-a",
+              "actual": "Route A",
+              "expected": "A"
+            },
+            {
+              "collection": "routes",
+              "id": "route-b",
+              "actual": "Route B",
+              "expected": "B"
+            },
+            {
+              "collection": "routes",
+              "id": "route-c",
+              "actual": "Route C",
+              "expected": "C"
+            }
+          ],
+          "alignment": {
+            "route-a": "route-a",
+            "route-b": "route-b",
+            "route-c": "route-c",
+            "person-joel": "person-joel",
+            "person-ravi": "person-ravi",
+            "person-sam": "person-sam",
+            "person-anita": "person-anita",
+            "person-maya": "person-maya",
+            "vehicle-car": "vehicle-car",
+            "vehicle-van": "vehicle-van",
+            "place-loading-bay": "place-loading-area",
+            "delivery-supply-truck": "delivery-supplies"
+          },
+          "unmatched_roles": [],
+          "compared_fields": 50
+        }
+      ]
+    }
+  ],
+  "measurement_version": "verdict-v1"
 }

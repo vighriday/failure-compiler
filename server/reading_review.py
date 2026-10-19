@@ -3,7 +3,13 @@
 from fastapi import HTTPException
 
 from server.checker.scenarios import generate_scenarios
-from server.evaluation import COLLECTIONS, align_entities, checker_fields, compare_reading
+from server.evaluation import (
+    COLLECTIONS,
+    align_entities,
+    checker_fields,
+    comparable_input,
+    compare_reading,
+)
 from server.reading import items_for_plan, questions_for_plan
 from server.review import ACCEPTED, REVIEWS, confirm_review, create_review, update_review
 from server.validation.models import PlanMap
@@ -96,7 +102,9 @@ def correction_audit(plan: PlanMap, truth: PlanMap, *, place_aliases: dict | Non
                     entity for entity in getattr(aligned, collection) if entity.id == expected.id
                 )
                 for field, value in expected.model_dump().items():
-                    if field in {"id", "name"} or getattr(comparable, field) == value:
+                    if field in {"id", "name"} or comparable_input(
+                        field, getattr(comparable, field)
+                    ) == comparable_input(field, value):
                         continue
                     control_row = next(
                         (

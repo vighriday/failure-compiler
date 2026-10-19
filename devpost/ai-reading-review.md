@@ -2,9 +2,33 @@
 
 ## Status
 
-Hardening and revised parts 1 to 6 are complete. The read-v3 bake-off selected Gemini: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. Following the user's continuation, a reversible place-identity question resolves the extra Hall explicitly. The same one-shot reading now reaches 100% checker-input agreement, 100/100 full-result matches and 100 actual scenarios through the UI. The raw reading is promoted as-is, with correction actions saved separately. Part 7 was attempted on 19 October: Gemini returned HTTP 503 on every case, including one explicit retry per failed request. No suggestion response or checker verdict exists. The earlier stop evidence is retained below. Slice 6 remains unchecked while live integration and suggestion review are pending; slice 7 has not started.
+The measurement was corrected on 19 October: checker equivalence compares only state, lateness_minutes and human_cost. Timelines are excluded because equal-quality schedules can differ. Existing read-v3 responses now score Gemini 100/100 mean verdicts and 94.34% aligned fields, against Groq 55/100 and 84%; Gemini remains primary. No new API calls were made. A reversible place-identity question resolves the extra Hall explicitly. The same one-shot reading now reaches 100% checker-input agreement, 100/100 locked verdict matches and 100 actual scenarios through the UI, without reordering loaders. The raw reading is promoted as-is, with correction actions saved separately. Part 7 was attempted on 19 October: Gemini returned HTTP 503 on every case, including one explicit retry per failed request. No suggestion response or checker verdict exists. The earlier stop evidence is retained below. Slice 6 remains unchecked while live integration and suggestion review are pending; slice 7 has not started.
 
 The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. The running app now uses the saved real reading and displays its provider/model. Live HTTP/UI integration, session keys and reviewed live fix suggestions remain pending; the existing fix suggestions are still labelled hand-written placeholders.
+
+## Verdict-only re-score, 19 October 2026
+
+Checker equivalence is exact agreement on **state, lateness_minutes and human_cost** for each of the truth map's 100 scenarios, matching the fields locked by `expected-results.json`. Timelines, chosen people, diagnostic bounds, dim-cause metadata and fingerprints are excluded. Common labels are used only when rendering human-cost text for comparison. Aligned field comparison treats `loader_ids` as sets and keeps `driver_ids` in primary-first order. Fingerprints use the same loader-set semantics without changing the displayed list.
+
+Every saved campaign was re-scored offline, including the original `bakeoff.json`. Each report retains its previous scores and ranking in `measurement_history`; `raw`, provider attempt logs and failed-call history are unchanged. No provider call or prompt revision was made.
+
+| Prompt | Provider | Aligned fields, three runs | Locked verdicts out of 100, three runs | Successful-run tokens |
+| --- | --- | --- | --- | --- |
+| read-v1 | Groq | 86%, 90%, 86% | 87, 87, 87 | 10,282 |
+| read-v1 | Gemini | 100%, 100%, 100% | 100, 100, 100 | 13,047 |
+| read-v2 | Groq | 75%, 75.44%, 75.44% | 87, 87, 87 | 11,643 |
+| read-v2 | Gemini | 100%, provider error, provider error | 100, unavailable, unavailable | 4,212 |
+| read-v3 | Groq | 84%, 84%, 84% | 55, 55, 55 | 10,775 |
+| read-v3 | Gemini | 94.34%, 94.34%, 94.34% | 100, 100, 100 | 7,470 |
+
+The incomplete read-v2 Gemini campaign remains excluded from its campaign ranking. Prompt versions are recorded separately; the active read-v3 campaign determines the primary. Loader reordering accounts for no input difference. The extra Hall still lowers Gemini's raw read-v3 field score: three additional place fields yield 50/53 = 94.34%; verdict equivalence alone never hides extra inputs or their additional scenarios.
+
+| Rank | Active provider / model | Mean locked verdicts / 100 | Mean aligned fields | Consistency variance | Successful-run tokens |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Gemini / gemini-3.8-flash | 100 | 94.34% | 0 | 7,470 |
+| 2 | Groq / openai/gpt-oss-120b | 55 | 84% | 0 | 10,775 |
+
+Ranking remains verdict matches, aligned fields, lower population variance across runs, then fewer tokens. Gemini stays primary, dated 19 October in `server/config.py`. `test_reading_matches_truth` now replays only the Hall identity correction plus the required confirmations and questions. It checks all aligned inputs, all 100 locked verdicts and the actual 100-scenario count, while asserting that the provider's loader order is unchanged.
 
 ## Original exact-name bake-off (superseded measurement)
 
@@ -57,7 +81,9 @@ The missing delivery is a substantive missing checker input; this is more than a
 - No live fix suggestions were requested after the stop condition. There are no real per-case verdicts or real-reading UI screenshots yet.
 - Slice 6 remains unchecked. Continuing requires a decision on missing records and name normalisation or correction before replacing the example fixtures.
 
-## Prompt versions and aligned scores
+## Superseded full-result measurement (historical)
+
+The following scores include arbitrary solver schedules. They are retained as history only; the verdict-only re-score below is authoritative.
 
 The revised measurement aligns entity identities by type and role, ignores display names in field comparison, and compares every result field, including numeric costs and schedules. Human-cost wording uses common labels only for this comparison. A missing entity is not filled from truth: failures targeting it are no-ops in the unchanged solver, and its missing inputs remain field mismatches. Ranking is mean exact checker results, mean aligned field percentage, lower variance across those two scores, then fewer total tokens.
 
@@ -80,14 +106,14 @@ No new provider calls were made to rescore `read-v1`; [bakeoff-read-v1.json](bak
 
 All saved campaigns use the same final evaluator: route letters, primary-driver/key-holder roles, vehicle use and the exclusive-loading place identify corresponding entities. Names are not compared or used to choose a match. Ambiguous or extra entities stay visible. Field-score denominators include the union of truth and extracted checker fields, so extra entities lower the score. Each reading runs the truth map's 100 scenarios; this is a common comparison matrix, not a claim that a reading with extra entities generates only 100 scenarios itself.
 
-### Selected primary, 17 October 2026
+### Earlier selection, 17 October 2026 (superseded scores)
 
 | Rank | Provider | Mean exact results / 100 | Mean aligned fields | Consistency variance | Successful-run tokens |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Gemini / gemini-3.8-flash | 43 | 90.57% | 50 | 7,470 |
 | 2 | Groq / openai/gpt-oss-120b | 12 | 82% | 0 | 10,775 |
 
-Ranking follows the requested order: exact full-result equivalence, aligned fields, consistency, tokens. The variance is the sum of population variances of those two scores across three runs. Gemini wins on the first criterion. Run 2 puts Ravi first in Route A's loading list; the other runs put Joel first. Assignment order is meaningful, and full schedule equality is intentionally included in the score. `server/config.py` records the date, winner and scores; the adapter reads that order, and each provider keeps its own model ID when primary and fallback switch.
+Ranking follows the requested order: exact full-result equivalence, aligned fields, consistency, tokens. The variance is the sum of population variances of those two scores across three runs. Gemini wins on the first criterion. Run 2 puts Ravi first in Route A's loading list; the other runs put Joel first. That evaluator incorrectly treated loader order as meaningful and intentionally included full schedule equality. The verdict-only re-score above supersedes that measurement. `server/config.py` records the date, winner and scores; the adapter reads that order, and each provider keeps its own model ID when primary and fallback switch.
 
 ## Part 6: one-shot winner reading and the earlier control gap
 
@@ -132,15 +158,15 @@ The user continued after the checkpoint. A generic rule question now asks whethe
 
 The original one-shot response was reused. Its bytes have SHA-256 `6f30729d00eb041136d3594a62886ce3ee2dce5dd480fdac9eca39c62b234cfa`, identical in the local candidate and promoted fixture. The review ledger also stores a digest of UTF-8 text with LF line endings and a digest of the exact `raw_text`, so checking out the repository on Windows does not create a false hash failure.
 
-The demo needs three explicit corrections:
+The current demo needs one explicit correction:
 
 1. Hall: **Same place as another listing**, choose **Loading bay**, then individually review the retained place's facts.
-2. Route A loaders: **Joel, Maya, Anita, Ravi**.
-3. Route C loaders: **Anita, Maya, Joel**.
 
-No fact addition or name edit is needed. Other guessed facts and all four arrival questions still require individual confirmation. After those actions, **every aligned checker input matches, all 100 full results match exactly, and the real map generates 100 scenarios**: 1 single weak spot, 3 hidden pairs, 12 dimmed, 84 survived.
+The earlier Route A and Route C loader reordering is removed from the review ledger and demo script. Loaders are eligible sets, so their order changes no checker input or verdict. The raw reading and its displayed loader order are preserved.
 
-`fixtures/example-reading.json` is the unedited provider record. `fixtures/example-corrections.json` contains only the separate review ledger and digests. `test_reading_matches_truth.py` replays the same server actions and compares checker inputs plus every full result. The old hand-written reading is retained only under `tests/fixtures/` for its explicit hardening contracts. The production app identifies the saved reading as Gemini output; the existing fix suggestions remain labelled placeholders while live suggestions await review.
+No fact addition or name edit is needed. Other guessed facts and all four arrival questions still require individual confirmation. After those actions, **every aligned checker input matches, all 100 locked verdicts match exactly, and the real map generates 100 scenarios**: 1 single weak spot, 3 hidden pairs, 12 dimmed, 84 survived.
+
+`fixtures/example-reading.json` is the unedited provider record. `fixtures/example-corrections.json` contains only the separate review ledger and digests. `test_reading_matches_truth.py` replays the same server actions and compares checker inputs plus every locked verdict. Driver order is retained; loader order is ignored. The old hand-written reading is retained only under `tests/fixtures/` for its explicit hardening contracts. The production app identifies the saved reading as Gemini output; the existing fix suggestions remain labelled placeholders while live suggestions await review.
 
 Playwright exercised the place picker, Change/undo, loader arrows, individual confirmations and all 100 cells without page errors or suggestion calls. New evidence is in `devpost/screens/read-v3-merged-before.png`, `read-v3-merged-reviewed.png`, `read-v3-merged-grid.png` and `devpost/screens/live-candidates/read-v3/read-v3-merged-ui-proof.json`. The earlier 115-cell stop evidence remains intact. The full story and re-confirmation browser regressions also pass with the real reading, including all three placeholder fixes and all 100 scenarios surviving. Fix fixture lookup aligns identities to the reviewed map, so the AI's supply-delivery ID does not break the example story.
 

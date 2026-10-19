@@ -51,24 +51,7 @@ def review_saved_plan(page, corrections, *, verify_undo=False):
                 expect(page.locator(".reading-row")).to_have_count(original_rows)
                 identify()
             continue
-        if action["action"] != "correct" or action["field"] != "loader_ids":
-            raise AssertionError(f"This UI proof needs an explicit control for {action}")
-        row = page.locator(f'[data-item-id="{action["item_id"]}"]')
-        opener = row.get_by_role("button", name="Correct", exact=True)
-        (opener if opener.count() else row.get_by_role("button", name="Answer", exact=True)).click()
-        for position, person_id in enumerate(action["value"]):
-            label = f"Move {person_id} earlier in loader_ids"
-            choice = row.locator(".choice-row").filter(
-                has=page.get_by_role("button", name=label, exact=True)
-            )
-            while True:
-                current = int(choice.locator("span").inner_text().split(".", 1)[0]) - 1
-                if current == position:
-                    break
-                with updated(page):
-                    choice.get_by_role("button", name=label, exact=True).click()
-                expect(choice.locator("span")).to_contain_text(f"{current}. ")
-        expect(row.locator(".status-chip")).to_have_text("corrected by you")
+        raise AssertionError(f"This UI proof needs an explicit control for {action}")
     with updated(page):
         page.get_by_role("button", name="Confirm everything that isn’t a guess", exact=True).click()
     guessed = page.locator(".reading-row").filter(has=page.locator(".status-guessed"))
