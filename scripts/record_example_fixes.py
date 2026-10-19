@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -14,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from server.ai.adapter import suggest_fixes  # noqa: E402
+from server.ai.groq_provider import cooldown_seconds  # noqa: E402
 from server.ai.types import AIError, AIFixResponse  # noqa: E402
 from server.checker.explain import route_reasons  # noqa: E402
 from server.checker.runner import run_checker  # noqa: E402
@@ -66,6 +68,9 @@ def main():
         action="store_true",
         help="Retry saved transient failures once; retain prior attempts and reuse successes",
     )
+    parser.add_argument("--provider", choices=("gemini", "groq"), default=PRIMARY_PROVIDER)
+    parser.add_argument("--minimum-interval", type=int, default=0, help="Seconds between retries")
+    parser.add_argument("--max-provider-attempts", type=int, default=0, help="Zero means no cap")
     args = parser.parse_args()
     if args.score_only and args.retry_failed:
         parser.error("score-only cannot request retries")
@@ -119,10 +124,29 @@ def main():
                 if retry
                 else []
             )
+            provider_attempts = sum(
+                attempt.get("provider") == args.provider
+                for record in previous
+                for attempt in record.get("attempts", [])
+            )
+            if args.max_provider_attempts and provider_attempts >= args.max_provider_attempts:
+                print(f"SKIP: {case_id} reached the {args.provider} attempt cap.", flush=True)
+                continue
+            if retry and args.minimum_interval and captured.get("recorded_at"):
+                elapsed = (
+                    datetime.now(UTC) - datetime.fromisoformat(captured["recorded_at"])
+                ).total_seconds()
+                if elapsed < args.minimum_interval:
+                    print(f"SKIP: {case_id} is still inside the retry interval.", flush=True)
+                    continue
             context = context_for(plan, result, results)
-            print(f"Capturing {case_id} from {PRIMARY_PROVIDER}", flush=True)
+            if args.provider == "groq":
+                while (remaining := cooldown_seconds()) > 0:
+                    print("Waiting for the Groq token budget.", flush=True)
+                    time.sleep(min(remaining, 30))
+            print(f"Capturing {case_id} from {args.provider}", flush=True)
             try:
-                response = suggest_fixes(context, keys, provider=PRIMARY_PROVIDER)
+                response = suggest_fixes(context, keys, provider=args.provider)
                 captured = {
                     "raw": response.raw.record(),
                     "attempts": response.attempts,
@@ -158,6 +182,7 @@ def main():
             json.dumps(
                 {
                     "case": case_id,
+                    "provider": captured["raw"]["provider"],
                     "suggestions": [
                         {
                             key: fix.get(key)

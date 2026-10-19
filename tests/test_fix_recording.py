@@ -87,11 +87,18 @@ def test_explicit_retry_retains_failure_and_never_repeats_success(monkeypatch, t
     recording.main()
     recording.main()
     assert len(calls) == 4  # A saved failure is never retried by default.
-    monkeypatch.setattr("sys.argv", [*argv, "--retry-failed"])
+    monkeypatch.setattr("sys.argv", [*argv, "--retry-failed", "--minimum-interval", "600"])
+    recording.main()
+    assert len(calls) == 4  # Enforce the user's minimum retry interval.
+    monkeypatch.setattr("sys.argv", [*argv, "--retry-failed", "--max-provider-attempts", "1"])
+    recording.main()
+    assert len(calls) == 4  # A per-provider cap cannot be exceeded.
+    monkeypatch.setattr("sys.argv", [*argv, "--retry-failed", "--provider", "groq"])
     recording.main()
     recording.main()
     assert len(calls) == 5 and calls[0] == calls[-1]
     cases = json.loads((tmp_path / "example-fixes.json").read_text(encoding="utf-8"))["cases"]
     assert cases[calls[0]]["raw"]["raw_text"] == payload
+    assert cases[calls[0]]["raw"]["provider"] == "groq"
     assert cases[calls[0]]["previous_attempts"][0]["error"] == "providers_failed"
     assert len(cases[calls[0]]["previous_attempts"]) == 1
