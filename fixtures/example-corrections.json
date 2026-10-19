@@ -1,0 +1,161 @@
+{
+  "reading_sha256": "a8d1fa55d89adcced9f9884c537c2543155c6c762f6bccc6d7437f97e4d823ab",
+  "provider": "gemini",
+  "prompt_version": "read-v3",
+  "scripted_corrections": [
+    {
+      "action": "answer",
+      "question_id": "rule-place-hall-identity",
+      "value": {
+        "choice": "Same place as another listing",
+        "place_id": "place-loading-bay"
+      }
+    },
+    {
+      "action": "correct",
+      "item_id": "route-a",
+      "field": "loader_ids",
+      "value": [
+        "person-joel",
+        "person-maya",
+        "person-anita",
+        "person-ravi"
+      ]
+    },
+    {
+      "action": "correct",
+      "item_id": "route-c",
+      "field": "loader_ids",
+      "value": [
+        "person-anita",
+        "person-maya",
+        "person-joel"
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "action": "answer",
+      "question_id": "rule-place-hall-identity",
+      "value": {
+        "choice": "Same place as another listing",
+        "place_id": "place-loading-bay"
+      }
+    },
+    {
+      "action": "correct",
+      "item_id": "route-a",
+      "field": "loader_ids",
+      "value": [
+        "person-joel",
+        "person-maya",
+        "person-anita",
+        "person-ravi"
+      ]
+    },
+    {
+      "action": "correct",
+      "item_id": "route-c",
+      "field": "loader_ids",
+      "value": [
+        "person-anita",
+        "person-maya",
+        "person-joel"
+      ]
+    },
+    {
+      "action": "confirm_all"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "ravi-availability"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "ravi-key"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "maya-availability"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "maya-key"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "sam-availability"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "sam-key"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "anita-availability"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "anita-key"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "place-loading-bay"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "place-loading-bay-loading"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-a-loading"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-a-driving"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-b"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-b-loading"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-b-driving"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-c-loading"
+    },
+    {
+      "action": "confirm_item",
+      "item_id": "route-c-driving"
+    },
+    {
+      "action": "answer",
+      "question_id": "reading-question-1",
+      "value": "Use the reviewed details"
+    },
+    {
+      "action": "answer",
+      "question_id": "reading-question-2",
+      "value": "Use the reviewed details"
+    },
+    {
+      "action": "answer",
+      "question_id": "reading-question-3",
+      "value": "Use the reviewed details"
+    },
+    {
+      "action": "answer",
+      "question_id": "reading-question-4",
+      "value": "Use the reviewed details"
+    }
+  ],
+  "captured_file_sha256": "6f30729d00eb041136d3594a62886ce3ee2dce5dd480fdac9eca39c62b234cfa",
+  "digest_format": "UTF-8 text with LF line endings",
+  "raw_text_sha256": "082002295e5d2dd0b4a90dd679796b64dce8a3d0eab1af6c6f5cb1d7c2b60f92"
+}

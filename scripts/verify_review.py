@@ -4,6 +4,7 @@ import os
 import re
 from pathlib import Path
 
+from browser_review import review_example
 from playwright.sync_api import expect, sync_playwright
 
 BASE = os.environ.get("FAILURE_COMPILER_URL", "http://127.0.0.1:8011")
@@ -15,7 +16,7 @@ CASES = [
         "86 survived",
     ),
     (
-        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies",
+        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck",
         "sam-route-a-driver",
         "87 survived",
     ),
@@ -33,11 +34,7 @@ def main():
         page.goto(BASE + "/#start")
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan", exact=True).click()
-        expect(page.locator(".reading-row")).to_have_count(24)
-        page.get_by_role("button", name=re.compile("Confirm everything")).click()
-        page.get_by_role("button", name="Only his car", exact=True).click()
-        page.get_by_role("button", name="Answer", exact=True).click()
-        page.get_by_role("button", name="Keep this guess", exact=True).click()
+        review_example(page)
         page.get_by_role("button", name="Confirm plan", exact=True).click()
         expect(page.locator(".crash-count")).to_contain_text("84 survived", timeout=60000)
         expect(page.locator(".result-cell")).to_have_count(100)

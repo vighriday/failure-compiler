@@ -6,6 +6,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from browser_review import confirm_pending, review_example
 from playwright.sync_api import expect, sync_playwright
 
 BASE = os.environ.get("FAILURE_COMPILER_URL", "http://127.0.0.1:5173")
@@ -60,11 +61,11 @@ def main():
         def confirm(page):
             page.get_by_role("button", name="Read plan", exact=True).click()
             expect(page.get_by_role("button", name="Confirm plan", exact=True)).to_be_disabled()
-            page.get_by_role("button", name=re.compile("Confirm everything")).click()
-            expect(page.get_by_role("button", name="Confirm plan", exact=True)).to_be_disabled()
+            review_example(page)
             ravi = page.locator('[data-item-id="ravi-driver"]')
             ravi.focus()
-            expect(page.locator("#plan-L16")).to_have_class(re.compile("line-active"))
+            source = ravi.locator(".source-tag").inner_text()
+            expect(page.locator(f"#plan-{source}")).to_have_class(re.compile("line-active"))
             ravi.get_by_role("button", name="Correct", exact=True).click()
             page.get_by_role(
                 "combobox", name="Correction for Ravi can drive.", exact=True
@@ -75,36 +76,18 @@ def main():
                 "combobox", name="Correction for Ravi can drive.", exact=True
             ).select_option("true")
             expect(page.locator(".rule-question")).to_have_count(0)
-            for route in ["route-a", "route-b", "route-c"]:
-                page.locator(f'[data-item-id="{route}"]').get_by_role(
-                    "button", name="Confirm", exact=True
-                ).click()
-            page.get_by_role("button", name="Only his car", exact=True).click()
-            page.get_by_role("button", name="Change", exact=True).click()
-            page.get_by_role("button", name="The van too", exact=True).click()
-            expect(page.locator('[data-item-id="route-c"]')).to_contain_text(
-                re.compile("Loading cover:.*Ravi")
-            )
-            page.get_by_role("button", name="Change", exact=True).click()
-            page.get_by_role("button", name="Only his car", exact=True).click()
-            expect(page.locator('[data-item-id="route-c"]')).not_to_contain_text(
-                re.compile("Loading cover:.*Ravi")
-            )
-            page.get_by_role("button", name="Answer", exact=True).click()
-            page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
-                "45"
-            )
-            page.get_by_role("combobox", name=re.compile("Correction for Route C")).select_option(
-                "60"
-            )
+            driving = page.locator('[data-item-id="route-c-driving"]')
+            driving.get_by_role("button", name="Correct", exact=True).click()
+            driving.get_by_role(
+                "combobox", name=re.compile("Correction for Route C's drive")
+            ).select_option("45")
+            driving.get_by_role(
+                "combobox", name=re.compile("Correction for Route C's drive")
+            ).select_option("60")
             sizes = page.get_by_role("combobox", name="Vehicle returns late size", exact=True)
             sizes.select_option("45")
             sizes.select_option("30")
-            while page.get_by_role("button", name="Confirm", exact=True).count():
-                with page.expect_response(
-                    lambda response: response.url.endswith("/api/update-map")
-                ):
-                    page.get_by_role("button", name="Confirm", exact=True).first.click()
+            confirm_pending(page)
             page.get_by_role("button", name="Confirm plan", exact=True).click()
             expect(page.locator(".result-cell")).to_have_count(100, timeout=30000)
 
@@ -344,7 +327,7 @@ def main():
         rule_page = new_page()
         load(rule_page)
         rule_page.get_by_role("button", name="Read plan", exact=True).click()
-        rule_page.get_by_role("button", name=re.compile("Confirm everything")).click()
+        review_example(rule_page)
         rule_page.locator('[data-item-id="ravi-driver"]').get_by_role(
             "button", name="Correct", exact=True
         ).click()
@@ -354,17 +337,10 @@ def main():
         expect(rule_page.locator(".rule-question")).to_have_count(3)
         for route, driver in [("A", "person-maya"), ("B", "person-sam"), ("C", "person-anita")]:
             rule_page.get_by_role(
-                "combobox", name=f"Choose a driver for route {route}", exact=True
+                "combobox", name=f"Choose a driver for Route {route}", exact=True
             ).select_option(driver)
         expect(rule_page.locator(".rule-question")).to_have_count(0)
-        rule_page.get_by_role("button", name="Only his car", exact=True).click()
-        rule_page.get_by_role("button", name="Answer", exact=True).click()
-        rule_page.get_by_role("button", name="Keep this guess", exact=True).click()
-        while rule_page.get_by_role("button", name="Confirm", exact=True).count():
-            with rule_page.expect_response(
-                lambda response: response.url.endswith("/api/update-map")
-            ):
-                rule_page.get_by_role("button", name="Confirm", exact=True).first.click()
+        confirm_pending(rule_page)
         rule_page.get_by_role("button", name="Confirm plan", exact=True).click()
         expect(rule_page.locator(".result-cell")).to_have_count(100, timeout=30000)
         rule_page.close()

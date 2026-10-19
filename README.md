@@ -7,7 +7,7 @@
 -->
 
 > [!NOTE]
-> **Submission draft.** The working app is complete through slice 5: example plan, confirmation, live checker, case details and fixes. Readings and suggestions are hand-written placeholders, clearly labelled in the app. Live AI and reports are planned for slices 6 and 7. Video, image and PDF links below are placeholders for the final submission.
+> **Submission draft.** The working app includes the example plan, confirmation, live checker, case details and scored fixes. The saved example reading is real, unedited Gemini output with explicit review steps; example fix suggestions remain labelled hand-written placeholders. Live pasted-plan integration and reports are still pending. Video, image and PDF links below are placeholders for the final submission.
 
 <div align="center">
 
@@ -393,9 +393,8 @@ flowchart LR
 >
 > Any "?" result is listed by name in the report and never counted as a pass. This version supports community distribution plans with up to 24 problems. It is a proof of concept, not a guarantee for real-world operations.
 
-<!-- UPDATE after slice 6: delete this note once the placeholder reading is replaced by a real AI reading. -->
 > [!NOTE]
-> **Build status:** until the live-AI step is finished, example mode uses a hand-written placeholder reading, clearly labelled in the app. It gets replaced by a real, saved AI reading before submission. The checker's results above do not depend on it: they come from the hand-checked truth map.
+> **Build status:** example mode uses one unedited saved Gemini reading. The review controls identify Hall as the same place as Loading bay and correct the loader order on Routes A and C. A regression verifies every checker input and all 100 results against the independent hand-checked truth map. Fix suggestions remain labelled placeholders until the real suggestions have been reviewed.
 
 ---
 
@@ -437,11 +436,13 @@ uv run -- python scripts/dev.py
 
 Open **http://localhost:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed.
 
+For the saved reading, answer the Hall question with **Same place as another listing**, choose **Loading bay**, and review its facts individually. Set Route A's loaders to **Joel, Maya, Anita, Ravi** and Route C's to **Anita, Maya, Joel** using the up arrows. Confirm guesses individually, answer the arrival questions after reviewing the associated facts, then confirm the plan. These steps produce the locked 100-scenario example.
+
 The launcher waits for the API health check and web page before printing both addresses. It allows up to 90 seconds for a cold start and names any server still starting. Keep that terminal open; press `Ctrl+C` to stop both servers. If a port is already in use, it stops without launching a duplicate.
 
 The interface follows the supplied Landing v2 design: Overview, a scroll-linked Plan story, Read, Crash test, Trust and Start. Sample illustrations are labelled; after loading a plan, Read and Crash test use the real confirmation and checker flow. The design templates and conversion instructions are in [`design/landing-v2/`](design/landing-v2/).
 
-**Live AI is planned for slice 6.** The current build supports the example plan and does not load `.env` or use the key field yet. You can prepare `.env` from `.env.example` with a [Groq](https://console.groq.com/keys) key in `GROQ_API_KEY` and a [Gemini](https://aistudio.google.com/apikey) key in `GEMINI_API_KEY`; these will become usable when the provider integration is connected.
+**Live pasted-plan reading is still pending in slice 6.** The app server supports the saved example and does not load `.env` or use the key field yet. The provider recording scripts use `.env`: a [Groq](https://console.groq.com/keys) key in `GROQ_API_KEY` and a [Gemini](https://aistudio.google.com/apikey) key in `GEMINI_API_KEY`. Gemini is the selected primary; its adapter and the Groq fallback have offline regression coverage.
 
 | Task | Command |
 |---|---|
@@ -534,7 +535,7 @@ failure-compiler/
 │   ├── fixes.py             Gate, score and apply example fixes
 │   ├── session.py           In-memory maps and results by fingerprint
 │   ├── config.py            Model names, problem types, size presets, limits
-│   ├── ai/                  Planned: provider adapters and prompts (slice 6)
+│   ├── ai/                  Provider adapters, strict schemas and versioned prompts
 │   ├── validation/
 │   │   ├── gate.py          Parse, schema, ids, normalisation
 │   │   ├── models.py        AI reading and confirmed map metadata
@@ -549,7 +550,8 @@ failure-compiler/
 ├── fixtures/
 │   ├── example-plan.txt     The messy plan
 │   ├── example-truth.json   The hand-checked correct map
-│   ├── example-reading.json Hand-written PLACEHOLDER reading
+│   ├── example-reading.json Unedited saved Gemini reading
+│   ├── example-corrections.json Explicit review actions, separate from the AI output
 │   ├── example-fixes.json   Hand-written PLACEHOLDER suggestions
 │   └── expected-results.json  All 100 locked results
 ├── scripts/                 dev.py, check_map.py, verify_story.py
@@ -564,7 +566,7 @@ failure-compiler/
 
 | Endpoint | What it does |
 |---|---|
-| `POST /api/read-plan` | Returns the hand-written example reading with no AI call. Live plan reading is planned for slice 6. |
+| `POST /api/read-plan` | Returns the saved real example reading with no new AI call. Live pasted-plan reading is still pending. |
 | `POST /api/validate-map` | Runs the rules after every correction, so the screen updates straight away |
 | `POST /api/update-map` | Applies constrained corrections and review actions to the server's own reading draft |
 | `POST /api/confirm-map` | Checks the server's confirmations, answers and rules, then returns the fingerprint |

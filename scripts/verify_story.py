@@ -1,9 +1,9 @@
 """Playwright contract for the full example story. Run with a local dev server up."""
 
 import os
-import re
 from pathlib import Path
 
+from browser_review import review_example
 from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,30 +43,29 @@ def main() -> None:
             assert response.value.status == 200
             return response.value.json()
 
-        def van_loading_answer(request):
-            return (
-                request.url.endswith("/api/update-map")
-                and request.post_data_json.get("action") == "answer"
-                and request.post_data_json.get("value") == "The van too"
-            )
-
         page.goto(f"{BASE_URL}/#start")
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan").click()
-        # The alternative answer must change checker inputs, not just its caption.
-        with page.expect_response(lambda response: van_loading_answer(response.request)):
-            page.get_by_role("button", name="The van too", exact=True).click()
-        expect(
-            page.locator(".statement-line").filter(has_text=re.compile("Loading cover:.*Ravi"))
-        ).to_have_count(3)
+        review_example(page)
+        # Adding and removing loading cover uses the actual ordered-person control.
+        route = page.locator('[data-item-id="route-c"]')
+        route.get_by_role("button", name="Correct", exact=True).click()
+        loader_picker = route.get_by_label("Loaders (primary first) for route-c", exact=True)
+        expect(loader_picker).to_be_enabled()
+        with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
+            loader_picker.focus()
+            loader_picker.press("ArrowDown")
+        expect(route).to_contain_text("Anita, Maya, Joel and Ravi")
+        with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
+            route.get_by_role(
+                "button", name="Remove person-ravi from loader_ids", exact=True
+            ).click()
+        expect(route.locator(".statement-line")).not_to_contain_text("Joel and Ravi")
         page.reload()
         page.get_by_role("tab", name="Start", exact=True).click()
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan").click()
-        page.get_by_role("button", name=re.compile("Confirm everything")).click()
-        page.get_by_role("button", name="Only his car", exact=True).click()
-        page.get_by_role("button", name="Answer", exact=True).click()
-        page.get_by_role("button", name="Keep this guess", exact=True).click()
+        review_example(page)
         page.get_by_role("button", name="Confirm plan").click()
         page.wait_for_function(
             "document.querySelectorAll('.result-cell').length > 0"
@@ -174,10 +173,7 @@ def main() -> None:
         reduced.goto(f"{BASE_URL}/#start")
         reduced.get_by_role("button", name="Load the example plan", exact=True).click()
         reduced.get_by_role("button", name="Read plan").click()
-        reduced.get_by_role("button", name=re.compile("Confirm everything")).click()
-        reduced.get_by_role("button", name="Only his car", exact=True).click()
-        reduced.get_by_role("button", name="Answer", exact=True).click()
-        reduced.get_by_role("button", name="Keep this guess", exact=True).click()
+        review_example(reduced)
         reduced.evaluate("""() => {
             window.cellCounts = [];
             new MutationObserver(() => window.cellCounts.push(

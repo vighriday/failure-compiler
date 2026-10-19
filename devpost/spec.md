@@ -75,14 +75,14 @@ PRD ref: `prd.md > The Core Journey`.
 
 | Role | Provider | Model | SDK |
 |---|---|---|---|
-| Primary | Groq | `openai/gpt-oss-120b` | `groq` (official) |
-| Fallback | Gemini | `gemini-3.8-flash` | `google-genai` (official) |
+| Primary | Gemini | `gemini-3.8-flash` | `google-genai` (official) |
+| Fallback | Groq | `openai/gpt-oss-120b` | `groq` (official) |
 
 Model names live in `server/config.py`. Fallback triggers: rate limit, server error, timeout, or format-check failure on the primary's output. One attempt per provider.
 
-The Gemini structured output call follows the current `google-genai` Interactions API. Verify the exact parameter name (`response_schema` vs `response_format`) against the installed SDK version early in the build.
+The Gemini adapter uses `google-genai` `models.generate_content` with `response_mime_type` and `response_json_schema`, verified against the installed SDK.
 
-Every AI result records provider and model; shown as "Read by Groq / openai/gpt-oss-120b" on the plan map and in the report.
+Every AI result records provider and model; shown as "Read by [provider/model]" on the plan map and in the report.
 
 Doc links:
 - FastAPI: https://fastapi.tiangolo.com/
@@ -498,7 +498,7 @@ No database. Confirmed maps, test results, and fix suggestion results are held i
 
 `test_checker_monotone.py`: on the example map, asserts that every pair's lateness is at least each of its singles'.
 
-`test_reading_matches_truth.py`: loads the unedited `fixtures/example-reading.json`, applies scripted corrections and additions through the review controls, aligns entities by type and role, then compares every checker input and all 100 full scenario results with `fixtures/example-truth.json`. Names are labels and are excluded. This planned test can be added when the one-shot reading passes the correction checkpoint; extra or missing checker entities must not be silently discarded.
+`test_reading_matches_truth.py`: loads the unedited `fixtures/example-reading.json`, checks its saved digest, applies the explicit actions from `example-corrections.json` through the review controls, aligns entities by type and role, then compares every checker input and all 100 full scenario results with `fixtures/example-truth.json`. Names are labels and are excluded. It also asserts that the actual map generates 100 scenarios; extra or missing checker entities must not be silently discarded.
 
 `test_format_gate.py`: bad JSON, extra fields, unknown names, wrong types - all rejected with a specific reason.
 
@@ -602,7 +602,7 @@ failure-compiler/
 ### Gemini - Primary AI provider
 - SDK: `google-genai` (official)
 - Model: `gemini-3.8-flash`
-- Structured output: follows current `google-genai` Interactions API. Verify the exact structured-output parameter against the installed SDK version at build time.
+- Structured output: `models.generate_content` with `response_mime_type` and `response_json_schema`, verified against the installed SDK.
 - Free tier note: content may be used by Google. Screen 1 discloses this.
 - Docs: https://googleapis.github.io/python-genai/
 - Key: `GEMINI_API_KEY` in `.env`
@@ -680,6 +680,6 @@ Verified by: `test_rules.py` includes a case where a person's `can_drive` is set
 
 ### Open Issues
 
-- **Gemini structured output parameter name.** The `google-genai` Interactions API parameter for structured output (whether it is `response_schema`, `response_format`, or another key) should be verified against the installed SDK version early in the build, not assumed. Record the finding as a comment in `gemini_provider.py`.
+- **Gemini structured output parameter name, resolved.** The installed SDK supports `models.generate_content` with `response_mime_type` and `response_json_schema`. The finding is recorded in `gemini_provider.py` and covered by the provider tests.
 - **`openapi-typescript` generation step** is manual for the PoC. A CI step would catch drift; out of scope.
 - **Bakeoff result:** Gemini is primary after the 17 October 2026 read-v3 comparison: 43/100 mean exact results and 90.57% aligned fields; Groq has 12/100 and 82%. See `server/config.py` and `ai-reading-review.md`.

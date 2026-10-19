@@ -317,7 +317,8 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-
   .reading-heading { align-items: flex-start; }
   .mini-action { max-width: 125px; text-align: right; white-space: normal; }
   .reading-row { grid-template-columns: 1fr; }
-  .reading-controls { justify-content: start; }
+  .reading-controls { justify-content: start; flex-wrap: wrap; white-space: normal; }
+  .reading-controls .status-chip { max-width: 100%; white-space: normal; }
   .confirm-footer { min-height: 66px; padding: 8px 12px; }
   .footer-status { gap: 5px; }
   .footer-status .mono { font-size: 12px; }

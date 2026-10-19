@@ -1,6 +1,7 @@
 """Gate fixed operations, score every scenario, and apply only server-approved fixes."""
 
 import json
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -10,7 +11,8 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 
 from server.checker.explain import route_reasons
 from server.checker.runner import run_checker
-from server.models import AppliedFix, FixOperation, FixSuggestion, ScenarioResult
+from server.evaluation import align_entities
+from server.models import AppliedFix, FixOperation, FixSuggestion, PlanMapData, ScenarioResult
 from server.session import SESSIONS, remember_map
 from server.validation.fingerprint import fingerprint_plan_map
 from server.validation.gate import GateError, normalise_plan_map_ids
@@ -120,6 +122,37 @@ class ScoredFix:
 SCORED: dict[tuple[str, str], list[ScoredFix]] = {}
 
 
+def example_case(plan: PlanMap, scenario_id: str, fixture: dict) -> dict:
+    """Align hand-written example suggestions to the reviewed map's entity identities."""
+    truth = PlanMap.from_truth_map(
+        PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
+    )
+    _, mapping, unmatched = align_entities(plan, truth)
+    if unmatched:
+        return {}
+
+    def aligned_problem(value):
+        kind, entity_id = value.split("__", 1)
+        return f"{kind}__{mapping.get(entity_id, entity_id)}"
+
+    aligned_case = {aligned_problem(value) for value in scenario_id.split("+")}
+    saved = next(
+        (value for key, value in fixture["cases"].items() if set(key.split("+")) == aligned_case),
+        {},
+    )
+    saved = deepcopy(saved)
+    inverse = {target: source for source, target in mapping.items()}
+    for fix in saved.get("fixes", []):
+        for operation in fix["operations"]:
+            operation["target_id"] = inverse.get(operation["target_id"], operation["target_id"])
+            value = operation["value"]
+            if isinstance(value, str):
+                operation["value"] = inverse.get(value, value)
+            elif isinstance(value, list):
+                operation["value"] = [inverse.get(item, item) for item in value]
+    return saved
+
+
 def score_fix(
     plan: PlanMap, current: list[ScenarioResult], scenario_id: str, raw: dict[str, Any]
 ) -> ScoredFix:
@@ -178,7 +211,7 @@ def suggest_fixes(request: SuggestRequest) -> dict[str, Any]:
     if result is None or result.state != "cross":
         raise HTTPException(404, "That broken case is not on the current grid.")
     fixture = json.loads((ROOT / "fixtures/example-fixes.json").read_text(encoding="utf-8"))
-    saved = fixture["cases"].get(request.scenario_id, {})
+    saved = example_case(session.plan, request.scenario_id, fixture)
     key = (request.fingerprint, request.scenario_id)
     if key not in SCORED:
         SCORED[key] = [

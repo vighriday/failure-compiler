@@ -2,9 +2,9 @@
 
 ## Status
 
-Hardening and revised parts 1 to 5 are complete. The read-v3 bake-off selected Gemini: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. Part 6 reached a new correction checkpoint: two loader-order edits match all 100 reference results, but the one-shot reading includes an extra Hall entity that cannot be removed with the approved controls. Its actual matrix has 115 scenarios and its checker inputs still differ. No example fixture has been replaced and no live fix suggestions were requested. Slice 6 remains unchecked; slice 7 has not started.
+Hardening and revised parts 1 to 5 are complete. The read-v3 bake-off selected Gemini: 43/100 mean exact checker results and 90.57% mean aligned fields, against Groq's 12/100 and 82%. Following the user's continuation, a reversible place-identity question resolves the extra Hall explicitly. The same one-shot reading now reaches 100% checker-input agreement, 100/100 full-result matches and 100 actual scenarios through the UI. The raw reading is promoted as-is, with correction actions saved separately. The earlier stop evidence is retained below. Slice 6 remains unchecked while live integration and suggestion review are pending; slice 7 has not started.
 
-The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. The candidate has real-reading browser screenshots; live HTTP/UI integration, session keys and live fix suggestions remain pending. The running app continues to use its labelled hand-written example.
+The provider adapter, strict schemas, versioned prompts, raw-response recording, token logs and offline provider tests are implemented. The running app now uses the saved real reading and displays its provider/model. Live HTTP/UI integration, session keys and reviewed live fix suggestions remain pending; the existing fix suggestions are still labelled hand-written placeholders.
 
 ## Original exact-name bake-off (superseded measurement)
 
@@ -89,7 +89,7 @@ All saved campaigns use the same final evaluator: route letters, primary-driver/
 
 Ranking follows the requested order: exact full-result equivalence, aligned fields, consistency, tokens. The variance is the sum of population variances of those two scores across three runs. Gemini wins on the first criterion. Run 2 puts Ravi first in Route A's loading list; the other runs put Joel first. Assignment order is meaningful, and full schedule equality is intentionally included in the score. `server/config.py` records the date, winner and scores; the adapter reads that order, and each provider keeps its own model ID when primary and fallback switch.
 
-## Part 6: one-shot winner reading and the remaining control gap
+## Part 6: one-shot winner reading and the earlier control gap
 
 One separate Gemini call captured the example with read-v3, LOW thinking and 2,480 total tokens. The successful response was not rerun or edited. Local evidence is under ignored `devpost/screens/live-candidates/read-v3/`:
 
@@ -111,7 +111,7 @@ The local browser proof used the existing up-arrow controls, individual guess co
 
 Screenshots at a 1440x900 viewport are saved locally as `devpost/screens/read-v3-candidate-before.png`, `read-v3-candidate-reviewed.png` and `read-v3-candidate-grid.png`. The preview overrides the fixture loader only inside its own local server process; canonical fixtures are untouched. There were no page errors or fix-suggestion requests. Map totals now reflect the current entity count instead of always claiming 14 problems and 100 scenarios.
 
-### Stop and remaining work
+### Earlier stop and remaining work at that point
 
 The requested reference-result score is reachable, but complete checker-input equivalence and the actual 100-scenario example are not reachable with the current controls. `test_reading_matches_truth.py` has not been added as a passing test by ignoring the extra entity. Regression tests instead prove that the guard retains extra entities and reports this distinction. A decision about handling extra extracted entities is needed before replacing the fixture. No removal control, merge rule, checker change, another successful capture or fix-suggestion call was added to get past the checkpoint.
 
@@ -125,3 +125,30 @@ Part 7 is not eligible yet. Suggestions and checker verdicts for Joel absent, su
 - `scripts/verify_saved_reading.py`: real candidate reviewed through visible controls; 100/100 common results, 115 actual cells, no page errors, no suggestion request.
 - Existing `scripts/verify_review.py` and `scripts/verify_story.py`: both passed on an isolated local server. The canonical demo, three fixes, 100 survived, linked fingerprints, re-confirmation and reduced motion remain intact.
 - Checker constraints, truth fixture, expected results and canonical reading/fix fixtures are unchanged. The preview server shut down after verification. Screenshots remain ignored.
+
+## Continued review: part 6 passes with an explicit place choice
+
+The user continued after the checkpoint. A generic rule question now asks whether an unused place listing is separate or the same place as another listed loading/supply place. Nothing is merged automatically. Choosing the same place preserves the removed listing, its source rows and any question references in server-owned history. The selected place's facts require individual re-confirmation; Change restores the original listing. Bulk confirmation cannot answer this question or accept the newly stale facts.
+
+The original one-shot response was reused. Its bytes have SHA-256 `6f30729d00eb041136d3594a62886ce3ee2dce5dd480fdac9eca39c62b234cfa`, identical in the local candidate and promoted fixture. The review ledger also stores a digest of UTF-8 text with LF line endings and a digest of the exact `raw_text`, so checking out the repository on Windows does not create a false hash failure.
+
+The demo needs three explicit corrections:
+
+1. Hall: **Same place as another listing**, choose **Loading bay**, then individually review the retained place's facts.
+2. Route A loaders: **Joel, Maya, Anita, Ravi**.
+3. Route C loaders: **Anita, Maya, Joel**.
+
+No fact addition or name edit is needed. Other guessed facts and all four arrival questions still require individual confirmation. After those actions, **every aligned checker input matches, all 100 full results match exactly, and the real map generates 100 scenarios**: 1 single weak spot, 3 hidden pairs, 12 dimmed, 84 survived.
+
+`fixtures/example-reading.json` is the unedited provider record. `fixtures/example-corrections.json` contains only the separate review ledger and digests. `test_reading_matches_truth.py` replays the same server actions and compares checker inputs plus every full result. The old hand-written reading is retained only under `tests/fixtures/` for its explicit hardening contracts. The production app identifies the saved reading as Gemini output; the existing fix suggestions remain labelled placeholders while live suggestions await review.
+
+Playwright exercised the place picker, Change/undo, loader arrows, individual confirmations and all 100 cells without page errors or suggestion calls. New evidence is in `devpost/screens/read-v3-merged-before.png`, `read-v3-merged-reviewed.png`, `read-v3-merged-grid.png` and `devpost/screens/live-candidates/read-v3/read-v3-merged-ui-proof.json`. The earlier 115-cell stop evidence remains intact. The full story and re-confirmation browser regressions also pass with the real reading, including all three placeholder fixes and all 100 scenarios surviving. Fix fixture lookup aligns identities to the reviewed map, so the AI's supply-delivery ID does not break the example story.
+
+### Promotion verification, 19 October 2026
+
+- `uv run -- python -m pytest -q`: **137 passed**, one dependency deprecation warning, 124.71 seconds.
+- `uv run -- python -m ruff check .`: passed.
+- `npm run build`: passed.
+- Saved `v2-verification.json`: all 11 browser checks pass at widths 1440/768/390/320, with no page errors. This includes scroll and animation recovery, keyboard navigation, all 105 illustrative sample cells, every driver rule picker, confirmation, live results and scored placeholder fixes. The actual reviewed example has 100 cells.
+- Existing story and re-confirmation browser proofs pass with the promoted reading. Submission assets are untouched; screenshots remain ignored.
+- No new reading or live fix call was made during verification. Real fix responses must be captured once per cross and remain uncommitted for the requested review.

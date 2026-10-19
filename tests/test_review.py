@@ -1,15 +1,30 @@
 """The server owns confirmations and constrains every editable fact type."""
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
+from server import main
 from server.main import app
 from server.review import REVIEWS
 from server.validation.gate import GateError, validate_ai_reading
 from server.validation.rules import validate_plan_rules
-from tests.validation_helpers import ai_reading_payload
+from tests.validation_helpers import ROOT, ai_reading_payload
 
 CLIENT = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def handmade_review_contract(monkeypatch):
+    """Keep the old hardening cases explicit; real reading coverage lives separately."""
+    reading = json.loads((ROOT / "tests/fixtures/handmade-reading.json").read_text())
+    original = main._fixture
+    monkeypatch.setattr(
+        main,
+        "_fixture",
+        lambda path: reading if path == "fixtures/example-reading.json" else original(path),
+    )
 
 
 def draft():

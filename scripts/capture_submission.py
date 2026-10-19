@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 
+from browser_review import review_example
 from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,7 +44,7 @@ def main() -> None:
         capture("02-paste-plan.png")
 
         page.get_by_role("button", name="Read plan", exact=True).click()
-        expect(page.locator(".reading-row")).to_have_count(24)
+        expect(page.locator(".reading-row")).to_have_count(32)
         page.locator('[data-item-id="joel-key"]').hover()
         expect(page.locator("#plan-L3")).to_have_class(re.compile("line-active"))
         # Keep the real source highlight visible; no text or status is altered for the image.
@@ -52,10 +53,7 @@ def main() -> None:
         captures.append("03-plan-map.png")
         capture("03-plan-map-full.png", full_page=True)
 
-        page.get_by_role("button", name=re.compile("Confirm everything")).click()
-        page.get_by_role("button", name="Only his car", exact=True).click()
-        page.get_by_role("button", name="Answer", exact=True).click()
-        page.get_by_role("button", name="Keep this guess", exact=True).click()
+        review_example(page)
         page.get_by_role("button", name="Confirm plan", exact=True).click()
         expect(page.locator(".result-cell")).to_have_count(100, timeout=30000)
         expect(page.locator(".result-cross")).to_have_count(4)
@@ -97,8 +95,11 @@ def main() -> None:
         browser.close()
 
     (OUT.parent / "captures.json").write_text(
-        json.dumps({"viewport": [1440, 900], "source": BASE,
-                    "files": captures, "page_errors": errors}, indent=2), encoding="utf-8"
+        json.dumps(
+            {"viewport": [1440, 900], "source": BASE, "files": captures, "page_errors": errors},
+            indent=2,
+        ),
+        encoding="utf-8",
     )
     print(f"Saved {len(captures)} real app captures to {OUT}")
 

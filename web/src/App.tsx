@@ -197,7 +197,7 @@ function App() {
             ))}
             {issues.filter((issue) => issue.field === "driver_ids").map((issue, index) => {
               const route = planMap.routes.find((candidate) => candidate.id === issue.item_id);
-              return route ? <div className="question-card rule-question" key={`${issue.item_id}-${index}`}><div className="question-icon">?</div><div className="question-body"><p>{routeLabel(route.name)} needs a driver who can drive. {issue.message}. Who drives {routeLabel(route.name)}?</p><select disabled={pending > 0} aria-label={`Choose a driver for route ${route.name}`} value="" onChange={(event) => resolveRoute(route.id, event.target.value)}><option value="">Choose a driver</option>{planMap.people.filter((person) => person.can_drive).map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></div></div> : null;
+              return route ? <div className="question-card rule-question" key={`${issue.item_id}-${index}`}><div className="question-icon">?</div><div className="question-body"><p>{routeLabel(route.name)} needs a driver who can drive. {issue.message}. Who drives {routeLabel(route.name)}?</p><select disabled={pending > 0} aria-label={`Choose a driver for ${routeLabel(route.name)}`} value="" onChange={(event) => resolveRoute(route.id, event.target.value)}><option value="">Choose a driver</option>{planMap.people.filter((person) => person.can_drive).map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></div></div> : null;
             })}
             {issues.length > 0 && <div className="rule-summary"><span className="rule-symbol">!</span><span>{issues.map((issue) => issue.message).join(" · ")}</span></div>}
           </section>

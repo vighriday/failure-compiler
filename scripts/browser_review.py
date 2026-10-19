@@ -1,13 +1,34 @@
 """Shared visible-control steps for the saved example's browser verification."""
 
+import json
+from pathlib import Path
+
 from playwright.sync_api import expect
+
+
+def review_example(page):
+    ledger = json.loads(
+        (Path(__file__).resolve().parents[1] / "fixtures/example-corrections.json").read_text()
+    )
+    review_saved_plan(page, ledger["scripted_corrections"])
 
 
 def updated(page):
     return page.expect_response(lambda response: response.url.endswith("/api/update-map"))
 
 
+def confirm_pending(page):
+    expect(page.locator(".footer-actions .button-text")).to_be_enabled()
+    pending = page.locator(".row-confirm")
+    while pending.count():
+        previous_count = pending.count()
+        with updated(page):
+            pending.first.click()
+        expect(pending).to_have_count(previous_count - 1)
+
+
 def review_saved_plan(page, corrections, *, verify_undo=False):
+    expect(page.locator(".reading-row").first).to_be_visible(timeout=30000)
     for action in corrections:
         if action["action"] == "answer" and action["question_id"].endswith("-identity"):
             card = page.locator(f'[data-question-id="{action["question_id"]}"]')
@@ -56,12 +77,7 @@ def review_saved_plan(page, corrections, *, verify_undo=False):
         row.get_by_role("button", name="Answer", exact=True).click()
         with updated(page):
             row.get_by_role("button", name="Keep this guess", exact=True).click()
-    pending = page.locator(".row-confirm")
-    while pending.count():
-        previous_count = pending.count()
-        with updated(page):
-            pending.first.click()
-        expect(pending).to_have_count(previous_count - 1)
+    confirm_pending(page)
     questions = page.get_by_role("button", name="Use the reviewed details", exact=True)
     while questions.count():
         previous_count = questions.count()

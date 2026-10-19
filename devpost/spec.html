@@ -495,7 +495,7 @@
   <h3>AI Layer</h3>
   <div class="provider-row">
     <div class="pcard">
-      <span class="role">Primary</span>
+      <span class="role">Fallback</span>
       <span class="name">Groq</span>
       <span class="model">openai/gpt-oss-120b</span>
       <dl>
@@ -506,12 +506,12 @@
       </dl>
     </div>
     <div class="pcard">
-      <span class="role">Fallback</span>
+      <span class="role">Primary</span>
       <span class="name">Gemini</span>
       <span class="model">gemini-3.8-flash</span>
       <dl>
         <dt>SDK</dt><dd><code>google-genai</code> (official)</dd>
-        <dt>Output</dt><dd>Interactions API structured output (verify param at build)</dd>
+        <dt>Output</dt><dd>generate_content with response_mime_type and response_json_schema (verified)</dd>
         <dt>Note</dt><dd>Free tier content used by Google; Screen 1 discloses</dd>
         <dt>Docs</dt><dd><a href="https://googleapis.github.io/python-genai/">googleapis.github.io</a></dd>
       </dl>
@@ -826,7 +826,7 @@ gate_reason:         str | None</code></pre>
     <tbody>
       <tr><td><code>test_example_locked.py</code></td><td>Checker on truth map vs expected-results.json; no question marks</td><td>No</td></tr>
       <tr><td><code>test_checker_monotone.py</code></td><td>Every pair's lateness &ge; each of its singles'</td><td>No</td></tr>
-      <tr><td><code>test_reading_matches_truth.py</code></td><td>Planned after the correction checkpoint: reading + review controls, aligned checker inputs and all 100 full results match truth; names excluded</td><td>No (uses fixture)</td></tr>
+      <tr><td><code>test_reading_matches_truth.py</code></td><td>Unedited reading + explicit review actions: every aligned checker input and all 100 full results match truth; actual count 100, names excluded</td><td>No (uses fixture)</td></tr>
       <tr><td><code>test_format_gate.py</code></td><td>Bad JSON, extra fields, unknown names all rejected with specific reasons</td><td>No</td></tr>
       <tr><td><code>test_rules.py</code></td><td>Rules engine including the cascade test</td><td>No</td></tr>
       <tr><td><code>test_determinism.py</code></td><td>Same truth map run twice; identical results</td><td>No</td></tr>
@@ -835,7 +835,7 @@ gate_reason:         str | None</code></pre>
 
   <div class="card" style="font-size:13.5px;margin-top:12px;">
     <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input including extra inputs, and runs the truth map's 100 scenarios on the aligned reading. Ranking is exact full-result matches, aligned fields, consistency, then tokens. No corrections are applied; raw responses and failed attempts are preserved. Every prompt version and its scores are logged in <code>ai-reading-review.md</code>. The dated winner becomes primary in <code>server/config.py</code>.</p>
-    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py</strong> is planned after the correction checkpoint: load the unedited <code>example-reading.json</code>, apply scripted corrections and additions through review controls, align entities by type and role, then compare every checker input and all 100 full scenario results against <code>example-truth.json</code>. Names are labels and are excluded. Extra or missing checker entities must not be silently discarded.</p>
+    <p style="margin-top:8px;"><strong>test_reading_matches_truth.py:</strong> load the unedited <code>example-reading.json</code>, check its saved digest, apply explicit actions from <code>example-corrections.json</code> through review controls, align entities by type and role, then compare every checker input and all 100 full results against <code>example-truth.json</code>. The actual map must generate 100 scenarios. Names are labels and are excluded; extra or missing checker entities must not be silently discarded.</p>
   </div>
 </section>
 
@@ -937,7 +937,7 @@ gate_reason:         str | None</code></pre>
   <h3>Gemini - Primary AI provider</h3>
   <div class="card" style="font-size:13.5px;">
     SDK: <code>google-genai</code> (official) &middot; Model: <code>gemini-3.8-flash</code><br>
-    Structured output: follows current <code>google-genai</code> Interactions API. Verify the exact parameter name against the installed SDK version at build time.<br>
+    Structured output: <code>google-genai</code> <code>models.generate_content</code> with <code>response_mime_type</code> and <code>response_json_schema</code>, verified against the installed SDK.<br>
     Free tier note: content may be used by Google. Screen 1 discloses this.<br>
     Docs: <a href="https://googleapis.github.io/python-genai/">googleapis.github.io/python-genai</a>
   </div>
@@ -1046,7 +1046,7 @@ gate_reason:         str | None</code></pre>
 
   <h3>Open Issues</h3>
   <ul>
-    <li><strong>Gemini structured output parameter name.</strong> Verify the exact parameter against the installed <code>google-genai</code> SDK version at build time. Record the finding as a comment in <code>gemini_provider.py</code>.</li>
+    <li><strong>Gemini structured output parameter name, resolved.</strong> The installed SDK supports <code>models.generate_content</code> with <code>response_mime_type</code> and <code>response_json_schema</code>. The finding is recorded in <code>gemini_provider.py</code> and covered by the provider tests.</li>
     <li><strong><code>openapi-typescript</code> generation step</strong> is manual for the PoC.</li>
     <li><strong>Bakeoff result:</strong> Gemini is primary after the 17 October 2026 read-v3 comparison: 43/100 mean exact results and 90.57% aligned fields; Groq has 12/100 and 82%. See <code>server/config.py</code> and <code>ai-reading-review.md</code>.</li>
   </ul>

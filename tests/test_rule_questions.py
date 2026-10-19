@@ -20,7 +20,7 @@ def review_with_missing(field):
         plan.finish_time = 0
     else:
         setattr(plan.routes[0], field, "" if field == "vehicle_id" else [])
-    items = json.loads((ROOT / "fixtures/example-reading.json").read_text())["items"]
+    items = json.loads((ROOT / "tests/fixtures/handmade-reading.json").read_text())["items"]
     items = [
         {**item, "status": "confirmed"}
         for item in items
