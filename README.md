@@ -7,7 +7,7 @@
 -->
 
 > [!NOTE]
-> **Submission draft.** The working app includes the example plan, confirmation, live checker, case details and scored fixes. The saved example reading is real, unedited Gemini output with explicit review steps; example fix suggestions remain labelled hand-written placeholders. Live pasted-plan integration and reports are still pending. Video, image and PDF links below are placeholders for the final submission.
+> **Submission draft.** The app includes live plan reading, confirmation, the live checker, case details and scored AI suggestions. Gemini is primary, with Groq as fallback. The saved example reading is real, unedited Gemini output with explicit review steps; saved example fixes remain labelled hand-written placeholders pending approval of the captured suggestions. Slice 6 stays open for that approval; reports remain in slice 7. Video, image and PDF links below are placeholders for the final submission.
 
 <div align="center">
 
@@ -371,14 +371,14 @@ flowchart LR
 - A vehicle does one route at a time. It's busy from the start of loading until the route ends.
 - The loading area takes one vehicle at a time. It opens at its opening time, once the supply truck is there and a key holder has arrived.
 - Each route needs a listed loader present while loading, then a listed driver and its vehicle.
-- **Only the people the plan names for a job can do that job.** Primary first, then listed backups. Start times can move freely within everyone's hours. That's what makes "add another backup driver" a real fix that can be tested, and turned down.
+- **Only the people the plan names for a job can do that job.** Drivers are displayed primary first, then listed backups; loaders are an eligible set with no priority. Start times can move freely within everyone's hours. That's what makes "add another backup driver" a real fix that can be tested, and turned down.
 - Noon is a soft deadline, so lateness can be measured instead of just failing.
 
 **Why "not delivered" instead of "infeasible".** Some routes can't run at all, for example when nobody can open the loading area. Those routes count as "not delivered", with a penalty bigger than any possible lateness: households × (finish time + 180 minutes). So the solver always returns an answer, and the screen can say "8 households not delivered" instead of "no solution". The checker only reports a route as *late* when something becomes free later. When nobody is left to do the job, it says *not delivered*.
 
 **Why dimming is safe.** Every problem type only *removes* options. A pair can never do better than its worse single, so a pair that contains a single weak spot is already broken, and there's no need to solve it. A test checks this on every pair. When a fix removes the weak spot, its dimmed pairs get tested properly again, and they can reveal a hidden pair. That's how the one-spare-key fix gets caught.
 
-**Why the results never change.** The solver uses one worker, a fixed seed (42), and a *deterministic* time limit that counts solver work instead of seconds, so a slower laptop gets the same answer. In our runs, all 100 tests finish in about a second.
+**Why the results never change.** The solver uses one worker, a fixed seed (42), and a *deterministic* time limit that counts solver work instead of seconds, so a slower laptop gets the same answer. The locked example test checks all 100 verdicts; the determinism test compares complete repeated results.
 
 ---
 
@@ -415,9 +415,16 @@ Every number in this README can be reproduced from the repository.
 | The fingerprint changes only when the checker's inputs change | [`tests/test_fingerprint.py`](tests/test_fingerprint.py) |
 | The whole demo story plays end to end in a real browser | [`scripts/verify_story.py`](scripts/verify_story.py), with the dev server running and Playwright installed |
 | V2 navigation, animation recovery, every sample square, editor controls and responsive layouts work | [`scripts/verify_landing.py`](scripts/verify_landing.py), at desktop, tablet and phone sizes |
-| The saved AI reading plus the demo's corrections equals the hand-checked map | `tests/test_reading_matches_truth.py` *(slice 6)* |
+| The saved AI reading plus the demo's corrections equals the hand-checked map | [`tests/test_reading_matches_truth.py`](tests/test_reading_matches_truth.py) |
+| Live paste, review, checker, suggestions and apply work offline; keys and caches stay session-scoped | [`tests/test_live_api.py`](tests/test_live_api.py), recorded real reading plus explicitly synthetic fix response |
+| Provider read/connect timeouts become safe retryable errors | [`tests/test_live_transport.py`](tests/test_live_transport.py) |
+| Real provider smoke tests require explicit opt-in and a key | [`tests/test_live_network.py`](tests/test_live_network.py) |
 
 Run the Python tests with `uv run -- python -m pytest -q`. Browser checks run separately with `uv run -- python scripts/verify_landing.py` and `uv run -- python scripts/verify_story.py`.
+
+The ordinary test run makes no provider requests, even when `.env` contains keys. Offline end-to-end coverage replays the real saved reading through the HTTP flow; its always-available fix response is explicitly synthetic. To replay all four actual recorded suggestion responses locally, set `RECORDED_AI_FIXES_PATH` to the ignored recorder output file before running the same test command. Each case needs a successful `raw` record. The replay checks provider attribution and fallback, and applies any eligible change before re-testing. It skips when no capture is supplied; new suggestions remain uncommitted until approved.
+
+Real-network smoke tests run only when you explicitly set `RUN_LIVE_AI_TESTS=1` and a provider key is available. Without both, they skip. These tests send the fictional example plan to the provider.
 
 ---
 
@@ -429,7 +436,7 @@ You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, a
 ```bash
 git clone https://github.com/vighriday/failure-compiler.git
 cd failure-compiler
-uv sync --extra dev
+uv sync --extra dev --extra ai
 npm install
 uv run -- python scripts/dev.py
 ```
@@ -442,7 +449,17 @@ The launcher waits for the API health check and web page before printing both ad
 
 The interface follows the supplied Landing v2 design: Overview, a scroll-linked Plan story, Read, Crash test, Trust and Start. Sample illustrations are labelled; after loading a plan, Read and Crash test use the real confirmation and checker flow. The design templates and conversion instructions are in [`design/landing-v2/`](design/landing-v2/).
 
-**Live pasted-plan reading is still pending in slice 6.** The app server supports the saved example and does not load `.env` or use the key field yet. The provider recording scripts use `.env`: a [Groq](https://console.groq.com/keys) key in `GROQ_API_KEY` and a [Gemini](https://aistudio.google.com/apikey) key in `GEMINI_API_KEY`. Gemini is the selected primary; its adapter and the Groq fallback have offline regression coverage.
+### Read your own plan
+
+1. Copy `.env.example` to `.env` in the project folder. Add a [Gemini key](https://aistudio.google.com/apikey) as `GEMINI_API_KEY`; add a [Groq key](https://console.groq.com/keys) as `GROQ_API_KEY` to enable fallback. The server reads these keys when handling a live request.
+2. Open **Start** and paste your plan. Or expand **Use your own AI key**, choose its provider and enter a key for this session. A typed key takes precedence for that provider; the selected provider is tried first. With environment keys, Gemini is tried first and Groq is the fallback.
+3. Click **Read plan**, review the source-linked facts and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted.
+
+Typed keys stay only in the local server's session memory. They are never written to files, logged, added to a map or returned in an API response. The server sends an HttpOnly session cookie; that cookie contains no key. Closing a tab does not clear server memory; restarting the server clears session keys, maps and results. `.env` keys remain in your local ignored file.
+
+The plan map and results show **Read by provider / model**; live suggestions show who supplied them. A Gemini server error such as HTTP 503, timeout, rate limit or failed output format check triggers one Groq attempt when a Groq key is available. Missing or invalid keys, unsupported plans and both-provider failures have clear errors and retry/example actions. A failed suggestion request leaves the checker's facts available.
+
+Screen 1 shows the Gemini data notice: Google may use content to improve its products. Avoid personal details; the example plan is fictional. Loading the saved example and its placeholder fixes makes no AI calls. Requesting new suggestions uses a configured key and sends the confirmed map and selected case to the provider.
 
 | Task | Command |
 |---|---|
@@ -450,7 +467,8 @@ The interface follows the supplied Landing v2 design: Overview, a scroll-linked 
 | Run all tests | `uv run -- python -m pytest -q` |
 | Print the results for any map file | `uv run -- python scripts/check_map.py fixtures/example-truth.json` |
 | Lint | `uv run -- ruff check .` |
-| Compare the two AI providers on the example | `uv run -- python scripts/bakeoff.py` *(slice 6)* |
+| Re-score saved provider readings without API calls | `uv run -- python scripts/bakeoff.py --rescore devpost/bakeoff-read-v3.json --output devpost/bakeoff-read-v3.json` |
+| Run a fresh three-call-per-provider bake-off | `uv run -- python scripts/bakeoff.py` *(uses keys and makes API calls)* |
 
 Playwright is a development dependency. Install its browser once with `uv run -- python -m playwright install chromium`. Start the app, then run either browser check. For a different frontend port, set `FAILURE_COMPILER_URL` to that local URL before running the scripts.
 
@@ -510,7 +528,7 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 - [x] **Slice 3:** the plan map screen
 - [x] **Slice 4:** the grid fills live
 - [x] **Slice 5:** broken case, fixes, flip
-- [ ] **Slice 6:** live AI with Groq and Gemini, and a real saved reading
+- [ ] **Slice 6:** live Gemini/Groq flow and real saved reading; final suggestion fixtures await approval
 - [ ] **Slice 7:** report, before and after, design pass
 - [ ] Final review, learning wrap-up and app map
 
@@ -532,8 +550,9 @@ failure-compiler/
 │   ├── main.py              FastAPI app and API routes
 │   ├── models.py            Checker, scenario and fix data shapes
 │   ├── grid.py              Live result stream and counts
-│   ├── fixes.py             Gate, score and apply example fixes
+│   ├── fixes.py             Gate, score, cache and apply saved/live fixes
 │   ├── session.py           In-memory maps and results by fingerprint
+│   ├── credentials.py       Private server-memory keys and browser-session ownership
 │   ├── config.py            Model names, problem types, size presets, limits
 │   ├── ai/                  Provider adapters, strict schemas and versioned prompts
 │   ├── validation/
@@ -566,12 +585,13 @@ failure-compiler/
 
 | Endpoint | What it does |
 |---|---|
-| `POST /api/read-plan` | Returns the saved real example reading with no new AI call. Live pasted-plan reading is still pending. |
+| `GET /api/ai-status` | Reports configured provider/model names and whether keys are available; never returns keys |
+| `POST /api/read-plan` | Reads pasted text live, or returns the saved example with no AI call; creates a server-owned review draft |
 | `POST /api/validate-map` | Runs the rules after every correction, so the screen updates straight away |
 | `POST /api/update-map` | Applies constrained corrections and review actions to the server's own reading draft |
 | `POST /api/confirm-map` | Checks the server's confirmations, answers and rules, then returns the fingerprint |
 | `GET /api/run-tests` | Streams each result as it finishes (server-sent events) |
-| `POST /api/suggest-fixes` | Loads placeholder explanations and suggestions, then gates, scores and caches the fixes. Live AI is planned for slice 6. |
+| `POST /api/suggest-fixes` | Gets live suggestions for a confirmed case, then gates, scores and caches them for that session; `live: true` requests AI instead of saved example placeholders, and `retry: true` uses the one explicit no-eligible retry |
 | `POST /api/apply-fix` | Applies an accepted fix, records the before and after fingerprints, re-tests |
 | `GET /api/report` | Planned for slice 7; not implemented yet |
 
@@ -587,8 +607,8 @@ failure-compiler/
 | Server | [FastAPI](https://fastapi.tiangolo.com/), built-in server-sent events | Live streaming without another library |
 | Data shapes and gate | [Pydantic v2](https://docs.pydantic.dev/latest/) | One strict definition of every shape |
 | Python | 3.12 with [uv](https://docs.astral.sh/uv/) | Identical installs on Windows, macOS and Linux |
-| AI, first choice (live UI pending) | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Won the 19 October verdict-only re-score: 100/100 mean verdicts, 94.34% aligned fields |
-| AI, fallback (live UI pending) | [Groq](https://console.groq.com/docs/structured-outputs) | Strict-schema adapter verified; primary order follows the bake-off |
+| AI, first choice | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Won the 19 October verdict-only re-score: 100/100 mean verdicts, 94.34% aligned fields |
+| AI, fallback | [Groq](https://console.groq.com/docs/structured-outputs) | One bounded fallback attempt; provider/model attribution stays visible |
 | Frontend | React, Vite, TypeScript (strict) | The grid, panel, preview and report share a lot of state |
 | Styling | Plain CSS variables, no UI kit | A coordinator's run sheet, not a stock dashboard |
 | Type | [IBM Plex Sans and Mono](https://github.com/IBM/plex), self-hosted | Mono for times and counts so the numbers line up |
@@ -617,10 +637,10 @@ The app looks like a coordinator's run sheet, not a tech dashboard: warm paper, 
 ## Privacy and security
 
 - Runs on your own machine. The server only listens on `127.0.0.1`.
-- Example mode makes **no AI calls**.
-- Planned live-AI mode will send plan text to the selected provider. The current app makes no provider requests. The example plan is fictional.
-- `.env` is ignored by Git. Provider keys are not loaded or used by the current build.
-- Maps, review drafts and results stay in server memory until the server restarts. Nothing is written to a database. Closing the tab does not clear server memory.
+- Loading the saved example and its placeholder suggestions makes **no AI calls**. Requesting new suggestions does.
+- Live reading sends your plan to the selected provider; live suggestions send the confirmed map and checker facts for the selected case. Gemini is the default primary and Groq the fallback. Screen 1 displays the Gemini data notice. The example plan is fictional.
+- `.env` is ignored by Git and loaded only by the server. Typed keys stay only in server session memory and are never logged, saved to a file or returned in an API response. The browser's HttpOnly session cookie contains no key.
+- Maps, review drafts, keys and results stay in server memory until the server restarts. Nothing is written to a database. Closing the tab does not clear server memory. Successful suggestion caches belong to the session, fingerprint and broken case.
 
 ---
 

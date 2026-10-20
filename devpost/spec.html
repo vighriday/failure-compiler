@@ -429,20 +429,20 @@
       <text x="274" y="107" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">validation gate</text>
       <text x="274" y="123" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">rules engine (Python)</text>
       <text x="274" y="139" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="#8A8A85">session store</text>
-      <!-- Arrow server to Groq -->
+      <!-- Arrow server to Gemini -->
       <line x1="350" y1="78" x2="445" y2="52" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
       <line x1="445" y1="64" x2="350" y2="92" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
-      <!-- Groq -->
+      <!-- Gemini -->
       <rect x="445" y="18" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5"/>
       <text x="519" y="40" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">Gemini (primary)</text>
-      <text x="519" y="57" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gpt-oss-120b</text>
-      <!-- Arrow server to Gemini -->
+      <text x="519" y="57" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gemini-3.8-flash</text>
+      <!-- Arrow server to Groq -->
       <line x1="350" y1="110" x2="445" y2="100" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrd)"/>
       <line x1="445" y1="112" x2="350" y2="122" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrd)"/>
-      <!-- Gemini -->
+      <!-- Groq -->
       <rect x="445" y="80" width="148" height="50" rx="6" fill="#E8E4DA" stroke="#D8D5CD" stroke-width="1.5" stroke-dasharray="4 3"/>
       <text x="519" y="101" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="13" fill="#1A1A18">Groq (fallback)</text>
-      <text x="519" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gemini-3.8-flash</text>
+      <text x="519" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#8A8A85">gpt-oss-120b</text>
       <!-- Arrow server to CP-SAT -->
       <line x1="350" y1="138" x2="445" y2="158" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
       <line x1="445" y1="168" x2="350" y2="148" stroke="#D8D5CD" stroke-width="1.5" marker-end="url(#arr)"/>
@@ -459,15 +459,15 @@
   </div>
 
   <ol class="journey">
-    <li><div class="jnum">1</div><div class="jbody"><strong>Paste plan or load example</strong>Browser sends text to <code>POST /api/read-plan</code>. Example mode returns <code>fixtures/example-reading.json</code>; zero AI calls.</div></li>
-    <li><div class="jnum">2</div><div class="jbody"><strong>Server calls the AI</strong>Groq gets one attempt (strict structured output against <code>AIPlanReading</code>). On failure, Gemini gets one attempt. On both failing, the PRD error state is returned.</div></li>
+    <li><div class="jnum">1</div><div class="jbody"><strong>Paste plan or load example</strong>Browser sends <code>{text, example, api_key?, key_provider?}</code> to <code>POST /api/read-plan</code>. Environment keys come from ignored <code>.env</code>; typed keys stay in private server session memory. Example mode returns the saved fixture; zero AI calls.</div></li>
+    <li><div class="jnum">2</div><div class="jbody"><strong>Server calls the AI</strong>Gemini is primary by default. On rate limit, server error including HTTP 503, timeout, or format-check failure, Groq gets one strict structured-output attempt, using available keys. An explicitly selected typed-key provider is tried first for that session. Invalid keys fail clearly without switching providers. On both failing, a clear error and retry action are returned.</div></li>
     <li><div class="jnum">3</div><div class="jbody"><strong>Format gate runs</strong>Pydantic validates <code>AIPlanReading</code>; duplicate ids rejected; reference integrity check by id. All failures return a <code>422</code> with the specific reason.</div></li>
     <li><div class="jnum">4</div><div class="jbody"><strong>Id normalisation and PlanMap construction</strong>Server rewrites all ids to stable slugs (<code>person-ravi</code>, <code>vehicle-van</code>, <code>route-c</code>), updates every reference, then wraps the reading into a <code>PlanMap</code> with every item's status set to <code>unconfirmed</code>.</div></li>
     <li><div class="jnum">5</div><div class="jbody"><strong>Plan map screen renders</strong>Checklist view, structured reading with source lines, "What we'll test" list.</div></li>
-    <li><div class="jnum">6</div><div class="jbody"><strong>User confirms or corrects</strong>Every correction triggers <code>POST /api/validate-map</code> (debounced 150 ms, same Python rules). Affected items lose their confirmed mark. Confirm button computed from live state.</div></li>
-    <li><div class="jnum">7</div><div class="jbody"><strong>Confirm</strong>Browser sends the map to <code>POST /api/confirm-map</code>. Server re-validates and returns the fingerprint (SHA-256 of canonical checker inputs). Map is frozen.</div></li>
+    <li><div class="jnum">6</div><div class="jbody"><strong>User confirms or corrects</strong>Constrained actions and the reading ID go to <code>POST /api/update-map</code>. The server updates its own draft and returns validation, statuses and rule questions; <code>POST /api/validate-map</code> can return the snapshot. Affected items lose their confirmed mark. Confirm button computed from live state.</div></li>
+    <li><div class="jnum">7</div><div class="jbody"><strong>Confirm</strong>Browser sends its reading ID to <code>POST /api/confirm-map</code>. The server checks its own confirmations, answers, gate and rules, then returns the fingerprint. Browser confirmation lists cannot bypass this gate.</div></li>
     <li><div class="jnum">8</div><div class="jbody"><strong>Crash test via SSE</strong><code>GET /api/run-tests?map={fingerprint}</code>. Singles first; dimmed pairs skipped; remaining pairs solved. "Not delivered" routes use the horizon penalty so every scenario yields a number. Each result streams as it finishes.</div></li>
-    <li><div class="jnum">9</div><div class="jbody"><strong>Broken case detail</strong>Clicking a cross triggers <code>POST /api/suggest-fixes</code>. One AI call; result cached by fingerprint and scenario - reopening a cross never calls the AI again. Response includes explanation sentence and up to three fix suggestions with full per-scenario results.</div></li>
+    <li><div class="jnum">9</div><div class="jbody"><strong>Broken case detail</strong>Clicking a cross triggers <code>POST /api/suggest-fixes</code>. One bounded provider request with fallback; successful responses cached by session owner, fingerprint and scenario. Reopening a cross reuses its results. Response includes the answering provider, explanation and up to three gated, fully scored suggestions.</div></li>
     <li><div class="jnum">10</div><div class="jbody"><strong>Preview</strong>Browser draws the projected grid from stored fix results. No re-solve.</div></li>
     <li><div class="jnum">11</div><div class="jbody"><strong>Accept a fix</strong><code>POST /api/apply-fix</code> validates, applies, records <code>from_fingerprint</code> and <code>to_fingerprint</code> in <code>AppliedFix</code>, produces a new fingerprint, starts a new SSE run. Changed cells replay from cache.</div></li>
     <li><div class="jnum">12</div><div class="jbody"><strong>Report</strong><code>GET /api/report?map={fingerprint}</code>. Before/After toggle and report chain reconstructed from <code>fix_history</code>. Browser print produces the PDF.</div></li>
@@ -517,7 +517,9 @@
       </dl>
     </div>
   </div>
-  <p style="font-size:13px;color:var(--ink-mid);">Model names in <code>server/config.py</code>. Fallback triggers: rate limit, server error, timeout, or format-check failure. One attempt per provider.</p>
+  <p style="font-size:13px;color:var(--ink-mid);">Model names in <code>server/config.py</code>. Default Gemini primary, Groq fallback on rate limit, server error including HTTP 503, timeout or format-check failure. One attempt per available provider. An explicitly selected typed-key provider is tried first for that session. Invalid keys and unsupported plans return their specific error.</p>
+  <p style="font-size:13px;color:var(--ink-mid);">Plan map and results show <strong>Read by provider / model</strong>; suggestions identify their answering provider separately. Safe metadata reports source (<code>live</code>, <code>saved</code>, <code>placeholder</code>), fallback use and provider/status/error summaries. Responses never contain keys or raw private provider requests. Report attribution is part of slice 7.</p>
+  <p style="font-size:13px;color:var(--ink-mid);"><code>GET /api/ai-status</code> returns provider/model names, selected provider and key-availability booleans only. A random HttpOnly, SameSite=Lax cookie identifies the session and contains no key. Typed keys stay in private server memory, outside maps, fingerprints, logs, disk and response bodies. Confirm and Apply fix retain their session owner and key scope; successful caches belong to that owner, fingerprint and case.</p>
 
   <h3>Frontend</h3>
   <table>
@@ -538,11 +540,12 @@
 <section id="runs">
   <h2>Where It Runs and How Someone Tries It</h2>
   <div class="card">
-    <p><strong>Start command</strong> (after <code>uv sync</code> and <code>npm install</code>):</p>
-    <pre><code>python scripts/dev.py</code></pre>
+    <p><strong>Start command</strong> (after <code>uv sync --extra dev --extra ai</code> and <code>npm install</code>):</p>
+    <pre><code>uv run -- python scripts/dev.py</code></pre>
     <p>Starts <code>uvicorn server.main:app --host 127.0.0.1 --port 8000</code> and <code>vite --port 5173</code> in parallel. Cross-platform; no <code>make</code>. Server binds to 127.0.0.1 only.</p>
     <p style="margin-top:10px;"><strong>Open:</strong> <code>http://localhost:5173</code></p>
-    <p style="margin-top:6px;"><strong>Keys:</strong> <code>GROQ_API_KEY</code> and/or <code>GEMINI_API_KEY</code> in <code>.env</code>. Not needed for example mode. <code>.env.example</code> ships with placeholders; <code>.env</code> is gitignored.</p>
+    <p style="margin-top:6px;"><strong>Keys:</strong> <code>GEMINI_API_KEY</code> in <code>.env</code> for the default primary; <code>GROQ_API_KEY</code> enables fallback. Either provider can be used alone. Not needed for the saved example. <code>.env.example</code> ships with placeholders; <code>.env</code> is gitignored. Or expand <strong>Use your own AI key</strong>, choose the provider and enter a session-only key that overrides its environment key.</p>
+    <p style="margin-top:6px;"><strong>Gemini data notice:</strong> Screen 1 always warns that Google may use content to improve its products. Avoid personal details; the example plan is fictional.</p>
     <p style="margin-top:6px;"><strong>Demo recording:</strong> load example, walk the full flow, record screen. Submission = video + public GitHub repo. Deployment is optional and post-PoC.</p>
   </div>
 </section>
@@ -667,11 +670,11 @@
   <p style="font-size:13px;color:var(--ink-mid);">The checker evaluates “Add Maya as backup driver for Route C” and turns it down because the gap is loading, not driving. Its reason is “Van back 10:45. Loading team gone.”</p>
 
   <h3>How the checker decides</h3>
-  <p>After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time without trading away the proven verdict. Both passes share the deterministic solver budget. If the earliest schedule cannot be proved, the result is a question mark. Small-model presolve probing is disabled to keep the full example below three seconds.</p>
+  <p>After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time without trading away the proven verdict. Both passes share the deterministic solver budget. If the second pass reaches its limit, retain the proven lateness verdict and the best valid timeline; earliest-start optimality is then not claimed. A question mark means the primary lateness verdict could not be proved. Small-model presolve probing is disabled to keep the full example below three seconds.</p>
   <div class="card" style="font-size:13.5px;">
     <p><span class="badge badge-tick">tick</span> <strong>Proven zero lateness.</strong> Zero is the floor; finding zero proves the plan genuinely survives.</p>
     <p style="margin-top:8px;"><span class="badge badge-cross">cross</span> <strong>Proven minimum above zero.</strong> That minimum is the human cost, proved optimal. E.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Routes that cannot run (no driver, loading area cannot open) use a "not delivered" penalty of households times the full horizon (finish time + 180 min), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"</p>
-    <p style="margin-top:8px;"><span class="badge badge-amber">qmark</span> <strong>Deterministic time limit hit</strong> before either is proved. Uses <code>max_deterministic_time</code>, not wall clock, so results are the same on every machine. Never a pass. Listed by name under "What was NOT tested."</p>
+    <p style="margin-top:8px;"><span class="badge badge-amber">qmark</span> <strong>Deterministic time limit hit</strong> before the minimum lateness is proved. Uses <code>max_deterministic_time</code>, not wall clock, so results are the same on every machine. Never a pass. Listed by name under "What was NOT tested."</p>
   </div>
 
   <h3>Run order</h3>
@@ -683,7 +686,8 @@
 <section id="fixes">
   <h2>Explain and Fix <span class="prd-ref">prd.md &rsaquo; Fix Cards and Scoring</span></h2>
 
-  <p>One AI call per broken case. <code>POST /api/suggest-fixes</code> sends the confirmed map plus the checker's facts (failing problem ids, timeline, late routes, lateness in minutes, or "not delivered" if applicable). The AI returns one plain explanation sentence and up to three fix suggestions in one response. The server caches the result keyed by fingerprint and scenario id - reopening a cross never calls the AI again.</p>
+  <p>One AI request per uncached broken case. <code>POST /api/suggest-fixes</code> uses the session-owned confirmed map and checker facts: failing problem ids, timeline, late routes, lateness, or "not delivered". Gemini is primary by default, with one Groq fallback on a transient provider or output-format failure. The AI returns an explanation and up to three suggestions; every operation is gated and every allowed fix is scored across the full grid. Successful responses are cached by session owner, fingerprint and scenario ID; failures do not become successful cache entries.</p>
+  <p>Request fields: <code>fingerprint</code>, <code>scenario_id</code>, optional <code>live: true</code> to ask AI instead of example placeholders, and <code>retry: true</code> for one explicit retry after a successful response has no eligible fix. Live-pasted maps use live suggestions by default. Responses expose <code>can_retry</code>; provider errors include checker-only <code>case_detail</code>, keeping timeline and costs visible while AI is unavailable.</p>
 
   <p>The checker's facts are always shown in the panel. The AI sentence sits next to them, labelled "AI's explanation." “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; the checker gives “Van back 10:45. Loading team gone.” The fixes are “Sam loads Route C” and “Sam backs up Route A.” One spare key is turned down because it reveals Joel absent + Maya absent; spare keys for Maya and Sam make all 100 scenarios survive.</p>
 
@@ -705,7 +709,7 @@
   <p><code>suggest-fixes</code> returns each fix's full <code>list[ScenarioResult]</code>. The browser derives <code>fixes_n</code>, <code>still_broken_n</code>, <code>new_crosses_n</code> from those results. Preview draws the projected grid directly from the stored results - no re-solve in the browser. Accepting a previewed fix replays from the cached results with the flip animation; any cell not in the cache re-solves.</p>
 
   <h3>Example mode saved fixes</h3>
-  <p><code>fixtures/example-fixes.json</code> stores the explanation and per-scenario results for each broken case. They still pass through the gate and are scored live. If a broken case appears with no saved suggestion, the panel says: "No saved suggestions for this case. Add a key to ask the AI."</p>
+  <p><code>fixtures/example-fixes.json</code> currently contains explicitly labelled hand-written placeholder explanations and suggestions. They still pass the gate and are scored live; they are not presented as provider output. New captures remain unedited and uncommitted until approved, and slice 6 remains unchecked pending that review. A case without saved suggestions, or a request for new suggestions, uses configured session/environment keys and identifies the actual answering provider.</p>
 </section>
 
 <!-- COMPONENTS -->
@@ -713,12 +717,12 @@
   <h2>Components</h2>
 
   <h3>Screen 1: Paste Plan <span class="prd-ref">prd.md &rsaquo; Screen 1</span></h3>
-  <p>Single <code>&lt;textarea&gt;</code> with a character counter (amber at 3,500, red at 4,000, submit disabled above). "Load example" button. AI key fields shown if no key is set. One-line Gemini data notice when a Gemini key is present. Connects to <code>POST /api/read-plan</code>.</p>
+  <p>Single <code>&lt;textarea&gt;</code> with a character counter (amber at 3,500, red at 4,000, submit disabled above). <strong>Load the example plan</strong> fills the saved-example textarea; zero provider requests. <strong>Use your own AI key</strong> expands a provider picker and password field. <code>GET /api/ai-status</code> reports availability without exposing keys. A Gemini data notice is always visible. Read plan sends text and any typed key; after success the browser clears the key and subsequent calls use the HttpOnly session cookie. On failure the entered value stays only in React memory so it can be corrected or retried; no browser persistence.</p>
 
   <h3>Screen 2: Plan Map <span class="prd-ref">prd.md &rsaquo; Screen 2</span></h3>
-  <p>Three stacked sections. <strong>Checklist view (top):</strong> computed from item status counts. Summary "AI read N items, M corrected by you, P added by you" derived from <code>status</code> fields. <strong>Structured reading (middle):</strong> one statement per item with <code>source_line</code>. Three visual states: unconfirmed, corrected (AI's <code>original_value</code> struck through), added. Constrained corrections only: <code>&lt;select&gt;</code> from entity ids, time picker. Every correction triggers <code>POST /api/validate-map</code> (debounced 150 ms). <strong>"What we'll test" (bottom):</strong> each problem with preset size picker.</p>
+  <p>Three stacked sections. <strong>Checklist view (top):</strong> computed from item status counts. Summary "AI read N items, M corrected by you, P added by you" derived from <code>status</code> fields. <strong>Structured reading (middle):</strong> one statement per item with <code>source_line</code>. Three visual states: unconfirmed, corrected (AI's <code>original_value</code> struck through), added. Constrained corrections only: <code>&lt;select&gt;</code> from entity ids, time picker. Every correction uses <code>POST /api/update-map</code> against the server-owned draft and returns validation. <strong>"What we'll test" (bottom):</strong> each problem with preset size picker.</p>
   <p><strong>Place identity question:</strong> an unused place listing alongside a loading or supply place requires an individual choice: keep separate, or select the same existing place. Only a listing without loading activity or delivery references can be merged. The server preserves its entity, source rows and question references for undo, retains the selected place's label and details, and requires its facts to be reviewed individually again. Raw AI output is unchanged. This review operation does not change the checker model or infer aliases from the truth fixture.</p>
-  <p>Confirm button disabled until all items confirmed and all rules pass. Connects to <code>POST /api/confirm-map</code>.</p>
+  <p>Confirm button disabled until all items confirmed and all rules pass. <strong>Read by provider / model</strong> is shown on the plan map and results, with fallback attribution when applicable. Connects to <code>POST /api/confirm-map</code>.</p>
 
   <h3>Screen 3: Crash Test Grid <span class="prd-ref">prd.md &rsaquo; Screen 3</span></h3>
   <p>CSS grid. One triangle (diagonal + below). Cells update via SSE. Four SVG mark states. Count line updates live. Before/After toggle after first accepted fix. Preview banner during fix preview. Connects to <code>GET /api/run-tests</code> (SSE).</p>
@@ -805,7 +809,7 @@ rejection_reason:    str | None              <span class="comment"># Checker-der
 gate_status:         "passed" | "format_error" | "rules_error" | "couldnt_apply"
 gate_reason:         str | None</code></pre>
 
-  <div class="card" style="font-size:13.5px;"><strong>State storage:</strong> no database. Confirmed maps, test results, and fix results held in server memory keyed by fingerprint. Closing the tab loses the session - by design.</div>
+  <div class="card" style="font-size:13.5px;"><strong>State storage:</strong> no database. Review drafts, maps, results, suggestions and typed keys stay in server memory, associated with the session owner. Maps/results use fingerprints; successful suggestions also use scenario IDs. Keys never enter map data, fingerprints, logs, files or responses. Closing a tab does not clear server memory; restarting the server clears these sessions. Environment keys remain in local ignored <code>.env</code>.</div>
 </section>
 
 <!-- FIXTURES AND TESTS -->
@@ -834,6 +838,9 @@ gate_reason:         str | None</code></pre>
     </tbody>
   </table>
 
+  <p><strong>Offline HTTP end-to-end:</strong> <code>test_live_api.py</code> replays the saved real provider reading through Read plan, the gate, review, confirm, all scenarios, a cross, scored suggestions and application. Its always-available test uses <code>tests/fixtures/synthetic-fix-response.json</code>, explicitly synthetic. The optional recorded replay reads a successful Joel-absent response from <code>RECORDED_AI_FIXES_PATH</code> (recorder JSON <code>cases["volunteer_absent__person-joel"].raw</code>); it skips without a supplied local capture. Captures stay unedited and outside the commit until approved.</p>
+  <p><strong>Real-network tests:</strong> <code>test_live_network.py</code> requires both explicit <code>RUN_LIVE_AI_TESTS=1</code> and the matching provider key in <code>.env</code> or the process environment. Its two reading smoke tests skip in normal <code>uv run -- python -m pytest -q</code> runs even when keys exist. Offline tests cover HTTP 503 fallback success, both-provider failure, missing/invalid keys, malformed output, unsupported plans, provider attribution, caching and key privacy. <code>test_live_transport.py</code> checks safe retryable read-timeout and connection-failure errors.</p>
+
   <div class="card" style="font-size:13.5px;margin-top:12px;">
     <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input including extra inputs, and runs the truth map's 100 scenarios on the aligned reading. Ranking is exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned fields, consistency, then tokens. No corrections are applied; raw responses and failed attempts are preserved. Every prompt version and its scores are logged in <code>ai-reading-review.md</code>. The dated winner becomes primary in <code>server/config.py</code>.</p>
     <p style="margin-top:8px;"><strong>test_reading_matches_truth.py:</strong> load the unedited <code>example-reading.json</code>, check its saved digest, apply explicit actions from <code>example-corrections.json</code> through review controls, align entities by type and role, then compare every checker input and all 100 locked verdicts against <code>example-truth.json</code>. The actual map must generate 100 scenarios. Names are labels and are excluded; extra or missing checker entities must not be silently discarded.</p>
@@ -861,7 +868,8 @@ gate_reason:         str | None</code></pre>
 │   │   ├── runner.py             <span class="comment"># Singles then pairs; dimmed skipped; SSE stream</span>
 │   │   ├── solver.py             <span class="comment"># One CP-SAT run; max_deterministic_time; fixed seed</span>
 │   │   └── scenarios.py          <span class="comment"># Generates singles + pairs from problem list</span>
-│   └── session.py                <span class="comment"># In-memory: fingerprint -&gt; {map, results, fix_results}</span>
+│   ├── credentials.py            <span class="comment"># Private session keys; public availability booleans only</span>
+│   └── session.py                <span class="comment"># Owner-scoped maps, results and scored suggestion caches</span>
 ├── web/
 │   ├── src/
 │   │   ├── main.tsx
@@ -956,12 +964,15 @@ gate_reason:         str | None</code></pre>
   <h2>Important Failure Modes <span class="prd-ref">prd.md &rsaquo; States and Boundaries</span></h2>
   <ul class="flist">
     <li><div class="ficon">x</div><div><strong>Both AI providers fail.</strong> Clear error message, retry button, "try the example plan instead." Applies to both read-plan and suggest-fixes paths.</div></li>
+    <li><div class="ficon">x</div><div><strong>Primary HTTP 503, timeout or rate limit.</strong> One attempt on the available fallback provider, then display the provider/model that answered. If neither succeeds, stable <code>error_code</code> plus safe plain <code>detail</code>; never reveal a key or raw provider request.</div></li>
     <li><div class="ficon">x</div><div><strong>AI output fails the format gate.</strong> Specific rejection reason (e.g. "Unknown person id 'dave' in route_a driver_ids"), retry button. Nothing unchecked reaches the plan map.</div></li>
     <li><div class="ficon">x</div><div><strong>A fix suggestion fails the gate.</strong> Card shows "Couldn't apply" with specific reason. Never scored, never acceptable.</div></li>
     <li><div class="ficon">x</div><div><strong><code>is_distribution_plan</code> is false.</strong> Shows the AI's reason. Offers to load the example.</div></li>
     <li><div class="ficon">?</div><div><strong>Solver hits the deterministic time limit.</strong> Question mark cell. Listed under "What was NOT tested." Never a pass.</div></li>
     <li><div class="ficon">!</div><div><strong>Plan exceeds 24 problems.</strong> Rule message on Screen 2 before Confirm: "This version supports up to 24 problems. This plan has N."</div></li>
     <li><div class="ficon">!</div><div><strong>Plan text exceeds ~4,000 characters.</strong> Counter turns amber at 3,500, red at 4,000, submit disabled above.</div></li>
+    <li><div class="ficon">x</div><div><strong>Missing or invalid AI key.</strong> Clear error, retry and example actions. Invalid-key responses do not silently switch providers.</div></li>
+    <li><div class="ficon">x</div><div><strong>No eligible fixes.</strong> Keep checker facts visible, show "None of these fixes worked" and allow one explicit retry for that session, fingerprint and case. Failed provider requests remain retryable; reopening a successful cached case never silently regenerates suggestions.</div></li>
   </ul>
 </section>
 

@@ -13,7 +13,7 @@ When you paste a plan, the server sends it to an AI (Gemini first, Groq as a fal
 
 The AI returns an `AIPlanReading`. The server wraps it into a `PlanMap`, adding its own metadata: which provider answered, per-item status, and correction history. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.
 
-Once the map passes the format check, the server runs plain rules and surfaces any failures as questions on screen. The browser calls `POST /api/validate-map` on every correction (debounced, fast, same Python code that runs at Confirm). The user confirms or corrects using constrained choices only. Corrections go directly into the map; the AI does not re-read.
+Once the map passes the format check, the server runs plain rules and surfaces any failures as questions on screen. The browser sends constrained actions to `POST /api/update-map`; the server updates its own reading draft and validates with the same rules used at Confirm. The user confirms or corrects using constrained choices only. The AI does not re-read.
 
 When everything is confirmed and all rules pass, the browser sends the map to `POST /api/confirm-map`. The server re-validates and returns a fingerprint: a SHA-256 hash of the canonical sorted checker inputs (people, vehicles, places, deliveries, routes, finish time, problem sizes). Two identical plans get the same fingerprint; changing a problem size changes it. Timestamps and status marks are excluded.
 
@@ -33,9 +33,9 @@ The example plan ships with a saved AI reading and saved fix suggestions, so the
 
 PRD ref: `prd.md > The Core Journey`.
 
-1. User pastes a plan (or loads the example). The browser sends the text to `POST /api/read-plan`. In example mode the server returns the saved fixture from `fixtures/example-reading.json` without making any AI call.
+1. User pastes a plan (or loads the example). The browser sends `{text, example, api_key?, key_provider?}` to `POST /api/read-plan`. The server reads environment keys from the ignored `.env`; a typed key is held only in the session's private server memory. In example mode the server returns the saved fixture from `fixtures/example-reading.json` without making any AI call.
 
-2. Server calls the AI. Groq (`openai/gpt-oss-120b`, strict structured output against `AIPlanReading`) gets one attempt. On rate limit, server error, timeout, or format-check failure, the server tries Gemini (`gemini-3.8-flash`). One attempt each. On both failing, the PRD error state returns to the browser.
+2. Server calls the AI. Gemini (`gemini-3.8-flash`, structured output against `AIPlanReading`) is the default primary. On rate limit, server error including HTTP 503, timeout, or format-check failure, the server tries Groq (`openai/gpt-oss-120b`, strict structured output). One attempt each, using available keys. An explicitly selected typed-key provider is tried first, with the other provider as fallback. Invalid keys fail clearly without silently switching providers. On both failing, the browser receives a clear error and a retry action.
 
 3. Format gate runs. The raw AI JSON is parsed and validated against `AIPlanReading` (`extra="forbid"`, all fields required). Duplicate ids are rejected. Reference integrity check: every id used in routes and jobs must exist in the entity lists. Failure returns a `422` with the specific rejection reason.
 
@@ -43,9 +43,9 @@ PRD ref: `prd.md > The Core Journey`.
 
 5. Plan map screen renders. The browser displays the checklist view, the structured reading with source lines, and the "What we'll test" list.
 
-6. User confirms or corrects. Every correction triggers `POST /api/validate-map` (debounced 150 ms). The server returns updated item statuses and rule failures. Affected items lose their confirmed mark. The Confirm button state is computed from the current map state, never stored.
+6. User confirms or corrects. Each constrained action goes to `POST /api/update-map` with the server-issued reading ID. The server updates its own draft and returns item statuses and rule failures; `POST /api/validate-map` can return the current validation snapshot. Affected items lose their confirmed mark. The Confirm button state is computed from the current map state, never stored.
 
-7. User hits Confirm. The browser sends the full map to `POST /api/confirm-map`. The server runs the gate and rules one final time. On pass, it returns the fingerprint. On failure, it returns the specific failing rule.
+7. User hits Confirm. The browser sends its reading ID to `POST /api/confirm-map`. The server checks its own confirmations, answers, gate and rules one final time. Browser confirmation lists cannot bypass this check. On pass, it returns the fingerprint. On failure, it returns the specific missing review or failing rule.
 
 8. Crash test begins. Browser calls `GET /api/run-tests?map={fingerprint}`. The server opens an SSE stream. Singles run first; dimmed pairs are marked without solving. Each result (`scenario_id, state, lateness_minutes, timeline`) is sent as it finishes.
 
@@ -78,11 +78,13 @@ PRD ref: `prd.md > The Core Journey`.
 | Primary | Gemini | `gemini-3.8-flash` | `google-genai` (official) |
 | Fallback | Groq | `openai/gpt-oss-120b` | `groq` (official) |
 
-Model names live in `server/config.py`. Fallback triggers: rate limit, server error, timeout, or format-check failure on the primary's output. One attempt per provider.
+Model names live in `server/config.py`. Fallback triggers: rate limit, server error including HTTP 503, timeout, or format-check failure on the primary's output. One attempt per available provider. Explicitly choosing a provider for a typed key changes the order only for that session. Invalid-key and unsupported-plan responses stop with their specific error.
 
 The Gemini adapter uses `google-genai` `models.generate_content` with `response_mime_type` and `response_json_schema`, verified against the installed SDK.
 
-Every AI result records provider and model; shown as "Read by [provider/model]" on the plan map and in the report.
+Every reading records provider and model; shown as "Read by provider / model" on the plan map and results. Suggestion responses identify their answering provider/model separately. Safe response metadata includes source (`live`, `saved` or `placeholder`), whether fallback answered and provider/status/error attempt summaries. API responses never contain keys or raw private provider requests. Report attribution remains part of slice 7.
+
+`GET /api/ai-status` exposes configured provider/model names, the session's selected provider and key-availability booleans only. A random HttpOnly, SameSite=Lax cookie identifies the session; its value contains no key. Typed keys stay in a private server-memory store, outside maps, fingerprints, logs, disk and response bodies. Confirming a map or applying a fix preserves its owner and session key scope. Successful suggestion caches are scoped to that owner, fingerprint and case.
 
 Doc links:
 - FastAPI: https://fastapi.tiangolo.com/
@@ -109,9 +111,9 @@ Rules are implemented only in Python (`server/validation/rules.py`). The browser
 
 Runtime: local, two processes. Started with one cross-platform command (PowerShell-compatible, no `make`).
 
-Start command (after `uv sync` and `npm install`):
+Start command (after `uv sync --extra dev --extra ai` and `npm install`):
 ```
-python scripts/dev.py
+uv run -- python scripts/dev.py
 ```
 This starts `uvicorn server.main:app --host 127.0.0.1 --port 8000` and `vite --port 5173` in parallel. The server binds to 127.0.0.1 only because AI keys are held in memory.
 
@@ -124,12 +126,13 @@ Submission: short demo video plus public GitHub repository. Deployment is option
 Environment requirements:
 - Python 3.12 (managed by uv)
 - Node.js 20+
-- `GROQ_API_KEY` and/or `GEMINI_API_KEY` in `.env` (not needed for example mode)
+- `GEMINI_API_KEY` in `.env` for the default primary and `GROQ_API_KEY` for fallback; either provider may be used alone. Keys are not needed for the saved example.
 - `.env.example` ships with placeholders; `.env` is gitignored
+- Alternatively, expand "Use your own AI key" on Screen 1, choose the provider and enter a session-only key. A typed key overrides that provider's environment key without editing `.env`.
 
 Free tier constraints:
 - Groq: 30 req/min, 1,000 req/day, 8,000 tokens/min, 200,000 tokens/day. Pasted plans capped at ~4,000 characters; visible counter on Screen 1. Prompts kept lean; reasoning at lowest setting.
-- Gemini free tier: Google may use content to improve its products. Screen 1 shows one line when a Gemini key is present: "If you use a Gemini key, don't paste personal details - Google may use them to improve its models. The example plan is fictional."
+- Gemini free tier: Google may use content to improve its products. Screen 1 always displays a Gemini data notice now that Gemini is the default primary: "If you use a Gemini key, don't paste personal details - Google may use them to improve its models. The example plan is fictional."
 
 ## Look and Feel
 
@@ -217,12 +220,12 @@ The checker evaluates “Add Maya as backup driver for Route C” and turns it d
 
 ### How the checker decides
 
-After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time from timelines without trading away the proven verdict. Both passes share the deterministic solver budget. If the earliest schedule cannot be proved, the result is a question mark. Small-model presolve probing is disabled to keep the full example run below three seconds.
+After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time from timelines without trading away the proven verdict. Both passes share the deterministic solver budget. If the second pass reaches its limit, retain the proven lateness verdict and the best valid timeline; earliest-start optimality is then not claimed. A question mark means the primary lateness verdict could not be proved. Small-model presolve probing is disabled to keep the full example run below three seconds.
 
 - Proven zero lateness: **tick.** Zero is the floor; finding zero proves the plan survives.
 - Proven minimum above zero: **cross.** The minimum is the human cost - e.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Proved optimal.
 - **Not delivered** routes use a penalty lateness of households times the full horizon (finish time plus 180 minutes), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area" Still a cross; tick and question mark keep their meaning.
-- Deterministic time limit hit before either is proved: **question mark.** Uses `max_deterministic_time`, not wall-clock seconds, so results are the same on every machine. Never counted as survived. Listed by name in the report under "What was NOT tested."
+- Deterministic time limit hit before the minimum lateness is proved: **question mark.** Uses `max_deterministic_time`, not wall-clock seconds, so results are the same on every machine. Never counted as survived. Listed by name in the report under "What was NOT tested."
 
 ### Run order
 
@@ -238,7 +241,9 @@ One solver worker, fixed seed. The same confirmed map always gives the same resu
 
 Implements `prd.md > Broken Case Detail Panel`, `prd.md > Fix Cards and Scoring`.
 
-One AI call per broken case: `POST /api/suggest-fixes` sends the confirmed map plus the checker's facts for that case (the two failing problem ids, the timeline, the late routes, lateness in minutes, or "not delivered" if applicable). The AI returns one plain explanation sentence and up to three fix suggestions. The server caches the result keyed by fingerprint and scenario id, so reopening a cross never calls the AI again.
+One AI request per uncached broken case: `POST /api/suggest-fixes` uses the session-owned confirmed map plus the checker's facts for that case (the failing problem ids, the timeline, the late routes, lateness in minutes, or "not delivered" if applicable). Gemini is primary by default, with one Groq fallback attempt on a transient provider or output-format failure. The AI returns one plain explanation sentence and up to three fix suggestions. The server gates each operation and scores every allowed fix against the complete scenario grid. Successful responses are cached by session owner, fingerprint and scenario ID, so reopening a cross reuses its scored results. Provider failures do not become successful cache entries.
+
+Request fields are `fingerprint`, `scenario_id`, optional `live: true` to ask AI instead of saved example placeholders, and optional `retry: true` for the single explicit retry after a successful response has no eligible fixes. Live-pasted maps use live suggestions by default. Responses expose `can_retry`; provider errors include checker-only `case_detail` so the timeline and costs remain visible even when the AI is unavailable.
 
 The checker's facts are always shown in the panel. The AI's sentence sits next to them, labelled "AI's explanation."
 
@@ -263,14 +268,14 @@ Fixes are composed of one or more of these operations. No new people or vehicles
 
 ### Example mode saved fixes
 
-`fixtures/example-fixes.json` stores the explanation and fix results for each broken case in the example plan. They still pass through the gate and are scored live. If a broken case appears that has no saved suggestion (e.g. a case uncovered after a fix is accepted), the panel says: "No saved suggestions for this case. Add a key to ask the AI." Requesting new suggestions also requires a key.
+`fixtures/example-fixes.json` currently stores explicitly labelled hand-written placeholder explanations and suggestions for the example. They still pass through the gate and are scored live; they are not presented as provider output. New captures remain unedited and uncommitted until the user approves them. Slice 6 stays unchecked until that review passes. If a case has no saved suggestion, or the user requests new suggestions, the live path requires a configured session/environment key and displays which provider answered.
 
 ## Components
 
 ### Screen 1: Paste Plan
 Implements `prd.md > Paste and Load`, `prd.md > Screen 1`.
 
-Single `<textarea>` with a character counter (cap ~4,000; amber at 3,500, red at 4,000, submit disabled above). "Load example" button. AI key field(s) shown if no key is set in the environment. One-line Gemini data notice when a Gemini key is present.
+Single `<textarea>` with a character counter (cap ~4,000; amber at 3,500, red at 4,000, submit disabled above). "Load the example plan" fills the textarea; saved-example mode makes no provider request. "Use your own AI key" expands a provider picker and password field. `GET /api/ai-status` reports availability without exposing keys. A Gemini data notice is visible on Screen 1. Read plan sends text and any typed key; after success the browser clears the key and further calls use the HttpOnly session cookie. On failure the entered value stays only in React memory for correction or retry; it is never persisted in the browser.
 
 Connects to: `POST /api/read-plan`.
 
@@ -281,7 +286,7 @@ Three sections stacked vertically:
 
 **Checklist view (top):** computed from the confirmed map - every job with a person and a backup, all ticked. This is the "it looks done" view. The summary "AI read 24 items, 2 corrected by you, 1 added by you" is computed from item `status` fields.
 
-**Structured reading (middle):** one statement per map item, with its `source_line`. Three visual states: default (status `unconfirmed`), corrected (AI's `original_value` struck through, correction marked "corrected by you"), added (no source line, marked "added by you"). Confirmed items get a small confirmed mark. Corrections use constrained inputs only: `<select>` from known entity ids, time picker for times. No free-text fields. Every correction triggers `POST /api/validate-map` (debounced 150 ms). Affected items that depend on the changed item lose their confirmed mark and show "check this, [name] changed."
+**Structured reading (middle):** one statement per map item, with its `source_line`. Three visual states: default (status `unconfirmed`), corrected (AI's `original_value` struck through, correction marked "corrected by you"), added (no source line, marked "added by you"). Confirmed items get a small confirmed mark. Corrections use constrained inputs only: `<select>` from known entity ids, time picker for times. No free-text fields. Every correction goes through `POST /api/update-map` against the server-owned draft and returns validation. Affected items that depend on the changed item lose their confirmed mark and show "check this, [name] changed."
 
 **Place identity question:** an unused place listing alongside a loading or supply place requires an individual choice: keep separate, or select the same existing place. Only a listing with no loading activity and no delivery references can be merged. The server preserves its entity, source rows and question references for undo, retains the selected place's label and details, and requires its facts to be reviewed individually again. The raw reading is unchanged. This review operation does not change the checker model or infer aliases from the truth fixture.
 
@@ -482,7 +487,7 @@ FixSuggestion
 
 ### State storage
 
-No database. Confirmed maps, test results, and fix suggestion results are held in server memory keyed by fingerprint. Closing the tab loses the session - by design.
+No database. Review drafts, confirmed maps, test results, fix suggestions and typed keys stay in server memory, associated with the session owner. Maps/results use fingerprints; successful suggestions additionally use scenario IDs. Keys never enter map data, fingerprints, logs, files or responses. Closing a tab does not clear server memory. Restarting the server clears these sessions; environment keys remain in the local ignored `.env` file.
 
 ## Fixtures and the Locked Test
 
@@ -508,6 +513,10 @@ No database. Confirmed maps, test results, and fix suggestion results are held i
 
 `test_determinism.py`: runs the example truth map twice and compares every result.
 
+`test_live_api.py` replays the saved real provider reading through Read plan, the gate, review, confirmation, all scenarios, a cross, scored suggestions and application. Its always-available offline test uses `tests/fixtures/synthetic-fix-response.json`, explicitly synthetic, to verify transport/gating without presenting it as AI output. `test_optional_recorded_fix_replays_through_live_http` replays an actual recorded Joel-absent response from the recorder JSON specified by `RECORDED_AI_FIXES_PATH` (`cases["volunteer_absent__person-joel"].raw`); it skips without a supplied local capture. Captured responses remain unedited and outside the commit until approved.
+
+`test_live_network.py` requires both explicit `RUN_LIVE_AI_TESTS=1` and the matching provider key from `.env` or the process environment. Its two provider reading smoke tests skip in the ordinary `uv run -- python -m pytest -q` run, even if `.env` contains keys. Deterministic offline tests cover primary HTTP 503 to fallback success, both-provider failures, missing/invalid keys, malformed output, unsupported plans, attribution, successful-response caching and key privacy. `test_live_transport.py` covers read timeouts and connection failures as safe retryable errors.
+
 `bakeoff.py`: runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input (including extra inputs), and runs the truth map's 100 scenarios on the aligned reading. It ranks providers by exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned field match, consistency, then tokens. It applies no corrections and preserves raw responses and failed attempts. Every prompt version and its scores are logged in `ai-reading-review.md`; the winner becomes primary in `server/config.py` with the date and scores.
 
 ## File Structure
@@ -531,7 +540,8 @@ failure-compiler/
 │   │   ├── runner.py            # Singles then pairs; dimmed pairs skipped; SSE stream
 │   │   ├── solver.py            # One CP-SAT run; max_deterministic_time; fixed seed
 │   │   └── scenarios.py        # Generates singles + pairs from problem list
-│   └── session.py                # In-memory: fingerprint -> {map, results, fix_results, fix_suggestions_cache}
+│   ├── credentials.py            # Private session keys; public availability booleans only
+│   └── session.py                # Owner-scoped maps, results and scored suggestion caches
 ├── web/
 │   ├── src/
 │   │   ├── main.tsx
@@ -599,7 +609,7 @@ failure-compiler/
 - Structured output: `response_format: { type: "json_schema", json_schema: { strict: true, schema: <AIPlanReading JSON schema> } }`
 - Rate limits (free tier): 30 req/min, 1,000 req/day, 8,000 tokens/min, 200,000 tokens/day
 - Docs: https://console.groq.com/docs/openai
-- Key: `GROQ_API_KEY` in `.env`
+- Key: `GROQ_API_KEY` in `.env`, or a Groq key typed into the session-only input.
 
 ### Gemini - Primary AI provider
 - SDK: `google-genai` (official)
@@ -607,7 +617,7 @@ failure-compiler/
 - Structured output: `models.generate_content` with `response_mime_type` and `response_json_schema`, verified against the installed SDK.
 - Free tier note: content may be used by Google. Screen 1 discloses this.
 - Docs: https://googleapis.github.io/python-genai/
-- Key: `GEMINI_API_KEY` in `.env`
+- Key: `GEMINI_API_KEY` in `.env`, or a Gemini key typed into the session-only input.
 
 ### OR-Tools 9.15
 - Install: `uv add ortools==9.15.*`
@@ -619,6 +629,7 @@ failure-compiler/
 Implements `prd.md > States and Boundaries`.
 
 - **Both AI providers fail** - clear error message, retry button, "try the example plan instead." Applies to both read-plan and suggest-fixes paths.
+- **Primary returns HTTP 503, times out or is rate limited** - one attempt on the available fallback provider, then display the provider/model that actually answered. If neither succeeds, return stable `error_code` plus a safe plain `detail`; never reveal a key or raw provider request.
 - **AI output fails the format gate** - "The AI's reading did not pass the format check" plus the specific reason (e.g. "Unknown person id 'dave' in route_a driver_ids" or "Duplicate id 'person-ravi'") plus a retry button. Nothing unchecked reaches the plan map.
 - **A fix suggestion fails the gate** - card shows "Couldn't apply" with the specific reason. Never scored, never acceptable.
 - **`is_distribution_plan` is false in the reading** - "This version only supports community distribution plans" plus the AI's reason. Offer to load the example.
@@ -626,6 +637,7 @@ Implements `prd.md > States and Boundaries`.
 - **Plan exceeds 24 problems** - rule message on Screen 2 before Confirm: "This version supports up to 24 problems. This plan has N."
 - **Plan text exceeds ~4,000 characters** - counter turns amber at 3,500, red at 4,000, submit disabled above 4,000.
 - **AI key invalid or call fails** - clear error message, retry button, suggest example plan.
+- **No eligible fixes** - keep checker facts visible, show "None of these fixes worked" and allow one explicit retry for that session, fingerprint and case. Failed provider requests can be retried; successful cached responses are not silently regenerated when a cross is reopened.
 
 ## What Was Simplified and Why
 
