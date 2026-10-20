@@ -20,3 +20,4 @@ __pycache__/
 
 # Local agent memory; project notes belong in the docs, not the repository.
 /.oxcode-memory/
+oxcode.hooks.json
