@@ -187,8 +187,22 @@ def controls(plan: PlanMap, item: dict) -> list[dict]:
 
 
 def changed_by(plan: PlanMap, item: dict) -> int | None:
-    if item["field"] == "holds_key":
-        return max((person.changed_by_fix or 0 for person in plan.people), default=0) or None
-    if item["field"] in {"loading", "loading_team"}:
-        return max((route.changed_by_fix or 0 for route in plan.routes), default=0) or None
-    return getattr(entity_for(plan, item), "changed_by_fix", None)
+    """Tag only facts a fix actually changed, rather than every row of its entity."""
+    field = item["field"]
+    for number, fix in reversed(list(enumerate(plan.fix_history, 1))):
+        for operation in fix.operations:
+            if field == "holds_key" and item.get("id") in {None, "joel-key"}:
+                if operation.op == "give_spare_key":
+                    return number
+            elif field in {"loading", "loading_team"}:
+                if operation.field == "loader_ids":
+                    return number
+            elif operation.target_id == item["entity_id"]:
+                fields = {field}
+                if field == "route":
+                    fields = {"driver_ids", "loader_ids", "vehicle_id", "households"}
+                elif field == "available_until":
+                    fields = {"available_from", "available_until"}
+                if operation.field in fields:
+                    return number
+    return None

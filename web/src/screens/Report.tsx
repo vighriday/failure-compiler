@@ -52,8 +52,8 @@ export function ReportContent({data, onBack}: {data: ReportData; onBack: () => v
       </article>)}</div>)}
     </section>
     <section className="report-section report-after" aria-labelledby="report-after-title"><h2 id="report-after-title">After the fixes</h2><p className="report-final-count mono">{data.after.count.line}</p>{data.after.count.survived === total && <h3><CellMark state="tick" />All {total} tested scenarios survive.</h3>}{data.confirmed_edits_after_fixes && <p>The current run also includes changes confirmed on the plan map after the last accepted fix.</p>}<p>Survived means survived the listed problems at the listed sizes. It is not a guarantee.</p></section>
-    <section className="report-section report-limits" aria-labelledby="report-limits-title"><h2 id="report-limits-title">What was NOT tested</h2><ul>{data.not_tested.map((line) => <li key={line}>{line}</li>)}</ul><h3>Question-mark results</h3>{data.unknown_results.length ? <ul>{data.unknown_results.map((row) => <li key={row.label}><strong>?</strong> {row.label} ({row.phases.join(" and ")}). Unknown is not a pass.</li>)}</ul> : <p>No question-mark results in the original or current run.</p>}</section>
-    <footer className="report-footer">{data.source !== "live" && <p>This report used a saved AI reading of the example plan.</p>}<p className="mono">Fingerprint: {data.fingerprint}</p></footer>
+    <div className="report-closing"><section className="report-section report-limits" aria-labelledby="report-limits-title"><h2 id="report-limits-title">What was NOT tested</h2><ul>{data.not_tested.map((line) => <li key={line}>{line}</li>)}</ul><h3>Question-mark results</h3>{data.unknown_results.length ? <ul>{data.unknown_results.map((row) => <li key={row.label}><strong>?</strong> {row.label} ({row.phases.join(" and ")}). Unknown is not a pass.</li>)}</ul> : <p>No question-mark results in the original or current run.</p>}</section>
+    <footer className="report-footer">{data.source !== "live" && <p>This report used a saved AI reading of the example plan.</p>}<p className="mono">Fingerprint: {data.fingerprint}</p></footer></div>
   </article>;
 }
 

@@ -33,9 +33,12 @@
   .report-screen h4 { font-size: 14px; }
   .report-screen h1, .report-screen h2, .report-screen h3, .report-screen h4 { break-after: avoid; }
   .report-section { padding: 14px 0; }
+  .report-closing { break-inside: avoid; }
   .report-fix, .report-broken-case, .report-fact, .report-screen tr, .report-footer { break-inside: avoid; }
   .report-fix { padding: 10px; }
   .report-screen .cell-mark { stroke: black !important; }
   .report-screen .report-broken-case, .report-screen .report-fix { border-color: black; }
   .report-screen p, .report-screen li { orphans: 3; widows: 3; }
+  .report-dimmed-group summary { list-style: none; }
+  .report-dimmed-group summary::-webkit-details-marker { display: none; }
 }

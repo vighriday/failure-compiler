@@ -242,6 +242,36 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     key_item = {"entity_type": "person", "entity_id": "person-joel", "field": "holds_key"}
     assert statement(final_plan, key_item) == "Joel, Maya and Sam hold loading-area keys."
     assert changed_by(final_plan, key_item) == 2
+    assert (
+        changed_by(
+            final_plan,
+            {
+                "id": "ravi-key",
+                "entity_type": "person",
+                "entity_id": "person-ravi",
+                "field": "holds_key",
+            },
+        )
+        is None
+    )
+    assert (
+        changed_by(
+            final_plan,
+            {
+                "id": "maya-availability",
+                "entity_type": "person",
+                "entity_id": "person-maya",
+                "field": "available_until",
+            },
+        )
+        is None
+    )
+    assert (
+        changed_by(
+            final_plan, {"entity_type": "route", "entity_id": "route-a", "field": "load_minutes"}
+        )
+        is None
+    )
     for route_id, fix_number in [("route-c", 1), ("route-a", 3)]:
         route_item = {"entity_type": "route", "entity_id": route_id, "field": "route"}
         assert "Sam" in statement(final_plan, route_item)
