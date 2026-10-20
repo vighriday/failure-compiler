@@ -3,6 +3,8 @@
 import logging
 from datetime import UTC, datetime
 
+import httpx
+
 from server.ai.types import AIError, ProviderResponse
 from server.config import PROVIDER_MODELS
 
@@ -57,7 +59,7 @@ def generate(system: str, user: str, schema: dict, key: str, version: str) -> Pr
             provider="gemini",
             status=401 if code == "invalid_key" else 502,
         ) from error
-    except (TimeoutError, ConnectionError) as error:
+    except (TimeoutError, ConnectionError, httpx.TransportError) as error:
         raise AIError(
             "timeout", "Gemini could not be reached before the timeout.", provider="gemini"
         ) from error

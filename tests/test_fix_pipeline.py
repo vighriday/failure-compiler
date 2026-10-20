@@ -8,7 +8,7 @@ from server.checker.runner import run_checker
 from server.facts import changed_by, statement
 from server.fixes import SCORED, score_fix
 from server.main import app
-from server.models import PlanMapData
+from server.models import PlanMapData, ScenarioResult
 from server.session import SESSIONS, remember_map
 from server.validation.models import PlanMap
 
@@ -23,6 +23,32 @@ def truth() -> PlanMap:
     return PlanMap.from_truth_map(
         PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
     )
+
+
+def test_new_single_is_not_described_as_a_hidden_pair(monkeypatch):
+    problem = "supply_delivery_late__delivery-supplies"
+    monkeypatch.setattr(
+        "server.fixes.run_checker",
+        lambda _: [ScenarioResult(scenario_id=problem, failures=[problem], state="cross")],
+    )
+    result = score_fix(
+        truth(),
+        [],
+        VAN_ANITA,
+        {
+            "id": "classification-test",
+            "description": "Move a route",
+            "operations": [
+                {
+                    "op": "move_route",
+                    "target_id": "route-c",
+                    "field": "vehicle_id",
+                    "value": "vehicle-car",
+                }
+            ],
+        },
+    ).suggestion
+    assert result.rejection_reason.startswith("This reveals a new single weak spot:")
 
 
 def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:

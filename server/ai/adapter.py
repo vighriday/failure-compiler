@@ -43,9 +43,13 @@ def _call(
     version: str,
     gate: Callable,
     provider: str | None,
+    preferred_provider: str | None = None,
 ) -> tuple[ProviderResponse, object, list[dict]]:
     attempts = []
-    for name in [provider] if provider else [PRIMARY_PROVIDER, FALLBACK_PROVIDER]:
+    order = [PRIMARY_PROVIDER, FALLBACK_PROVIDER]
+    if preferred_provider:
+        order = [preferred_provider, "groq" if preferred_provider == "gemini" else "gemini"]
+    for name in [provider] if provider else order:
         if name not in {"groq", "gemini"}:
             raise AIError("provider_error", "Unknown AI provider.", status=422)
         key = keys.get(name)
@@ -80,7 +84,9 @@ def _call(
     )
     error = AIError(
         "format_check_failed" if "format_check_failed" in codes else "providers_failed",
-        "AI reading did not pass the format check: " + reason
+        ("AI reading" if version.startswith("read-") else "AI suggestions")
+        + " did not pass the format check: "
+        + reason
         if "format_check_failed" in codes
         else "Both providers failed. " + reason,
     )
@@ -88,7 +94,13 @@ def _call(
     raise error
 
 
-def read_plan(text: str, keys: dict[str, str], *, provider: str | None = None) -> ReadingResult:
+def read_plan(
+    text: str,
+    keys: dict[str, str],
+    *,
+    provider: str | None = None,
+    preferred_provider: str | None = None,
+) -> ReadingResult:
     if not text.strip() or len(text) > 4000:
         raise AIError("invalid_plan", "Enter a plan of 1 to 4,000 characters.", status=422)
 
@@ -97,22 +109,33 @@ def read_plan(text: str, keys: dict[str, str], *, provider: str | None = None) -
         if not reading.is_distribution_plan:
             raise AIError(
                 "not_distribution",
-                reading.not_distribution_reason or "This does not look like a distribution plan.",
+                "This version only supports community distribution plans. "
+                + (
+                    reading.not_distribution_reason
+                    or "This does not look like a distribution plan."
+                ),
                 status=422,
             )
-        for item in [
-            *reading.people,
-            *reading.vehicles,
-            *reading.places,
-            *reading.deliveries,
-            *reading.routes,
-        ]:
-            match = re.fullmatch(r"L([1-9][0-9]*)", item.source_line)
-            if not match or int(match[1]) > len(text.splitlines()):
+        lines = text.splitlines()
+        sources = [
+            (item.source_line, "source_line", item.id)
+            for item in [
+                *reading.people,
+                *reading.vehicles,
+                *reading.places,
+                *reading.deliveries,
+                *reading.routes,
+            ]
+        ]
+        if reading.finish_time > 0 or reading.finish_time_source:
+            sources.append((reading.finish_time_source, "finish_time_source", "finish_time"))
+        for source, field, item_id in sources:
+            match = re.fullmatch(r"L([1-9][0-9]*)", source)
+            if not match or int(match[1]) > len(lines) or not lines[int(match[1]) - 1].strip():
                 raise GateError(
-                    f"Invalid source_line {item.source_line!r} for {item.id}",
-                    field="source_line",
-                    bad_value=item.source_line,
+                    f"Invalid {field} {source!r} for {item_id}; use a nonblank plan line.",
+                    field=field,
+                    bad_value=source,
                 )
         return reading
 
@@ -133,17 +156,26 @@ def read_plan(text: str, keys: dict[str, str], *, provider: str | None = None) -
         READ_PROMPT_VERSION,
         gate,
         provider,
+        preferred_provider,
     )
     return ReadingResult(raw, reading, attempts)
 
 
-def suggest_fixes(context: dict, keys: dict[str, str], *, provider: str | None = None) -> FixResult:
+def suggest_fixes(
+    context: dict,
+    keys: dict[str, str],
+    *,
+    provider: str | None = None,
+    preferred_provider: str | None = None,
+) -> FixResult:
     def gate(raw: str) -> AIFixResponse:
         result = AIFixResponse.model_validate_json(raw)
         if len(result.fixes) > 3:
             raise GateError(
                 "At most three fixes are allowed", field="fixes", bad_value=len(result.fixes)
             )
+        if len({fix.id for fix in result.fixes}) != len(result.fixes):
+            raise GateError("Duplicate fix id", field="fixes.id", bad_value="duplicate")
         return result
 
     raw, fixes, attempts = _call(
@@ -154,5 +186,6 @@ def suggest_fixes(context: dict, keys: dict[str, str], *, provider: str | None =
         FIX_PROMPT_VERSION,
         gate,
         provider,
+        preferred_provider,
     )
     return FixResult(raw, fixes, attempts)

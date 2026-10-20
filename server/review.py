@@ -11,7 +11,7 @@ from pydantic import TypeAdapter
 from server.facts import changed_by, controls, entity_for, loading_team, statement
 from server.place_review import answer_place_question, reopen_place_question
 from server.rule_questions import answer_rule_question, sync_rule_questions
-from server.session import SESSIONS, remember_map
+from server.session import get_map, remember_map
 from server.validation.gate import normalise_plan_map_ids
 from server.validation.models import PlanMap
 from server.validation.rules import validate_plan_rules
@@ -27,14 +27,35 @@ class Review:
     answers: dict[str, str] = field(default_factory=dict)
     confirmed: bool = False
     out_of_date: bool = False
+    owner: str | None = None
+    source: str = "saved"
+    attempts: list[dict] = field(default_factory=list)
+    raw_record: dict | None = field(default=None, repr=False)
 
 
 REVIEWS: dict[str, Review] = {}
 
 
-def create_review(plan: PlanMap, items: list[dict], questions: list[dict]) -> dict:
+def create_review(
+    plan: PlanMap,
+    items: list[dict],
+    questions: list[dict],
+    *,
+    owner: str | None = None,
+    source: str = "saved",
+    attempts: list[dict] | None = None,
+    raw_record: dict | None = None,
+) -> dict:
     reading_id = uuid4().hex
-    review = Review(plan.model_copy(deep=True), deepcopy(items), deepcopy(questions))
+    review = Review(
+        plan.model_copy(deep=True),
+        deepcopy(items),
+        deepcopy(questions),
+        owner=owner,
+        source=source,
+        attempts=attempts or [],
+        raw_record=raw_record,
+    )
     for item in review.items:
         item["original_statement"] = statement(review.plan, item)
     REVIEWS[reading_id] = review
@@ -45,6 +66,12 @@ def get_review(reading_id: str | None) -> Review:
     if not isinstance(reading_id, str) or not reading_id or reading_id not in REVIEWS:
         raise HTTPException(422, "Missing or unknown reading_id; review confirmations are required")
     return REVIEWS[reading_id]
+
+
+def check_owner(reading_id: str | None, owner: str) -> None:
+    review = get_review(reading_id)
+    if review.owner is not None and review.owner != owner:
+        raise HTTPException(404, "This reading is not part of the current session.")
 
 
 def snapshot(reading_id: str) -> dict:
@@ -80,6 +107,14 @@ def snapshot(reading_id: str) -> dict:
         "open_questions": sum(q["id"] not in review.answers for q in review.questions),
         "confirmed": review.confirmed,
         "out_of_date": review.out_of_date,
+        "read_by": f"{review.plan.ai_meta.provider} / {review.plan.ai_meta.model}",
+        "source": review.source,
+        "placeholder": review.source == "placeholder",
+        "fallback_used": len(review.attempts) > 1,
+        "attempts": [
+            {key: row[key] for key in ("provider", "status", "error") if key in row}
+            for row in review.attempts
+        ],
     }
 
 
@@ -248,7 +283,7 @@ def update_review(request: dict) -> dict:
             review.out_of_date = True
     elif action == "restore_fixed":
         fingerprint = request.get("fingerprint")
-        session = SESSIONS.get(fingerprint)
+        session = get_map(fingerprint, review.owner)
         if session is None or not any(
             fix.from_fingerprint == review.plan.fingerprint for fix in session.plan.fix_history
         ):
@@ -273,6 +308,6 @@ def confirm_review(request: dict) -> dict:
     if missing or messages:
         raise HTTPException(422, "Review required: " + "; ".join([*missing, *messages]))
     _sync_entity_statuses(review)
-    review.plan.fingerprint = remember_map(review.plan)
+    review.plan.fingerprint = remember_map(review.plan, owner=review.owner, source=review.source)
     review.confirmed, review.out_of_date = True, False
     return {**snapshot(reading_id), "fingerprint": review.plan.fingerprint}

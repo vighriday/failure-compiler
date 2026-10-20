@@ -4,16 +4,27 @@ import json
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, ValidationError
 
+from server.ai import adapter
+from server.ai.types import AIError
 from server.checker.explain import route_reasons
 from server.checker.runner import run_checker
+from server.credentials import CLIENTS, available_keys, public_attempts
 from server.evaluation import align_entities
 from server.models import AppliedFix, FixOperation, FixSuggestion, PlanMapData, ScenarioResult
-from server.session import SESSIONS, remember_map
+from server.session import (
+    MapSession,
+    MapSnapshot,
+    capture_map,
+    get_map,
+    map_is_current,
+    remember_map,
+)
 from server.validation.fingerprint import fingerprint_plan_map
 from server.validation.gate import GateError, normalise_plan_map_ids
 from server.validation.models import PlanMap
@@ -27,6 +38,8 @@ class SuggestRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     fingerprint: str
     scenario_id: str
+    live: bool = False
+    retry: bool = False
 
 
 class ApplyRequest(SuggestRequest):
@@ -119,7 +132,46 @@ class ScoredFix:
     plan: PlanMap | None
 
 
-SCORED: dict[tuple[str, str], list[ScoredFix]] = {}
+SCORED: dict[tuple, list[ScoredFix]] = {}
+DETAILS: dict[tuple, dict] = {}
+RAW_FIXES: dict[tuple, list[dict]] = {}
+FIX_LOCKS: dict[tuple, Lock] = {}
+RETRIED: set[tuple] = set()
+
+
+def cache_key(
+    session: MapSession, fingerprint: str, scenario_id: str, revision: int | None = None
+) -> tuple:
+    if session.owner is None:
+        return (fingerprint, scenario_id)
+    return (
+        session.owner,
+        fingerprint,
+        session.revision if revision is None else revision,
+        scenario_id,
+    )
+
+
+def require_current(session: MapSession, captured: MapSnapshot, fingerprint: str) -> None:
+    if get_map(fingerprint, session.owner) is not session or not map_is_current(session, captured):
+        raise HTTPException(409, "This reading changed. Run the current confirmed map again.")
+
+
+def fix_context(plan: PlanMap, result: ScenarioResult, results: list[ScenarioResult]) -> dict:
+    from server.checker.scenarios import _instantiate_problems
+
+    problems = {problem["id"]: problem for problem in _instantiate_problems(plan.checker_data())}
+    return {
+        "confirmed_map": plan.checker_data().model_dump(mode="json"),
+        "selected_case": result.model_dump(mode="json"),
+        "selected_problems": [problems[pid] for pid in result.failures],
+        "checker_reasons": route_reasons(plan.checker_data(), result),
+        "each_alone": [
+            row.model_dump(mode="json")
+            for row in results
+            if len(row.failures) == 1 and row.scenario_id in result.failures
+        ],
+    }
 
 
 def example_case(plan: PlanMap, scenario_id: str, fixture: dict) -> dict:
@@ -190,7 +242,10 @@ def score_fix(
             p["id"]: p["label"] for p in problem_labels(_instantiate_problems(plan.checker_data()))
         }
         name = " + ".join(labels[p] for p in suggestion.new_crosses[0].split("+"))
-        suggestion.rejection_reason = f"This reveals a new hidden pair: {name}."
+        category = (
+            "single weak spot" if len(suggestion.new_crosses[0].split("+")) == 1 else "hidden pair"
+        )
+        suggestion.rejection_reason = f"This reveals a new {category}: {name}."
     elif not suggestion.eligible:
         result = next(r for r in results if r.scenario_id == scenario_id)
         reasons = route_reasons(candidate.checker_data(), result)
@@ -203,43 +258,121 @@ def score_fix(
 
 
 @router.post("/api/suggest-fixes")
-def suggest_fixes(request: SuggestRequest) -> dict[str, Any]:
-    session = SESSIONS.get(request.fingerprint)
-    if session is None or session.results is None:
+def suggest_fixes(request: SuggestRequest, http_request: Request) -> dict[str, Any]:
+    session = get_map(request.fingerprint, http_request.state.owner)
+    if session is None:
         raise HTTPException(409, "Run this confirmed map before asking for fixes.")
-    result = next((r for r in session.results if r.scenario_id == request.scenario_id), None)
+    captured = capture_map(session)
+    if captured.results is None:
+        raise HTTPException(409, "Run this confirmed map before asking for fixes.")
+    plan, results = captured.plan, captured.results
+    result = next((r for r in results if r.scenario_id == request.scenario_id), None)
     if result is None or result.state != "cross":
         raise HTTPException(404, "That broken case is not on the current grid.")
-    fixture = json.loads((ROOT / "fixtures/example-fixes.json").read_text(encoding="utf-8"))
-    saved = example_case(session.plan, request.scenario_id, fixture)
-    key = (request.fingerprint, request.scenario_id)
-    if key not in SCORED:
-        SCORED[key] = [
-            score_fix(session.plan, session.results, request.scenario_id, raw)
-            for raw in saved.get("fixes", [])
+    key = cache_key(session, request.fingerprint, request.scenario_id, captured.revision)
+    lock = FIX_LOCKS.setdefault(key, Lock())
+    with lock:
+        with session.lock:
+            require_current(session, captured, request.fingerprint)
+        cached = DETAILS.get(key)
+        upgrade = (
+            (request.live or captured.source == "live")
+            and cached is not None
+            and cached["source"] != "live"
+        )
+        retry = (
+            request.retry
+            and cached is not None
+            and not any(suggestion["eligible"] for suggestion in cached["suggestions"])
+        )
+        if retry and key in RETRIED:
+            raise HTTPException(409, "The extra suggestion attempt has already been used.")
+        if cached is not None and not upgrade and not retry:
+            with session.lock:
+                require_current(session, captured, request.fingerprint)
+                return cached
+        live = captured.source == "live" or request.live or retry
+        raw_record = None
+        if live:
+            owner = http_request.state.owner
+            try:
+                response = adapter.suggest_fixes(
+                    fix_context(plan, result, results),
+                    available_keys(owner),
+                    preferred_provider=CLIENTS[owner].selected_provider,
+                )
+            except AIError as error:
+                with session.lock:
+                    require_current(session, captured, request.fingerprint)
+                error.case_detail = {
+                    "placeholder": False,
+                    "source": "live",
+                    "suggested_by": None,
+                    "fallback_used": False,
+                    "attempts": public_attempts(getattr(error, "attempts", [])),
+                    "explanation": None,
+                    "suggestions": [],
+                    "can_retry": False,
+                    "result": result.model_dump(mode="json"),
+                    "route_reasons": route_reasons(plan.checker_data(), result),
+                    "alone_results": [
+                        r.model_dump(mode="json")
+                        for r in results
+                        if r.scenario_id in result.failures
+                    ],
+                }
+                raise
+            with session.lock:
+                require_current(session, captured, request.fingerprint)
+            raw_record = response.raw.record()
+            saved = response.fixes.model_dump(mode="json")
+            source = "live"
+            suggested_by = f"{response.raw.provider} / {response.raw.model}"
+            attempts = public_attempts(response.attempts)
+        else:
+            fixture = json.loads((ROOT / "fixtures/example-fixes.json").read_text(encoding="utf-8"))
+            saved = example_case(plan, request.scenario_id, fixture)
+            source, suggested_by, attempts = "placeholder", None, []
+        scored = [
+            score_fix(plan, results, request.scenario_id, raw) for raw in saved.get("fixes", [])
         ]
-    reasons = route_reasons(session.plan.checker_data(), result)
-    return {
-        "placeholder": True,
-        "explanation": saved.get("explanation"),
-        "result": result.model_dump(mode="json"),
-        "route_reasons": reasons,
-        "alone_results": [
-            r.model_dump(mode="json") for r in session.results if r.scenario_id in result.failures
-        ],
-        "suggestions": [entry.suggestion.model_dump(mode="json") for entry in SCORED[key]],
-    }
+        details = {
+            "placeholder": source == "placeholder",
+            "source": source,
+            "suggested_by": suggested_by,
+            "fallback_used": len(attempts) > 1,
+            "attempts": attempts,
+            "explanation": saved.get("explanation"),
+            "result": result.model_dump(mode="json"),
+            "route_reasons": route_reasons(plan.checker_data(), result),
+            "alone_results": [
+                r.model_dump(mode="json") for r in results if r.scenario_id in result.failures
+            ],
+            "suggestions": [entry.suggestion.model_dump(mode="json") for entry in scored],
+            "can_retry": live and not retry and key not in RETRIED,
+        }
+        with session.lock:
+            require_current(session, captured, request.fingerprint)
+            if raw_record is not None:
+                RAW_FIXES.setdefault(key, []).append(raw_record)
+            if retry:
+                RETRIED.add(key)
+            SCORED[key] = scored
+            DETAILS[key] = details
+            return details
 
 
 @router.post("/api/apply-fix")
-def apply_fix(request: ApplyRequest) -> dict[str, Any]:
-    session = SESSIONS.get(request.fingerprint)
+def apply_fix(request: ApplyRequest, http_request: Request) -> dict[str, Any]:
+    session = get_map(request.fingerprint, http_request.state.owner)
+    captured = capture_map(session) if session else None
+    key = (
+        cache_key(session, request.fingerprint, request.scenario_id, captured.revision)
+        if session
+        else ()
+    )
     entry = next(
-        (
-            entry
-            for entry in SCORED.get((request.fingerprint, request.scenario_id), [])
-            if entry.suggestion.id == request.fix_id
-        ),
+        (entry for entry in SCORED.get(key, []) if entry.suggestion.id == request.fix_id),
         None,
     )
     if session is None or entry is None or entry.plan is None or not entry.suggestion.eligible:
@@ -255,15 +388,19 @@ def apply_fix(request: ApplyRequest) -> dict[str, Any]:
         from_fingerprint=request.fingerprint,
         to_fingerprint=fingerprint,
     )
-    plan.fix_history = [*session.plan.fix_history, applied]
+    plan.fix_history = [*captured.plan.fix_history, applied]
     number = len(plan.fix_history)
     targets = {operation.target_id for operation in applied.operations}
     for entity in [*plan.people, *plan.vehicles, *plan.routes]:
         if entity.id in targets:
             entity.changed_by_fix = number
-    remember_map(plan, entry.suggestion.scenario_results)
-    return {
-        "fingerprint": fingerprint,
-        "plan_map": plan.model_dump(mode="json"),
-        "applied_fix": applied.model_dump(mode="json"),
-    }
+    with session.lock:
+        require_current(session, captured, request.fingerprint)
+        remember_map(
+            plan, entry.suggestion.scenario_results, owner=session.owner, source=captured.source
+        )
+        return {
+            "fingerprint": fingerprint,
+            "plan_map": plan.model_dump(mode="json"),
+            "applied_fix": applied.model_dump(mode="json"),
+        }

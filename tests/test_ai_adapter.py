@@ -77,6 +77,7 @@ def fake_response(payload=None, provider="groq"):
 
 def reading_response(provider="groq"):
     payload = ai_reading_payload()
+    payload["finish_time_source"] = "L1"
     for collection in ("people", "vehicles", "places", "deliveries", "routes"):
         for entity in payload[collection]:
             entity["source_line"] = "L3"
@@ -117,6 +118,40 @@ def test_success_preserves_exact_raw_response_and_only_normalises_separate_copy(
     assert result.raw.raw_text == response.response["raw"]
     assert result.reading.deliveries[0].id == "delivery-supply-truck"
     assert '"id": "delivery-supplies"' in result.raw.raw_text
+
+
+@pytest.mark.parametrize(
+    ("field", "source"),
+    [("finish_time_source", "L9999"), ("finish_time_source", "L2"), ("source_line", "L2")],
+)
+def test_sources_reject_missing_or_blank_physical_lines(monkeypatch, field, source):
+    response = reading_response()
+    payload = json.loads(response.raw_text)
+    if field == "source_line":
+        payload["people"][0][field] = source
+    else:
+        payload[field] = source
+    response.raw_text = json.dumps(payload)
+    monkeypatch.setattr(adapter.groq_provider, "generate", lambda *args: response)
+    with pytest.raises(AIError) as failure:
+        adapter.read_plan(
+            "Distribution plan\n\nDeliver by noon.", {"groq": "synthetic"}, provider="groq"
+        )
+    assert failure.value.code == "format_check_failed"
+    assert f"Invalid {field} '{source}'" in str(failure.value)
+    assert failure.value.attempts[0]["raw"]["raw_text"] == response.raw_text
+
+
+def test_missing_finish_has_no_invented_source_and_can_reach_its_rule(monkeypatch):
+    response = reading_response()
+    payload = json.loads(response.raw_text)
+    payload.update(finish_time=0, finish_time_source="", finish_time_guessed=True)
+    response.raw_text = json.dumps(payload)
+    monkeypatch.setattr(adapter.groq_provider, "generate", lambda *args: response)
+    result = adapter.read_plan(
+        "Distribution plan\n\nLoading details.", {"groq": "synthetic"}, provider="groq"
+    )
+    assert result.reading.finish_time == 0 and result.reading.finish_time_source == ""
 
 
 def test_invalid_key_is_clear_and_is_not_retried(monkeypatch):

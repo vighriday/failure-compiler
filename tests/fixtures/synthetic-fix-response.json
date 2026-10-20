@@ -1,0 +1,20 @@
+{
+  "explanation": "Synthetic test response: only the existing key holder can open the loading area.",
+  "fixes": [
+    {
+      "id": "synthetic-spare-keys",
+      "description": "Synthetic test: give Maya and Sam spare keys",
+      "operations": [
+        {"op": "give_spare_key", "target_id": "person-maya", "field": "holds_key", "value": true},
+        {"op": "give_spare_key", "target_id": "person-sam", "field": "holds_key", "value": true}
+      ]
+    },
+    {
+      "id": "synthetic-unknown-person",
+      "description": "Synthetic invalid reference for gate coverage",
+      "operations": [
+        {"op": "give_spare_key", "target_id": "person-dave", "field": "holds_key", "value": true}
+      ]
+    }
+  ]
+}

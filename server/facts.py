@@ -38,13 +38,13 @@ LABELS = {
     "arrives_at": "Delivery arrives at",
     "place_id": "Place",
     "driver_ids": "Drivers (primary first)",
-    "loader_ids": "Loaders (primary first)",
+    "loader_ids": "Loaders",
     "vehicle_id": "Vehicle",
     "households": "Households",
     "load_minutes": "Loading minutes",
     "drive_minutes": "Driving minutes",
     "finish_time": "Finish time",
-    "loading_team": "Loading team (primary first)",
+    "loading_team": "Loading team",
 }
 
 

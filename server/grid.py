@@ -4,13 +4,13 @@ import json
 import time
 from collections.abc import Iterator
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 
 from server.checker.runner import iter_checker
 from server.checker.scenarios import _instantiate_problems, generate_scenarios
 from server.models import RunCount, ScenarioResult
-from server.session import SESSIONS
+from server.session import capture_map, get_map, map_is_current
 
 router = APIRouter()
 
@@ -77,11 +77,16 @@ def _event(kind: str, **payload: object) -> str:
 
 
 @router.get("/api/run-tests")
-def run_tests(map: str = Query(...), reduced_motion: bool = False) -> StreamingResponse:
-    session = SESSIONS.get(map)
+def run_tests(
+    request: Request, map: str = Query(...), reduced_motion: bool = False
+) -> StreamingResponse:
+    session = get_map(map, request.state.owner)
     if session is None:
         raise HTTPException(404, "Confirmed map not found. Confirm the plan again.")
-    plan = session.plan.checker_data()
+    captured = capture_map(session)
+    plan = captured.plan.checker_data()
+    cached = captured.results
+    read_by = f"{captured.plan.ai_meta.provider} / {captured.plan.ai_meta.model}"
     problems = problem_labels(_instantiate_problems(plan))
     singles, pairs = generate_scenarios(plan)
     scenarios = singles + pairs
@@ -95,9 +100,10 @@ def run_tests(map: str = Query(...), reduced_motion: bool = False) -> StreamingR
             scenarios=[
                 {"scenario_id": s["scenario_id"], "failures": s["failures"]} for s in scenarios
             ],
+            read_by=read_by,
+            source=captured.source,
         )
         started = time.monotonic()
-        cached = session.results
         source = cached if cached is not None else iter_checker(plan)
         completed: list[ScenarioResult] = []
         for result in source:
@@ -112,7 +118,9 @@ def run_tests(map: str = Query(...), reduced_motion: bool = False) -> StreamingR
                 result=result.model_dump(mode="json"),
                 count=count_results(completed, len(scenarios)).model_dump(),
             )
-        session.results = completed
+        with session.lock:
+            if get_map(map, request.state.owner) is session and map_is_current(session, captured):
+                session.results = completed
         yield _event("complete", count=count_results(completed).model_dump())
 
     return StreamingResponse(

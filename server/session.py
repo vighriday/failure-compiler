@@ -1,6 +1,7 @@
 """In-memory maps and results, addressed by the confirmed checker fingerprint."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from threading import RLock
 
 from server.models import ScenarioResult
 from server.ordering import canonical_order
@@ -12,23 +13,78 @@ from server.validation.models import PlanMap
 class MapSession:
     plan: PlanMap
     results: list[ScenarioResult] | None = None
+    owner: str | None = None
+    source: str = "saved"
+    revision: int = 0
+    lock: RLock = field(default_factory=RLock, repr=False, compare=False)
+
+
+@dataclass(frozen=True)
+class MapSnapshot:
+    plan: PlanMap
+    results: list[ScenarioResult] | None
+    source: str
+    revision: int
+
+
+def capture_map(session: MapSession) -> MapSnapshot:
+    with session.lock:
+        return MapSnapshot(
+            session.plan.model_copy(deep=True),
+            [result.model_copy(deep=True) for result in session.results]
+            if session.results is not None
+            else None,
+            session.source,
+            session.revision,
+        )
+
+
+def map_is_current(session: MapSession, captured: MapSnapshot) -> bool:
+    """Caller holds session.lock while checking and installing a result."""
+    return (
+        session.revision == captured.revision
+        and session.plan == captured.plan
+        and session.source == captured.source
+    )
 
 
 SESSIONS: dict[str, MapSession] = {}
+OWNED_SESSIONS: dict[tuple[str, str], MapSession] = {}
 
 
-def remember_map(plan: PlanMap, results: list[ScenarioResult] | None = None) -> str:
+def get_map(fingerprint: str, owner: str | None = None) -> MapSession | None:
+    if owner is not None and (owner, fingerprint) in OWNED_SESSIONS:
+        return OWNED_SESSIONS[owner, fingerprint]
+    # Unowned maps are created only by trusted Python helpers, such as the
+    # locked example tests. HTTP readings always have an owner.
+    return SESSIONS.get(fingerprint)
+
+
+def remember_map(
+    plan: PlanMap,
+    results: list[ScenarioResult] | None = None,
+    *,
+    owner: str | None = None,
+    source: str = "saved",
+) -> str:
     fingerprint = fingerprint_plan_map(plan)
     plan.fingerprint = fingerprint
     plan = canonical_order(plan)
-    if fingerprint not in SESSIONS:
-        SESSIONS[fingerprint] = MapSession(plan.model_copy(deep=True), results)
+    store = SESSIONS if owner is None else OWNED_SESSIONS
+    key = fingerprint if owner is None else (owner, fingerprint)
+    if key not in store:
+        store[key] = MapSession(plan.model_copy(deep=True), results, owner, source)
     else:
         # Equivalent inputs can carry different labels or role IDs in a new reading.
         # Regenerate presentation/results rather than pairing old IDs with new metadata.
-        if SESSIONS[fingerprint].plan.checker_data() != plan.checker_data():
-            SESSIONS[fingerprint].results = None
-        SESSIONS[fingerprint].plan = plan.model_copy(deep=True)
-        if results is not None:
-            SESSIONS[fingerprint].results = results
+        session = store[key]
+        with session.lock:
+            if session.plan != plan or session.source != source:
+                session.revision += 1
+            if session.plan.checker_data() != plan.checker_data():
+                session.results = None
+            session.plan = plan.model_copy(deep=True)
+            session.source = source
+            if results is not None:
+                session.results = results
     return fingerprint
