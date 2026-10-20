@@ -723,7 +723,7 @@
         <div class="screen-card-body">
           <p>A live-filling grid: 12 to 15 failure types across and down, around 100 tests. Cells fill in order as the checker runs. Accepted fixes flip changed cells with a short animation.</p>
           <p><strong>Count line</strong> (live): <span class="mono" style="font-size:13px;">"100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived."</span></p>
-          <p><strong>Before/After toggle</strong> above the grid once any fix is accepted.</p>
+          <p><strong>Before/After toggle</strong> above the grid once any fix is accepted. Before shows the original confirmed plan's metadata, results and count, reconstructed from frozen snapshots in the AppliedFix chain. After shows the current run. Before is read-only; switching cancels previews and never calls the checker or AI. Re-confirmed manual edits are identified separately from accepted fixes.</p>
           <p><strong>Preview banner</strong> when a fix is selected: "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked, count line shows projected numbers. "Cancel preview" restores exactly.</p>
         </div>
       </div>
@@ -755,7 +755,7 @@
         </div>
         <div class="screen-card-body">
           <p>Reached from "See report," available any time after the first run. One page in the app. Six sections plus an example-mode notice if applicable.</p>
-          <p>"Print or save as PDF" button uses browser print with a clean print layout.</p>
+          <p>"Print or save as PDF" calls <code>window.print()</code>. A4 and Letter layouts hide navigation and controls, keep marks readable in black and white, and keep limitations with the fingerprint footer. The sample PDF comes from the full example story with all 100 scenarios surviving.</p>
         </div>
       </div>
 
@@ -764,6 +764,7 @@
 
   <!-- LOOK AND FEEL -->
   <section id="look">
+    <p><strong>Slice 7:</strong> keep the current look and descriptive report, history and builder classes. New mockups will drive a separate grid, panel and report design pass. Keyboard operation, visible focus, text at least 12px, text contrast of at least 4.5:1 and reduced motion are required now. Natural schedules select the earliest sensible morning after proving the best lateness, without changing verdicts. Gemini remains primary; saved Groq suggestions retain their fallback label. The fixed-choice builder uses the same gate and scorer.</p>
     <p><strong>Approved Landing v2:</strong> Overview, Plan, Read, Crash test, Trust and Start share the paper interface. The Start tab contains the editor. Source highlights follow the plan story on scroll; the pipeline can be replayed. The page-break effect restores every fragment and control, including when navigating away. All motion respects reduced motion. Illustrative previews are labelled; the confirmed-map flow runs the live checker.</p>
     <h2>Look and Feel</h2>
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;"><span class="source-ref">scope.md &gt; Inspiration and Identity</span></p>
@@ -1001,14 +1002,15 @@
     <details class="report-section">
       <summary>1. The plan <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Confirmed map and correction trail</span></summary>
       <div class="report-section-body">
-        Confirmed map with: <span class="mono">"AI read 24 items, 2 corrected by you, 1 added by you."</span>
+        <p>Confirmed facts with sources, original AI values and corrections, plus <span class="mono">"AI read N items, N corrected by you, N added by you."</span> Counts come from the confirmation evidence, not post-fix status marks. The approved example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Accepted changes are attributed only to the fields they changed.</p>
+        <p><span class="mono">"Read by provider / model"</span> identifies the original reading separately from suggestion providers. Explicit review answers are retained.</p>
       </div>
     </details>
 
     <details class="report-section">
       <summary>2. What was tested <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Problem list, sizes, total</span></summary>
       <div class="report-section-body">
-        Each failure type with the size used, e.g. <span class="mono">"Supply truck 45 minutes late."</span> Total: <span class="mono">"100 tests: every single problem and every possible pair."</span>
+        The exact 14 example problems with their confirmed sizes, e.g. <span class="mono">"Supply truck 45 minutes late."</span> Total: <span class="mono">"100 tests: every single problem and every pair that can happen."</span> Other maps show their actual problems and counts.
       </div>
     </details>
 
@@ -1023,7 +1025,7 @@
     <details class="report-section">
       <summary>4. Fixes <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Accepted and turned down</span></summary>
       <div class="report-section-body">
-        Every accepted fix: what changed and its result. Every turned-down fix: its one-line reason. Showing what did not work is part of the honesty.
+        Every accepted fix is labelled (AI) or (yours), with its operations and fixes/still broken/new crosses scores. Every requested turned-down or couldn't-apply suggestion retains its one-line checker or gate reason and provider label, including earlier rounds. Cards that fail the gate are explicitly not scored. Showing what did not work is part of the honesty.
       </div>
     </details>
 
@@ -1039,10 +1041,10 @@
       <div class="report-section-body">
         <ul>
           <li>Three or more problems at once.</li>
-          <li>Problem types outside the fixed list: bad weather, a volunteer getting sick halfway through, wrong addresses, running short on food.</li>
+          <li>Problem types outside the fixed list: bad weather, a volunteer getting sick halfway through, wrong addresses, running short on food, volunteers arriving late.</li>
           <li>Other sizes of the same problems: "the truck was tested 45 minutes late, not 90."</li>
           <li>Anything the plan did not mention.</li>
-          <li>Any question-mark results, listed by name.</li>
+          <li>Any question-mark results, listed by name for the original and current runs. They never count as survived.</li>
         </ul>
       </div>
     </details>
@@ -1050,7 +1052,7 @@
     <details class="report-section">
       <summary>Example mode notice <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">If applicable</span></summary>
       <div class="report-section-body">
-        "This report used a saved AI reading of the example plan."
+        "This report used a saved AI reading of the example plan." The fingerprint appears in the footer. The report remains available after the first completed run even if crosses remain.
       </div>
     </details>
   </section>

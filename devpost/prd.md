@@ -69,6 +69,8 @@ A live-filling grid. Failure types across the top and down the side; roughly 12 
 
 **Before/After toggle** sits above the grid once any fix is accepted. Compares the original plan against the current fixed version.
 
+Before restores the first confirmed run from frozen snapshots in the accepted-fix chain, including its original counts and labels. Before is read-only. Historical results can be explored by hover or focus; changes are made in After, which shows the current run. Switching cancels any preview and never re-tests, calls AI or changes the plan. Later plan-map edits are shown as confirmed edits rather than invented fixes.
+
 **Preview banner** (when a fix is being previewed): "Previewing: Fix 2." Changed cells outlined. New crosses marked distinctly. Count line shows what the numbers would be. "Cancel preview" restores the grid exactly. One preview at a time.
 
 ### Screen 4: Broken Case Detail (panel)
@@ -102,20 +104,20 @@ When no AI card is eligible, say "None of these suggestions worked". Live mode o
 Reached from "See report." One page in the app.
 
 **Sections:**
-1. **The plan:** confirmed map with correction trail: "AI read 24 items, 2 corrected by you, 1 added by you."
-2. **What was tested:** the problem list with the sizes used; total test count.
+1. **The plan:** current confirmed facts and source lines, with "AI read N items, N corrected by you, N added by you" and "Read by provider / model". The example starts with 32 AI items; identifying Hall as Loading bay leaves 30 facts and counts as one correction. A fix marks only facts its operations actually changed.
+2. **What was tested:** the exact problem list with sizes. The example has 14 problems and "100 tests: every single problem and every pair that can happen". Other maps show their actual counts.
 3. **What broke (before fixes):** single weak spots and hidden pairs, each with its human cost. Dimmed results grouped separately: "12 pairs already broken by the hall key alone." If removing a weak spot via a fix caused any formerly-dimmed pairs to resolve or reveal a new hidden pair, the report shows that honestly.
-4. **Fixes:** every accepted fix with what it changed and its result. Every turned-down fix with its one-line reason.
+4. **Fixes:** accepted changes labelled "Fix N (AI)" or "Fix N (yours)", each operation and its fixes / still broken / new crosses scores at that point. Include turned-down and couldn't-apply suggestions requested during the run, their one-line checker or gate reasons, and the provider label. Gate failures say "Not scored". Preserve earlier suggestion rounds; a report never requests new ones.
 5. **After fixes:** final count, e.g. "All 100 tested scenarios survive."
 6. **What was NOT tested:** specific, not a generic disclaimer:
    - Three or more problems at once.
-   - Problem types outside the fixed list, with concrete examples (bad weather, a volunteer getting sick halfway through, wrong addresses, running short on food).
+   - Problem types outside the fixed list: bad weather, someone getting sick partway through, wrong addresses, running short of food, volunteers arriving late.
    - Other sizes of the same problems: "the truck was tested 45 minutes late, not 90."
    - Anything the plan didn't mention.
    - Any question-mark results, listed by name.
 7. **Example mode notice** (if applicable): "This report used a saved AI reading of the example plan."
 
-**Print or save as PDF** button: browser print, with a clean print layout. No custom file export.
+**Print or save as PDF** button: `window.print()`, with an A4/Letter-compatible print stylesheet. Navigation, buttons and disclosure controls are hidden; pen marks and text remain readable in black and white. Limitations and fingerprint stay together. A report is available after the first completed run, even if crosses remain. The sample PDF is printed from the real full story with Playwright.
 
 ---
 
@@ -143,6 +145,10 @@ Marks: ticks and crosses are clean stroke marks, like a pen on a checklist. No e
 Timeline: the deadline is a solid red vertical line labelled "Noon: families waiting."
 
 Motion only where it means something: cells fill in order over a few seconds as the checker runs. Accepted fixes flip changed cells with a short animation. Both effects respect `prefers-reduced-motion`.
+
+Timelines use natural schedules: after proving the best lateness, the checker selects the earliest sensible morning without changing the verdict. Gemini remains primary; the approved Groq example suggestions are labelled fallback responses. The fixed-choice coordinator builder uses the same gate and scorer.
+
+Slice 7 keeps the current look. New mockups will drive a separate grid, panel and report design pass. This slice adds functional layout, printing and accessibility: keyboard operation, visible focus, text contrast of at least 4.5:1, text at least 12px, and reduced motion. Report, history and builder components keep descriptive classes for restyling.
 
 V2 also includes tab entrances and underline movement, reading progress, scroll-linked source highlights, a replayable pipeline, example-plan typing, and the clickable “breaks” effect. The page-break effect restores every fragment and control after completion or navigation. All motion respects reduced-motion settings; keyboard users can operate every control.
 

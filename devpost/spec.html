@@ -518,7 +518,7 @@
     </div>
   </div>
   <p style="font-size:13px;color:var(--ink-mid);">Model names in <code>server/config.py</code>. Default Gemini primary, Groq fallback on rate limit, server error including HTTP 503, timeout or format-check failure. One attempt per available provider. An explicitly selected typed-key provider is tried first for that session. Invalid keys and unsupported plans return their specific error.</p>
-  <p style="font-size:13px;color:var(--ink-mid);">Plan map and results show <strong>Read by provider / model</strong>; suggestions identify their answering provider separately. Safe metadata reports source (<code>live</code>, <code>saved</code>, <code>placeholder</code>), fallback use and provider/status/error summaries. Responses never contain keys or raw private provider requests. Report attribution is part of slice 7.</p>
+  <p style="font-size:13px;color:var(--ink-mid);">Plan map, results and report show <strong>Read by provider / model</strong>; suggestions identify their answering provider separately. Safe metadata reports source (<code>live</code>, <code>saved</code>, <code>placeholder</code>), fallback use and provider/status/error summaries. Responses never contain keys or raw private provider requests. The report preserves reading and suggestion attribution separately.</p>
   <p style="font-size:13px;color:var(--ink-mid);"><code>GET /api/ai-status</code> returns provider/model names, selected provider and key-availability booleans only. A random HttpOnly, SameSite=Lax cookie identifies the session and contains no key. Typed keys stay in private server memory, outside maps, fingerprints, logs, disk and response bodies. Confirm and Apply fix retain their session owner and key scope; successful caches belong to that owner, fingerprint and case.</p>
 
   <h3>Frontend</h3>
@@ -530,7 +530,7 @@
       <tr><td>Styling</td><td>Plain CSS + custom properties</td><td>Full control over grid and timeline visuals.</td></tr>
       <tr><td>Fonts</td><td><code>@fontsource/ibm-plex-*</code></td><td>Self-hosted; no runtime call to Google Fonts.</td></tr>
       <tr><td>Grid / timeline</td><td>CSS grid + SVG, hand-built</td><td>Exact visual control over all four cell states.</td></tr>
-      <tr><td>Type sync</td><td><code>openapi-typescript</code></td><td>Types from FastAPI schema; drift is a compile error.</td></tr>
+      <tr><td>Client contracts</td><td><code>web/src/types.ts</code> and the production TypeScript build</td><td>Contracts maintained beside the API client. Automatic OpenAPI generation is deferred.</td></tr>
     </tbody>
   </table>
   <p style="font-size:13px;color:var(--ink-mid);">Rules are implemented only in Python (<code>server/validation/rules.py</code>). The browser never reimplements them; it calls <code>POST /api/validate-map</code>.</p>
@@ -726,6 +726,7 @@
 
   <h3>Screen 3: Crash Test Grid <span class="prd-ref">prd.md &rsaquo; Screen 3</span></h3>
   <p>CSS grid. One triangle (diagonal + below). Cells update via SSE. Four SVG mark states. Count line updates live. Before/After toggle after first accepted fix. Preview banner during fix preview. Connects to <code>GET /api/run-tests</code> (SSE).</p>
+  <p><code>CrashTest.tsx</code> fetches the session-owned report snapshot for Before/After after an accepted change. Before uses original metadata, results and counts from frozen AppliedFix ancestors and is read-only; After uses the current run. Switching cancels an active preview and never re-solves or calls AI. Historical marks remain focusable for their explanations.</p>
 
   <h3>Screen 4: Broken Case Detail Panel <span class="prd-ref">prd.md &rsaquo; Screen 4</span></h3>
   <p>Right-side panel; grid stays interactive. Checker's facts, AI explanation (labelled), fix cards with checker-derived turned-down reasons. Preview draws from stored results; accept sends to <code>POST /api/apply-fix</code> and opens new SSE stream.</p>
@@ -733,13 +734,20 @@
   <p>AI retry preserves coordinator cards and considers only AI eligibility. &ldquo;None of these suggestions worked&rdquo; appears when no AI card is eligible. Live cases with a key offer &ldquo;Ask for new suggestions&rdquo; once; saved cases never capture another round.</p>
 
   <h3>Screen 5: Report <span class="prd-ref">prd.md &rsaquo; Screen 5</span></h3>
-  <p>Six sections as in the PRD. <code>window.print()</code> with <code>@media print</code> stylesheet. "Read by" attribution. Fingerprint in footer. Connects to <code>GET /api/report</code>.</p>
+  <p><code>web/src/screens/Report.tsx</code> renders the six PRD sections using descriptive <code>report-*</code> classes and <code>report.css</code>. <code>GET /api/report?map=&lt;fingerprint&gt;</code> in <code>server/report.py</code> resolves the session owner and requires a completed first run, even if crosses remain. Unknown or foreign maps return 404; unrun maps or missing history return 409. The endpoint calls neither a provider nor a solver.</p>
+  <p>Confirmation stores review evidence outside checker inputs: original AI count, corrected/added counts, bindings, sources and explicit answers. The example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Current statements come from the accepted map. Fix provenance matches operation fields, so changing a key cannot label unrelated hours as changed.</p>
+  <p>Successful suggestion rounds and coordinator changes append summaries with scenario, provider label, gate/verdict reason and scores. Accepting a fix freezes the parent snapshot and evidence in the child's ancestor store. The report follows AppliedFix fingerprints through these snapshots. Accepted scores compare old/new cross sets; earlier rejected cards survive retries and later fixes. Re-confirmed manual edits are identified separately. Raw private responses and keys are excluded.</p>
+  <p>The report includes confirmed facts and the review summary; the exact 14 example problems and their sizes; &ldquo;100 tests: every single problem and every pair that can happen&rdquo;; original weak spots and hidden pairs with human costs; dimmed pairs grouped under their weak spot; accepted (AI)/(yours) operations and scores; turned-down and couldn't-apply cards with reasons and providers; and the final count. Other maps use actual counts. Unknown results are named for original and current runs and never counted as survived.</p>
+  <p>Explicit limits: three or more problems at once; bad weather, partway illness, wrong addresses, food shortages and volunteers arriving late; other sizes of the same problems; anything the plan omitted; and named question-mark results. The saved-example notice and fingerprint remain visible.</p>
+  <p><code>window.print()</code> uses an <code>@media print</code> stylesheet with automatic A4/Letter size, no controls, black text and SVG marks, intact cards and limitations kept with the footer. <code>scripts/capture_report.py</code> prints the full real example story to <code>docs/sample-report.pdf</code>; <code>scripts/verify_report_pdf.py</code> checks text, bounds, minimum size and rendered pages. Letter proof stays ignored.</p>
+  <p>Slice 7 retains the current look; new mockup styling is a separate pass. Native keyboard verification, visible focus, text at least 12px, text contrast at least 4.5:1 and reduced motion are checked by <code>scripts/verify_accessibility.py</code>, development-only axe-core and computed text checks. Gemini remains primary, Groq fallback. Two-pass natural schedules minimize start times after fixing best lateness, preserving verdicts. The fixed-choice builder uses the same gate and scorer.</p>
+  <p><code>scripts/capture_gallery.py</code> creates six actual-app 1500x1000 PNGs under <code>docs/images</code> using the README names. <code>scripts/check_readme_links.py</code> checks file targets, heading anchors and optionally external URLs. The demo video is explicitly pending. Browser verification uses isolated offline previews and no provider calls.</p>
 </section>
 
 <!-- DATA MODEL -->
 <section id="data">
   <h2>Data Model</h2>
-  <p>All shapes in <code>server/models.py</code> as Pydantic v2 with <code>extra="forbid"</code>. TypeScript types generated via <code>openapi-typescript</code>. Neither side can drift.</p>
+  <p>Checker/fix shapes are Pydantic v2 models with <code>extra="forbid"</code>; review/report payloads are built by their server modules. Client contracts are maintained in <code>web/src/types.ts</code> beside the API client and checked by the production TypeScript build. Automatic OpenAPI generation is deferred.</p>
 
   <div class="schema-split">
     <div class="schema-box">
@@ -779,7 +787,8 @@
   original_value: AIPerson | None   <span class="comment"># AI's original reading, for the strikethrough</span>
 
 <span class="comment"># "added" = created by a rule question, not the AI
-# Summary "AI read 24 items, 2 corrected, 1 added" computed from status counts</span></code></pre>
+# Summary "AI read N items, N corrected, N added" uses stored confirmation evidence
+# Example: 32 AI items, one correction, zero additions; 30 current facts after merge</span></code></pre>
 
   <h3>Checker entity shapes</h3>
   <pre><code>Person          id, name, available_from, available_until, holds_key
@@ -856,79 +865,63 @@ gate_reason:         str | None</code></pre>
   <div class="file-tree">
 <pre>failure-compiler/
 ├── server/
-│   ├── main.py                   <span class="comment"># FastAPI app; all API routes</span>
-│   ├── models.py                 <span class="comment"># AIPlanReading, PlanMap, ScenarioResult, FixSuggestion</span>
-│   ├── config.py                 <span class="comment"># AI model names, size presets, problem type defs, cap</span>
-│   ├── ai/
-│   │   ├── adapter.py            <span class="comment"># Public interface: read_plan(), suggest_fixes()</span>
-│   │   ├── groq_provider.py      <span class="comment"># Groq call (AIPlanReading schema, strict mode)</span>
-│   │   ├── gemini_provider.py    <span class="comment"># Gemini call (verify structured output param at build)</span>
-│   │   └── prompts.py            <span class="comment"># Prompt templates; reasoning at lowest setting</span>
-│   ├── validation/
-│   │   ├── gate.py               <span class="comment"># Full gate: parse, Pydantic, references, rules</span>
-│   │   └── rules.py              <span class="comment"># The only implementation of rules</span>
-│   ├── checker/
-│   │   ├── runner.py             <span class="comment"># Singles then pairs; dimmed skipped; SSE stream</span>
-│   │   ├── solver.py             <span class="comment"># One CP-SAT run; max_deterministic_time; fixed seed</span>
-│   │   └── scenarios.py          <span class="comment"># Generates singles + pairs from problem list</span>
-│   ├── credentials.py            <span class="comment"># Private session keys; public availability booleans only</span>
-│   └── session.py                <span class="comment"># Owner-scoped maps, results and scored suggestion caches</span>
-├── web/
-│   ├── src/
-│   │   ├── main.tsx
-│   │   ├── App.tsx
-│   │   ├── api/
-│   │   │   └── client.ts         <span class="comment"># Typed fetch + SSE; types from generated schema</span>
-│   │   ├── components/
-│   │   │   ├── PastePlan/
-│   │   │   ├── PlanMap/
-│   │   │   │   ├── ChecklistView.tsx
-│   │   │   │   ├── StructuredReading.tsx
-│   │   │   │   ├── CorrectionInput.tsx   <span class="comment"># select + time picker only</span>
-│   │   │   │   └── WhatWeTest.tsx
-│   │   │   ├── CrashTest/
-│   │   │   │   ├── Grid.tsx
-│   │   │   │   ├── GridCell.tsx          <span class="comment"># SVG marks</span>
-│   │   │   │   └── CountLine.tsx
-│   │   │   ├── BrokenCase/
-│   │   │   │   ├── DetailPanel.tsx
-│   │   │   │   ├── Timeline.tsx          <span class="comment"># SVG; finish line in red</span>
-│   │   │   │   └── FixCard.tsx           <span class="comment"># Preview draws from stored results</span>
-│   │   │   └── Report/
-│   │   │       └── ReportPage.tsx
-│   │   ├── state/
-│   │   │   ├── reducer.ts         <span class="comment"># All map mutations; preview state</span>
-│   │   │   └── types.ts
-│   │   └── styles/
-│   │       ├── tokens.css
-│   │       └── *.css
-│   ├── scripts/
-│   │   └── gen-types.ts
-│   ├── index.html
-│   ├── vite.config.ts
-│   └── tsconfig.json
+│   ├── main.py                  # FastAPI routes, gate, confirmation, SSE and fixes
+│   ├── models.py                # Reading, plan, scenario and fix models
+│   ├── config.py                # Gemini primary, Groq fallback, sizes and caps
+│   ├── ai/                      # Provider adapters, prompts and safe metadata
+│   ├── validation/              # Gate, normalization, fingerprint and rules
+│   ├── checker/                 # Scenarios, two-pass natural schedules, explanations
+│   ├── review.py                # Server-owned confirmations and explicit decisions
+│   ├── facts.py                 # Fact bindings, sources and operation-level provenance
+│   ├── fixes.py                 # Fixed operations, gate and all-scenario scoring
+│   ├── report.py                # Six report sections and frozen history traversal
+│   ├── credentials.py           # Private memory-only session keys
+│   └── session.py               # Owner-scoped maps, evidence, runs and ancestors
+├── web/src/
+│   ├── main.tsx
+│   ├── App.tsx                  # Paste, review and confirmation flow
+│   ├── api/client.ts            # Typed fetch and SSE
+│   ├── types.ts                 # Maintained client contracts
+│   ├── landing/                 # Approved v2 tabs, source story and illustrative grid
+│   ├── components/
+│   │   ├── FactEditor.tsx       # Constrained fact corrections
+│   │   ├── MissingFactQuestion.tsx
+│   │   ├── CrashGrid.tsx        # SVG states and keyboard-readable explanations
+│   │   ├── CasePanel.tsx        # Scored AI and coordinator cards
+│   │   ├── CaseTimeline.tsx
+│   │   └── ChangeBuilder.tsx    # One to three fixed-choice operations
+│   ├── screens/
+│   │   ├── CrashTest.tsx        # Current run, preview and Before/After
+│   │   ├── Report.tsx           # Screen 5 and browser print action
+│   │   └── report.css           # Semantic sections and A4/Letter print styles
+│   └── styles.css
 ├── fixtures/
-│   ├── example-plan.txt          <span class="comment"># Saturday food distribution plan (messy text)</span>
-│   ├── example-truth.json        <span class="comment"># Correct confirmed map, hand-authored</span>
-│   ├── example-reading.json      <span class="comment"># Chosen provider's real output, saved as-is</span>
-│   ├── example-fixes.json        <span class="comment"># Saved suggestions for each broken case</span>
-│   └── expected-results.json     <span class="comment"># Hand-checked verdicts for all 100 cells</span>
+│   ├── example-plan.txt
+│   ├── example-truth.json
+│   ├── example-reading.json     # Real unedited Gemini reading
+│   ├── example-corrections.json # Approved review controls and decisions
+│   ├── example-fixes.json       # Real unedited Groq fallback suggestions
+│   └── expected-results.json    # Locked verdicts for all 100 scenarios
 ├── scripts/
-│   ├── dev.py                    <span class="comment"># Starts both servers; 127.0.0.1 only</span>
-│   └── bakeoff.py                <span class="comment"># Compares providers against example-truth.json</span>
-├── tests/
-│   ├── test_example_locked.py
-│   ├── test_checker_monotone.py
-│   ├── test_reading_matches_truth.py
-│   ├── test_format_gate.py
-│   ├── test_rules.py
-│   └── test_determinism.py
-├── devpost/
+│   ├── dev.py                   # Local API and web launcher
+│   ├── bakeoff.py               # Recorded provider comparison
+│   ├── local_preview.py         # Isolated offline browser verification
+│   ├── browser_story.py         # Shared full example flow
+│   ├── capture_report.py        # Real A4 and Letter browser printing
+│   ├── verify_report_pdf.py     # PDF text, bounds and rendered proof
+│   ├── capture_gallery.py       # 1500x1000 actual-app images and Before/After GIF
+│   ├── check_readme_links.py
+│   └── verify_accessibility.py  # Keyboard story, axe and computed text checks
+├── tests/                       # Locked solver, API, review, fix, report and asset tests
+├── docs/
+│   ├── sample-report.pdf
+│   └── images/                  # Six gallery PNGs, thumbnail and actual-results GIF
+├── devpost/                     # Planning docs; ignored local verification proofs
 ├── pyproject.toml
 ├── package.json
 ├── .env.example
 ├── .gitignore
-├── LICENSE                       <span class="comment"># MIT</span>
+├── LICENSE
 └── README.md</pre>
   </div>
 </section>

@@ -547,7 +547,7 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 - [x] **Slice 4:** the grid fills live
 - [x] **Slice 5:** broken case, fixes, flip
 - [x] **Slice 6:** live Gemini/Groq flow, real saved reading and approved real suggestions, fixed-choice coordinator changes, offline end-to-end verification
-- [ ] **Slice 7:** report, before and after, design pass
+- [x] **Slice 7:** report, Before/After, printable sample PDF, gallery assets and accessibility. New mockup styling is a separate pass.
 - [ ] Final review, learning wrap-up and app map
 
 <!-- Keep this paragraph truthful. Edit the wording however you like. -->
