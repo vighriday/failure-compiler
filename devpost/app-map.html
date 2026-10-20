@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Failure Compiler app map</title>
+  <style>
+    :root { color: #1f1f1f; background: #f7f4ed; font: 16px/1.5 system-ui, sans-serif; }
+    body { max-width: 960px; margin: 0 auto; padding: 2rem; }
+    h1, h2 { font-family: Georgia, serif; }
+    code { font-family: ui-monospace, monospace; }
+    .route { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); margin: 1.5rem 0; }
+    .stop { border: 1px solid #777; border-radius: .5rem; padding: 1rem; background: #fffdf8; }
+    .arrow { align-self: center; text-align: center; font-size: 1.5rem; }
+    @media (max-width: 700px) { .route { grid-template-columns: 1fr; } .arrow { transform: rotate(90deg); } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Failure Compiler</h1>
+    <p>This app turns a messy distribution plan into confirmed facts, tests every
+      single and pair problem, and lets the checker decide whether a change is safe.</p>
+
+    <h2>One real action</h2>
+    <p>Load the example, confirm the map, open a broken case, and read the concrete
+      morning shown for that result. The schedule is an explanation; the verdict
+      compares the locked outcome fields, so tied schedules do not change it.</p>
+
+    <div class="route" aria-label="Code route from action to result">
+      <section class="stop">
+        <h3>1. Read and confirm</h3>
+        <p><code>server/main.py</code><br><code>read_plan</code> and review endpoints
+          create a server-owned reading session.</p>
+      </section>
+      <div class="arrow" aria-hidden="true">→</div>
+      <section class="stop">
+        <h3>2. Test the map</h3>
+        <p><code>server/checker/runner.py</code><br><code>run_checker</code> streams
+          the 100 fixed scenarios through the solver.</p>
+      </section>
+      <div class="arrow" aria-hidden="true">→</div>
+      <section class="stop">
+        <h3>3. Explain the result</h3>
+        <p><code>web/src/components/CaseTimeline.tsx</code><br>The timeline shows
+          one morning that gets the result, not a uniquely authoritative schedule.</p>
+      </section>
+    </div>
+
+    <h2>To change this, start here</h2>
+    <ul>
+      <li>Change the scenario set or locked count: <code>server/checker/scenarios.py</code>
+        and <code>tests/test_example_locked.py</code>.</li>
+      <li>Change what counts as an equivalent verdict: <code>server/evaluation.py</code>
+        and <code>tests/test_evaluation.py</code>.</li>
+      <li>Change the visible timeline wording: <code>web/src/components/CaseTimeline.tsx</code>.</li>
+      <li>Change the source-citation contract: <code>server/validation/models.py</code>,
+        <code>server/ai/prompts.py</code> and <code>tests/test_fact_sources.py</code>.</li>
+    </ul>
+
+    <h2>A practice to reuse</h2>
+    <p>When the provider produced different but equally good schedules, the build
+      separated observable verdict fields from explanatory metadata. The evidence
+      is recorded in <code>devpost/ai-reading-review.md</code> and enforced by
+      <code>tests/test_evaluation.py</code>. On another project, define the
+      equivalence fields before comparing generated outputs.</p>
+
+    <h2>Run it again</h2>
+    <p>From the repository root: <code>uv sync</code>, <code>npm install</code>,
+      then <code>uv run -- python scripts/dev.py</code>. Open
+      <code>http://127.0.0.1:5173/demo</code> for a clean start. This map reflects
+      commit <code>6e7c801</code> and is a compact reference snapshot that can drift
+      as the app changes.</p>
+  </main>
+</body>
+</html>

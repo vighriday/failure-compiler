@@ -109,19 +109,21 @@ The earlier after-slice-5 checkpoint was deferred by the learner's later instruc
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete - focused alternative: investigate the confirmation gate or verdicts versus schedules using real evidence from this build
-- [ ] Optional edit and transfer reflection addressed - offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete - focused alternative: investigated verdicts versus schedules using the provider measurement and evaluation tests
+- [x] Optional edit and transfer reflection addressed - learner said the distinction was clear and requested one precise timeline label
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered - personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Focused alternative traced the schedule-equivalence decision through `devpost/ai-reading-review.md`, `server/evaluation.py` and `tests/test_evaluation.py`; the learner found it clear.
+Route and stops: Reference route in `devpost/app-map.html`: `server/main.py` `read_plan` → `server/checker/runner.py` `run_checker` → `web/src/components/CaseTimeline.tsx`.
+Edit outcome: Kept the requested wording correction, changing “The checker's best schedule” to “One morning that gets this result”; `npm run build` passed.
+Reflection: Answered; the learner requested the label correction and did not add a transfer question.
+Activity mode: Focused alternative with real evidence, followed by a small wording edit.
 
 ## Revisions
 
 - Final completion pass Parts 5 and 6, 20 October 2026: `728634a` adds the single-container deployment contract, FastAPI-served production frontend, per-browser in-memory isolation, no-key public example guidance, 4,000-character plan limit, six-request-per-minute AI limit, and HTTPS-at-host requirements. `docs/deployment-readiness.md` compares Hugging Face Spaces, Render and Fly.io and recommends Render Starter. Docker/Podman is not installed on this Windows machine, so the image build and container run remain the only unexecuted verification. Final regression after that commit: 220 tests passed, 2 opt-in network tests skipped, Ruff clean, production build clean, the locked count line remained `100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived.`, accessibility passed with 1,370 keyboard presses and 4.55:1 minimum measured contrast, and the full browser story/review/landing checks passed with 100 survived and no page or console errors. Final Review, hands-on feedback, learning wrap-up and app map remain pending by design.
+
+- Hands-on audit and wrap-up, 20 October 2026: The learner selected Render Starter and asked for a layperson-oriented check. The live `/demo` path returned to a clean landing page with no debug text; the existing browser story, review, landing and accessibility checks passed with no page errors. The learner clarified that the timeline should say “One morning that gets this result” because tied schedules can exist; that wording is now used in `CaseTimeline.tsx` and the app map records the verdict-versus-schedule practice. Final Review still needs explicit learner confirmation after this last wording change.
 
 - Completion pass Part 4 completed: the final gallery, README, scope, PRD and spec companions match the real reading, cards, builder, natural schedules, report and reset. Every local README target resolves; 23 external targets return 200 and the Devpost link opens in the browser despite its automated-checker 403. No em dashes were added. A fresh authenticated Windows clone of `4a8cb00`, without an `.env` file, passes plain `uv sync`, `npm install` (zero reported vulnerabilities), the documented launcher, 219 tests with two opt-in skips, Ruff, the production build, Chromium install, the full browser story and the exact locked count line. The root suite also passes 219 tests with two skips. Upstream deprecation warnings are recorded in `release-review.md`; local proof stays ignored. The history/index scan finds no credentials, actual learner profile or ZIP; four intentional old example screenshots and a harmless TypeScript hook were reviewed without rewriting history. GitHub visibility is PRIVATE and anonymous access fails, so public release still needs explicit approval. The earlier deferred slice-5 hands-on check is folded into the learner's requested Part-6 checkpoint, with the focused gate/verdict learning activity afterward. Final Review and the wrap-up remain unchecked.
 
