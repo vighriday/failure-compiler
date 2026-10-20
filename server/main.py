@@ -29,6 +29,7 @@ from server.fixes import router as fixes_router
 from server.grid import router as grid_router
 from server.labels import read_by_label
 from server.models import PlanMapData
+from server.rate_limit import check_ai_rate_limit
 from server.reading import items_for_plan, plan_from_record, questions_for_plan
 from server.report import router as report_router
 from server.review import check_owner, confirm_review, create_review, snapshot, update_review
@@ -188,6 +189,8 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
         text = request.get("text", "")
         if not isinstance(text, str):
             raise AIError("invalid_plan", "Enter a plan of 1 to 4,000 characters.", status=422)
+        client_host = http_request.client.host if http_request.client else "unknown"
+        check_ai_rate_limit(owner, client_host, "read-plan")
         result = adapter.read_plan(text, keys, preferred_provider=preferred_provider)
         plan = plan_map_from_reading(
             result.reading,

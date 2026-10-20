@@ -503,6 +503,10 @@ Screen 1 shows the Gemini data notice: Google may use content to improve its pro
 
 Playwright is included by `uv sync`. Install its browser once with `uv run -- python -m playwright install chromium`, build with `npm run build`, then run the isolated browser runner. The story, review and landing scripts can also target an already-running app through `FAILURE_COMPILER_URL`.
 
+### Deployment preparation
+
+The app is prepared for a single-container deployment: the [Dockerfile](Dockerfile) builds the Vite frontend and FastAPI serves it. The container binds `0.0.0.0` only inside the container; local development remains on `127.0.0.1`. Do not set provider keys on the public service. Visitors can use the saved example or enter their own key for that browser session. HTTPS belongs at the hosting provider, and the live AI endpoints enforce the 4,000-character plan limit and an in-process six-request-per-minute limit. See the [deployment readiness comparison](docs/deployment-readiness.md) for the Render recommendation and the local Docker-engine limitation.
+
 ### Provider measurements
 
 Checker equivalence compares **state, lateness_minutes and human_cost** for the same 100 scenarios. It excludes timelines, because equally good schedules can differ. Field matching aligns entities by type and role, ignores names, compares loaders as sets and keeps drivers in primary-first order. Complete campaigns rank by verdict matches, then aligned fields, consistency across runs, then tokens.

@@ -18,6 +18,7 @@ from server.credentials import CLIENTS, available_keys, public_attempts
 from server.evaluation import align_entities
 from server.labels import route_label
 from server.models import AppliedFix, FixOperation, FixSuggestion, PlanMapData, ScenarioResult
+from server.rate_limit import check_ai_rate_limit
 from server.session import (
     MapSession,
     MapSnapshot,
@@ -455,6 +456,8 @@ def suggest_fixes(request: SuggestRequest, http_request: Request) -> dict[str, A
         raw_record = None
         if live:
             owner = http_request.state.owner
+            client_host = http_request.client.host if http_request.client else "unknown"
+            check_ai_rate_limit(owner, client_host, "suggest-fixes")
             try:
                 response = adapter.suggest_fixes(
                     fix_context(plan, result, results),
