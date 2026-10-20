@@ -14,9 +14,9 @@ Fixes get tested before you trust them.
 [![Python 3.12](https://img.shields.io/badge/python-3.12-1f1f1f)](pyproject.toml)
 [![Checker: OR-Tools CP-SAT](https://img.shields.io/badge/checker-OR--Tools%20CP--SAT-1f1f1f)](https://developers.google.com/optimization/cp/cp_solver)
 [![Built with the Devpost Learn Skill Pack](https://img.shields.io/badge/built%20with-Devpost%20Learn%20Skill%20Pack-8a5a14)](devpost/)
-[![Runs locally](https://img.shields.io/badge/runs-locally%2C%20no%20key%20needed-1f1f1f)](#run-it-in-60-seconds)
+[![Runs locally](https://img.shields.io/badge/runs-locally%2C%20no%20key%20needed-1f1f1f)](#run-it-locally)
 
-**[Demo video status](#demo-video)** &nbsp;·&nbsp; **[Run it in 60 seconds](#run-it-in-60-seconds)** &nbsp;·&nbsp; **[Read the planning docs](#built-plan-first)**
+**[Demo video status](#demo-video)** &nbsp;·&nbsp; **[Run it locally](#run-it-locally)** &nbsp;·&nbsp; **[Read the planning docs](#built-plan-first)**
 
 [![Failure Compiler: the actual landing hero](docs/images/video-thumbnail.png)](#demo-video)
 
@@ -457,9 +457,11 @@ Real-network smoke tests run only when you explicitly set `RUN_LIVE_AI_TESTS=1` 
 
 ---
 
-## Run it in 60 seconds
+## Run it locally
 
 You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, and Node.js 20 or newer.
+
+The repository is currently private pending final publication approval, so cloning requires access. Setup below was verified in a fresh Windows clone without an `.env` file; download and cold-start time varies.
 
 ```bash
 git clone https://github.com/vighriday/failure-compiler.git

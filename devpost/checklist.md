@@ -91,7 +91,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Hands-on checkpoint - after slice 5 (the complete demo story), I explore the running app and give feedback
+The earlier after-slice-5 checkpoint was deferred by the learner's later instructions. The final completion pass now has one hands-on checkpoint after Part 6, covering the whole implemented story before the learning wrap-up.
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -103,13 +103,13 @@ Build mode: fast
 - [x] Part 1: truthful fact citations, nullable-source schema, unedited primary reading and new-schema bake-off evidence.
 - [x] Part 2: report summary, plain reasons, real answers and sample PDF of five pages or fewer.
 - [x] Part 3: clean demo reset, timed click runbook and recording thumbnails.
-- [ ] Part 4: final assets/docs, clean-clone and repository audit, complete regression.
+- [x] Part 4: final assets/docs, clean-clone and repository audit, complete regression.
 - [ ] Part 5: tested deployment container and host proposal; do not deploy yet.
 - [ ] Part 6: final verification report and pause for hands-on notes and deployment choice.
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete - focused alternative: follow one AI reading from raw JSON through the gate, normalisation, rules, and confirmation to the checker
+- [ ] Learning activity complete - focused alternative: investigate the confirmation gate or verdicts versus schedules using real evidence from this build
 - [ ] Optional edit and transfer reflection addressed - offered/declined/already covered/not applicable as appropriate
 - [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
@@ -120,6 +120,8 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- Completion pass Part 4 completed: the final gallery, README, scope, PRD and spec companions match the real reading, cards, builder, natural schedules, report and reset. Every local README target resolves; 23 external targets return 200 and the Devpost link opens in the browser despite its automated-checker 403. No em dashes were added. A fresh authenticated Windows clone of `4a8cb00`, without an `.env` file, passes plain `uv sync`, `npm install` (zero reported vulnerabilities), the documented launcher, 219 tests with two opt-in skips, Ruff, the production build, Chromium install, the full browser story and the exact locked count line. The root suite also passes 219 tests with two skips. Upstream deprecation warnings are recorded in `release-review.md`; local proof stays ignored. The history/index scan finds no credentials, actual learner profile or ZIP; four intentional old example screenshots and a harmless TypeScript hook were reviewed without rewriting history. GitHub visibility is PRIVATE and anonymous access fails, so public release still needs explicit approval. The earlier deferred slice-5 hands-on check is folded into the learner's requested Part-6 checkpoint, with the focused gate/verdict learning activity afterward. Final Review and the wrap-up remain unchecked.
 
 - Completion pass Part 4, source-focus repair: the expanded browser check found that an automatic scroll could move the pointer off a source row and clear its keyboard highlight. Source tags, statement rows and question cards now restore the currently focused source on mouse leave. Mention-only rows retain their honest mentioned-on tag while remaining traceable. No styles changed. The landing regression now focuses every Route C field tag and Ravi's driving tag and checks each actual line; all 11 landing checks pass at 1440/768/390/320 with no unexpected browser errors. The keyboard story covers ten states, 1,370 Tab presses, visible focus, no text below 12px and minimum measured contrast 4.55:1.
 

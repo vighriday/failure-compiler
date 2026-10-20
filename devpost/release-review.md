@@ -25,6 +25,7 @@ The final visual design, checker constraints, truth map, locked verdicts and rea
 - Four fictional slice-3 screenshots remain in old commits. All four were visually reviewed; they show the intentionally saved early example screens with no keys or personal plan. A historical `oxcode.hooks.json` only runs `npx tsc --noEmit`. Neither is in the current index. History was not rewritten.
 - The current untracked hook and unrelated `.gitignore` edit were left untouched. Intended bake-off records and fixtures contain only the public fictional example.
 - `.env.example` contains empty placeholders; the root MIT licence is visible. Acknowledgements link the six requested upstream licences. Bundled React/font notices and GSAP licence references are retained under `web/public/third-party-notices.txt`.
+- GitHub reports this repository as **PRIVATE**. An unauthenticated page request returns 404 and an anonymous Git read fails. The fresh clone succeeds through the existing authenticated Git setup. Visibility was not changed; public release of the code and included history needs the learner's explicit approval before submission.
 - Every README local file/image/heading resolves. All 23 ordinary external targets return 200. Devpost returns 403 to the automated URL checker but opens successfully through the browser; its link is retained.
 
 ## Verification checkpoint
@@ -35,7 +36,7 @@ The final visual design, checker constraints, truth map, locked verdicts and rea
 - The full saved story and review/editing browser regressions pass. All 11 landing checks pass at 1440/768/390/320 with no unexpected browser errors. The two expected missing/invalid-key responses remain explicitly controlled test cases.
 - The native keyboard story passes with 1,370 Tab presses. Ten states pass axe and rendered-text checks, no text is below 12px, minimum measured contrast is 4.55:1, visible focus and reduced motion pass.
 - The browser checks exposed a focus/hover conflict during automatic scrolling. Source rows and tags now preserve the focused source when the pointer leaves; each Route C field tag is checked against its actual line. Styles are unchanged.
-- Fresh-clone evidence is recorded below after completion.
+- Fresh authenticated Windows clone of `4a8cb00`, with no `.env`: plain `uv sync`, `npm install`, the documented `scripts/dev.py` launcher, full tests, Ruff, production build, Chromium install, isolated full browser story and `check_map` all pass. npm reports zero vulnerabilities. Both local servers become ready within the 90-second allowance and stop cleanly. The clone suite is **219 passed, 2 skipped**, 196.55 seconds; it reports the Starlette/httpx warning and two upstream boolean-inversion deprecations. The root suite reports only the first warning. Existing activated-environment and cross-filesystem copy notices do not affect the selected clone environment or results. Logs and the command/commit manifest remain ignored under `devpost/screens/clean-clone-proof`.
 
 ## Pending user checkpoint
 
