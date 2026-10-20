@@ -1,8 +1,8 @@
 import MissingFactQuestion from "./components/MissingFactQuestion";
 import { routeLabel } from "./lib/labels";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { confirmMap, readExample, updateMap } from "./api/client";
-import type { ExampleReading, PlanMap, ReadingItem, RuleQuestion, ReviewState, Status } from "./types";
+import { APIError, aiStatus, confirmMap, readExample, readPlan as readLivePlan, updateMap } from "./api/client";
+import type { AIProvider, ExampleReading, PlanMap, ReadingItem, RuleQuestion, ReviewState, Status } from "./types";
 import FactEditor from "./components/FactEditor";
 import CrashTest from "./screens/CrashTest";
 import LandingPage from "./landing/LandingPage";
@@ -78,7 +78,11 @@ function App() {
   }, []);
   const [planText, setPlanText] = useState("");
   const [apiKey, setApiKey] = useState("");
+  const [keyProvider, setKeyProvider] = useState<AIProvider>("gemini");
+  const [readingPlan, setReadingPlan] = useState(false);
   const [showKey, setShowKey] = useState(false);
+  const savedExampleText = useRef<string>();
+  useEffect(() => { aiStatus().then((status) => setKeyProvider(status.selected_provider ?? status.primary_provider)).catch(() => undefined); }, []);
   const [reading, setReading] = useState<ExampleReading | null>(null);
   const [items, setItems] = useState<ReadingItem[]>([]);
   const [planMap, setPlanMap] = useState<PlanMap | null>(null);
@@ -89,6 +93,7 @@ function App() {
   const [activeLine, setActiveLine] = useState<string | undefined>();
   const [editing, setEditing] = useState<string | null>(null);
   const [error, setError] = useState("");
+  useEffect(() => { if (showKey && tab === "start") document.getElementById("landing-key")?.focus(); }, [showKey, error, tab]);
   const [outOfDate, setOutOfDate] = useState(false);
   const [pending, setPending] = useState(0);
   const queue = useRef<Promise<unknown>>(Promise.resolve());
@@ -121,20 +126,25 @@ function App() {
 
   async function loadExample() {
     setError("");
-    try { const result = await readExample(planText); setReading(result); setPlanText(result.plan_text); return result.plan_text; }
+    try { const result = await readExample(planText); savedExampleText.current = result.plan_text; activeReading.current = undefined; setReading(result); setPlanText(result.plan_text); setPlanMap(null); setItems([]); setQuestions([]); setAnswers({}); setIssues([]); setConfirmed(false); setOutOfDate(false); return result.plan_text; }
     catch (reason) { setError(reason instanceof Error ? reason.message : "Could not load the example plan."); }
   }
 
   async function readPlan() {
+    if (readingPlan || !planText.trim() || planText.length > 4000) return;
     setError("");
-    if (!reading || planText !== reading.plan_text) {
-      setShowKey(true);
-      setError(apiKey.trim() ? "Live AI reading is not available yet. Load the example plan for now." : "Add your own AI key to read a pasted plan. Or load the saved example reading.");
-      return;
-    }
-    const result = await readExample(planText);
-    setReading(result); activeReading.current = result.reading_id;
-    syncReview(result as ExampleReading & ReviewState); setEditing(null); navigate("read");
+    setReadingPlan(true);
+    try {
+      const result = savedExampleText.current === planText
+        ? await readExample(planText)
+        : await readLivePlan(planText, apiKey.trim(), keyProvider);
+      setReading(result); activeReading.current = result.reading_id; setApiKey("");
+      syncReview(result as ExampleReading & ReviewState); setEditing(null); navigate("read");
+      window.scrollTo({top: 0, behavior: "instant"});
+    } catch (reason) {
+      if (reason instanceof APIError && ["missing_key", "invalid_key"].includes(reason.code)) setShowKey(true);
+      setError(reason instanceof Error ? reason.message : "Could not read this plan. Try again, or load the example plan.");
+    } finally { setReadingPlan(false); }
   }
 
   function confirmItem(item: ReadingItem) { void mutate("confirm_item", {item_id: item.id}).then((result) => { if (result) setEditing(null); }); }
@@ -161,7 +171,7 @@ function App() {
       <section className="map-layout">
         <aside className="source-column">
           <div className="source-heading">
-            <div><span className="eyebrow">SOURCE PLAN</span><h2>Saturday food run</h2></div>
+            <div><span className="eyebrow">SOURCE PLAN</span><h2>{reading.source === "live" ? "Your plan" : "Saturday food run"}</h2></div>
             <span className="mono small">{reading.plan_text.trimEnd().split("\n").length} lines</span>
           </div>
           <div className="source-paper">
@@ -173,7 +183,7 @@ function App() {
         <section className="map-content" aria-label="Plan map">
           <div className="map-intro">
             {outOfDate && <div className="outdated-notice">Out of date: re-run. Confirm the edited map to test it again.</div>}
-            <div className="placeholder-notice"><span className="notice-mark">i</span><span>{reading.placeholder ? "Example mode: this reading was written by hand for testing and is not real AI output." : `Example mode: saved AI reading. Read by ${reading.read_by}.`}</span></div>
+            <div className="placeholder-notice"><span className="notice-mark">i</span><span>{reading.placeholder ? "Example mode: this reading was written by hand for testing and is not real AI output." : `${reading.source === "live" ? "Live AI reading" : "Example mode: saved AI reading"}. Read by ${reading.read_by}.`}{reading.fallback_used && " The fallback provider answered."}</span></div>
           </div>
 
           <section className="checklist-card">
@@ -245,7 +255,7 @@ function App() {
             </div>
             <div className="problem-total"><span>Pairwise tests when you confirm</span><span className="mono">{totalScenarios} scenarios</span></div>
           </section>
-          <div className="read-by mono">READ BY · {reading.read_by} <span>·</span> {reading.placeholder ? "PLACEHOLDER" : "SAVED READING"}</div>
+          <div className="read-by mono">Read by {reading.read_by} <span>·</span> {reading.placeholder ? "PLACEHOLDER" : reading.source === "live" ? "LIVE READING" : "SAVED READING"}</div>
           {error && <p className="inline-error map-error" role="alert">{error}</p>}
           {confirmed && <div className="confirmation-result" role="status"><Tick /> Plan confirmed. Fingerprint <span className="mono">{planMap.fingerprint}</span></div>}
         </section>
@@ -258,11 +268,12 @@ function App() {
   ) : undefined;
   return <LandingPage
     tab={tab} onNavigate={navigate}
-    text={planText} onTextChange={(value) => { setPlanText(value); if (planMap && value !== reading?.plan_text) { setOutOfDate(true); setConfirmed(false); } }}
+    text={planText} onTextChange={(value, userEdit) => { if (userEdit) savedExampleText.current = undefined; setPlanText(value); if (planMap && value !== reading?.plan_text) { setOutOfDate(true); setConfirmed(false); } }}
     apiKey={apiKey} onKeyChange={setApiKey} keyOpen={showKey} onKeyOpen={setShowKey}
+    keyProvider={keyProvider} onKeyProviderChange={setKeyProvider} readingPlan={readingPlan}
     onLoadExample={loadExample} onReadPlan={readPlan} error={error}
     readContent={mapContent}
-    testContent={planMap ? planMap.fingerprint && !outOfDate ? <CrashTest embedded plan={planMap} onPlanChange={(updated) => { void mutate("restore_fixed", {fingerprint: updated.fingerprint}); }} onEdit={() => navigate("read")} /> : <section className="confirmation-gate"><p className="eyebrow">03 · CRASH TEST</p><h1>Confirm the plan before we test it.</h1><p>{outOfDate ? "Out of date. The map changed. Review and confirm it so the checker uses your current plan." : "Every detail and open question needs your answer first."}</p><button type="button" className="button button-primary" onClick={() => navigate("read")}>Review the plan <span aria-hidden="true">→</span></button></section> : undefined}
+    testContent={planMap ? planMap.fingerprint && !outOfDate ? <CrashTest embedded plan={planMap} readingSource={reading?.source} fallbackUsed={reading?.fallback_used} onTryExample={() => { navigate("start"); void loadExample(); }} onPlanChange={(updated) => { void mutate("restore_fixed", {fingerprint: updated.fingerprint}); }} onEdit={() => navigate("read")} /> : <section className="confirmation-gate"><p className="eyebrow">03 · CRASH TEST</p><h1>Confirm the plan before we test it.</h1><p>{outOfDate ? "Out of date. The map changed. Review and confirm it so the checker uses your current plan." : "Every detail and open question needs your answer first."}</p><button type="button" className="button button-primary" onClick={() => navigate("read")}>Review the plan <span aria-hidden="true">→</span></button></section> : undefined}
   />;
 }
 

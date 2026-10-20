@@ -52,6 +52,15 @@ export type PlanMap = {
   fix_history: AppliedFix[];
 };
 
+export type AIProvider = "gemini" | "groq";
+export type ReadingSource = "live" | "saved" | "placeholder";
+export type AIStatus = {
+  primary_provider: AIProvider; primary_model: string;
+  fallback_provider: AIProvider; fallback_model: string;
+  selected_provider?: AIProvider | null;
+  key_available: Record<AIProvider, boolean>;
+};
+
 export type ExampleReading = {
   reading_id: string;
   plan_text: string;
@@ -60,6 +69,8 @@ export type ExampleReading = {
   questions: RuleQuestion[];
   placeholder: boolean;
   read_by: string;
+  source: ReadingSource;
+  fallback_used: boolean;
   problem_types: Record<string, number>;
 };
 
@@ -94,4 +105,5 @@ export type FixSuggestion = {
 export type CaseDetail = {
   placeholder: boolean; explanation: string | null; result: ScenarioResult;
   route_reasons: Record<string, string>; alone_results: ScenarioResult[]; suggestions: FixSuggestion[];
+  source?: ReadingSource; suggested_by?: string | null; fallback_used?: boolean; can_retry?: boolean;
 };

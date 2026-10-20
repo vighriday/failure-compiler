@@ -56,7 +56,7 @@ def main():
             "Route A · Car · Ravi, backups Maya and Joel and Sam"
         )
         expect(page.locator('[data-item-id="route-c"]')).to_contain_text(
-            "Loading cover: Anita, Maya, Joel and Sam"
+            "Loading cover: Joel, Anita, Maya and Sam"
         )
         page.screenshot(path=str(SCREENS / "hardening-current-facts.png"), full_page=True)
         van = page.locator('[data-item-id="van"]')

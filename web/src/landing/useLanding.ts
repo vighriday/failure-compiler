@@ -3,13 +3,16 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { EXAMPLE, FIXES, PLAN, STATEMENTS, STORY, TABS, caseTitle, sampleCellType, type LandingTab } from "./data";
+import type { AIProvider } from "../types";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 export type LandingProps = {
   tab: LandingTab; onNavigate: (tab: LandingTab) => void;
-  text: string; onTextChange: (value: string) => void;
+  text: string; onTextChange: (value: string, userEdit?: boolean) => void;
   apiKey: string; onKeyChange: (value: string) => void;
+  keyProvider: AIProvider; onKeyProviderChange: (value: AIProvider) => void;
   keyOpen: boolean; onKeyOpen: (open: boolean) => void;
+  readingPlan: boolean;
   onLoadExample: () => Promise<string | undefined>; onReadPlan: () => void;
   error?: string;
 };
@@ -151,7 +154,7 @@ export function useLanding(props: LandingProps) {
   const bar = (s: number, e: number, label: string, load = false, show = true) => ({ l: pct(s), w: pct(Math.max(0, e - s)), top: load ? "18px" : "28px", h: load ? "6px" : "20px", bg: load ? "#CFC9BB" : "#4D4F45", op: show ? 1 : 0, label, ltop: load ? "2px" : "31px", lc: load ? "#57544C" : "#F6F4EE", pl: load ? "0" : "8px" });
   const tl = [{ route: "Route A", veh: "car", msgOp: 0, bars: [bar(0, 10, "Load", true), bar(45, 105, "Ravi")] }, { route: "Route B", veh: "van", msgOp: 0, bars: [bar(60, 70, "Load", true), bar(70, 105, "Sam")] }, { route: "Route C", veh: "van", msgOp: stage >= 1 ? 0 : 1, bars: [bar(105, 115, "Load: Sam", true, stage >= 1), bar(120, 175, "Ravi", false, stage >= 1)] }];
   const FLOW = [["YOU", "Write the plan", "In plain words, the way you’d text your team."], ["AI", "Reads it", "Finds the people, vehicles, routes and times. Asks you when unsure."], ["CHECKER", "Tests it", "Runs 100 tests. No AI here, just rules and maths."], ["CHECKER", "Shows the proof", "Every result comes with the exact case behind it."]];
-  const lineCount = text ? text.split("\n").length : 0, noText = !text.trim() || text.length > 4000 || loadingExample;
+  const lineCount = text ? text.split("\n").length : 0, noText = !text.trim() || text.length > 4000 || loadingExample || props.readingPlan;
   return {
     tab_top: tab === "top", tab_plan: tab === "plan", tab_read: tab === "read", tab_test: tab === "test", tab_trust: tab === "trust", tab_start: tab === "start",
     root, progRef, navRef, indRef, tabRef, heroRef, gridWrap, readRef, gutRef, minRef, shardLayer, onNavKeyDown,
@@ -173,9 +176,9 @@ export function useLanding(props: LandingProps) {
     allClear: stage >= 3, resetFixes: () => { setStage(0); setRunId(n => n + 1); setSel([11, 8]); },
     flow: FLOW.map(([k, t, b], i) => ({ k, t, b, op: flow > i ? 1 : .18, ty: flow > i ? "0px" : "12px", dot: flow > i ? i >= 2 ? "#1E6B47" : "#1A1916" : "#F6F4EE", tc: i >= 2 ? "#1E6B47" : "#57544C" })), flowW: ["0%", "12.5%", "37.5%", "62.5%", "100%"][flow], replayFlow: () => setFlowRun(n => n + 1),
     outcomes: [{ isBreak: true, isOk: false, isQ: false, t: "Breaks", c: "#B23A2E", b: "We show you the exact case, the timeline and why.", br: "1px solid #DAD6CB", pl: "0px" }, { isBreak: false, isOk: true, isQ: false, t: "Survives", c: "#1E6B47", b: "Nothing failed in our tests. That’s not a promise about the real day.", br: "1px solid #DAD6CB", pl: "28px" }, { isBreak: false, isOk: false, isQ: true, t: "Unknown", c: "#8A6410", b: "Something was unclear, so we say so. It never counts as a pass.", br: "none", pl: "28px" }].map(o => ({ ...o, bg: "transparent", enter: () => {} })),
-    text, onText: (event: ChangeEvent<HTMLTextAreaElement>) => { clearInterval(typer.current); loadingId.current++; setLoadingExample(false); props.onTextChange(event.target.value); setLoaded(false); }, onTaScroll: (event: UIEvent<HTMLTextAreaElement>) => { if (gutRef.current) gutRef.current.style.transform = `translateY(${-event.currentTarget.scrollTop}px)`; }, edFocus: () => setEdFocused(true), edBlur: () => setEdFocused(false), edBorder: edFocused ? "#1A1916" : "#CFC9BB",
-    lineCount, gutter: Array.from({ length: Math.max(17, lineCount) }, (_, i) => ({ n: i + 1, c: i < lineCount ? "#57544C" : "#C9C3B4" })), charText: text.length.toLocaleString("en-US"), noTextS: noText ? "true" : "false", readBg: noText ? "#E4E0D6" : "#1E6B47", readColor: noText ? "#77736A" : "#F6F4EE", readCursor: noText ? "not-allowed" : "pointer", readOutline: readFocus && !noText ? "2px solid #1A1916" : "none", readPlan: () => { if (!noText) { setReadFocus(false); props.onReadPlan(); } },
-    loadExample, exampleLoaded: loaded, exampleLabel: loadingExample ? "Loading example…" : loaded ? "Example plan loaded" : "Load the example plan", toggleKey: () => props.onKeyOpen(!props.keyOpen), keyOpen: props.keyOpen, keyRot: props.keyOpen ? "90deg" : "0deg", apiKey: props.apiKey, onKey: (event: ChangeEvent<HTMLInputElement>) => props.onKeyChange(event.target.value), error: props.error,
+    text, onText: (event: ChangeEvent<HTMLTextAreaElement>) => { clearInterval(typer.current); loadingId.current++; setLoadingExample(false); props.onTextChange(event.target.value, true); setLoaded(false); }, onTaScroll: (event: UIEvent<HTMLTextAreaElement>) => { if (gutRef.current) gutRef.current.style.transform = `translateY(${-event.currentTarget.scrollTop}px)`; }, edFocus: () => setEdFocused(true), edBlur: () => setEdFocused(false), edBorder: edFocused ? "#1A1916" : "#CFC9BB",
+    lineCount, gutter: Array.from({ length: Math.max(17, lineCount) }, (_, i) => ({ n: i + 1, c: i < lineCount ? "#57544C" : "#C9C3B4" })), charText: text.length.toLocaleString("en-US"), charColor: text.length >= 4000 ? "#B23A2E" : text.length >= 3500 ? "#8A6410" : "#57544C", noTextS: noText ? "true" : "false", readBg: noText ? "#E4E0D6" : "#1E6B47", readColor: noText ? "#77736A" : "#F6F4EE", readCursor: noText ? "not-allowed" : "pointer", readOutline: readFocus && !noText ? "2px solid #1A1916" : "none", readPlan: () => { if (!noText) { setReadFocus(false); props.onReadPlan(); } },
+    loadExample, exampleLoaded: loaded, exampleLabel: loadingExample ? "Loading example…" : loaded ? "Example plan loaded" : "Load the example plan", toggleKey: () => props.onKeyOpen(!props.keyOpen), keyOpen: props.keyOpen, keyRot: props.keyOpen ? "90deg" : "0deg", apiKey: props.apiKey, onKey: (event: ChangeEvent<HTMLInputElement>) => props.onKeyChange(event.target.value), keyProvider: props.keyProvider, onKeyProvider: (event: ChangeEvent<HTMLSelectElement>) => props.onKeyProviderChange(event.target.value as AIProvider), readingPlan: props.readingPlan, error: props.error,
   };
 }
 export type LandingValues = ReturnType<typeof useLanding>;

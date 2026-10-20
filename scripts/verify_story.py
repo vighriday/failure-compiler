@@ -47,20 +47,23 @@ def main() -> None:
         page.get_by_role("button", name="Load the example plan", exact=True).click()
         page.get_by_role("button", name="Read plan").click()
         review_example(page)
-        # Adding and removing loading cover uses the actual ordered-person control.
+        # Adding loading cover preserves the saved reading's display order.
         route = page.locator('[data-item-id="route-c"]')
         route.get_by_role("button", name="Correct", exact=True).click()
-        loader_picker = route.get_by_label("Loaders (primary first) for route-c", exact=True)
+        loader_picker = route.get_by_label("Loaders for route-c", exact=True)
         expect(loader_picker).to_be_enabled()
         with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
             loader_picker.focus()
             loader_picker.press("ArrowDown")
-        expect(route).to_contain_text("Anita, Maya, Joel and Ravi")
+        expect(route).to_contain_text("Loading cover: Joel, Anita, Maya and Ravi")
         with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
             route.get_by_role(
                 "button", name="Remove person-ravi from loader_ids", exact=True
             ).click()
-        expect(route.locator(".statement-line")).not_to_contain_text("Joel and Ravi")
+        expect(
+            route.get_by_role("button", name="Remove person-ravi from loader_ids", exact=True)
+        ).to_have_count(0)
+        expect(route).to_contain_text("Loading cover: Joel, Anita and Maya")
         page.reload()
         page.get_by_role("tab", name="Start", exact=True).click()
         page.get_by_role("button", name="Load the example plan", exact=True).click()

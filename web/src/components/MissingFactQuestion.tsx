@@ -29,7 +29,7 @@ export default function MissingFactQuestion({question, plan, disabled, onAnswer}
   const route = plan.routes.find((route) => route.id === question.entity_id);
   const field = question.field ?? "vehicle_id";
   const control: FactControl = {
-    field, label: field === "vehicle_id" ? "Choose a vehicle" : "Choose people (primary first)",
+    field, label: field === "vehicle_id" ? "Choose a vehicle" : field === "loader_ids" ? "Choose loaders" : "Choose drivers (primary first)",
     type: field === "vehicle_id" ? "select" : "ordered_people", value: route?.[field] ?? "",
     options: (field === "vehicle_id" ? plan.vehicles : plan.people.filter((person) => field === "loader_ids" || person.can_drive)).map((entity) => ({value: entity.id, label: entity.name})),
   };

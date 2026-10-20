@@ -18,6 +18,8 @@ VAN_ANITA = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-
 def main():
     SCREENS.mkdir(parents=True, exist_ok=True)
     errors = []
+    console_errors = []
+    controlled_failures = []
     checked = []
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -30,7 +32,11 @@ def main():
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.on(
                 "console",
-                lambda message: errors.append(message.text) if message.type == "error" else None,
+                lambda message: (
+                    console_errors.append((message.text, message.location.get("url")))
+                    if message.type == "error"
+                    else None
+                ),
             )
             page.goto(f"{BASE}/")
             page.evaluate("document.fonts.ready")
@@ -252,6 +258,30 @@ def main():
         expect(read).to_be_disabled()
         expect(page.get_by_role("alert")).to_contain_text("4,001")
         editor.fill("\n".join(f"Line {n}" for n in range(60)))
+
+        # Keep this visual regression offline even when the server has .env keys.
+        # Provider and format-gate behavior is exercised by verify_live.py.
+        def controlled_read(route):
+            body = route.request.post_data_json
+            if body.get("example"):
+                route.continue_()
+                return
+            supplied = bool(body.get("api_key"))
+            controlled_failures.append(route.request.url)
+            route.fulfill(
+                status=401,
+                content_type="application/json",
+                body=json.dumps(
+                    {
+                        "detail": "The AI key is invalid. Check it and try again."
+                        if supplied
+                        else "Add an AI key, or load the example plan.",
+                        "error_code": "invalid_key" if supplied else "missing_key",
+                    }
+                ),
+            )
+
+        page.route("**/api/read-plan", controlled_read)
         editor.evaluate("el => { el.scrollTop = 120; el.dispatchEvent(new Event('scroll')); }")
         assert page.locator("[data-plan-editor]").evaluate(
             "el => el.parentElement.firstElementChild.firstElementChild.style.transform"
@@ -261,13 +291,13 @@ def main():
         expect(page.get_by_label("AI key", exact=True)).to_be_visible()
         page.get_by_label("AI key", exact=True).fill("test-key")
         read.click()
-        expect(page.get_by_role("alert")).to_contain_text("Live AI reading is not available yet")
+        expect(page.get_by_role("alert")).to_contain_text("The AI key is invalid")
         key_button = page.get_by_role("button", name="Use your own AI key", exact=True)
         key_button.click()
         expect(key_button).to_have_attribute("aria-expanded", "false")
         checked.append(
             "Empty and over-limit input, synchronized gutter, key disclosure,"
-            " controlled key and honest error states"
+            " controlled key and offline error states"
         )
         page.get_by_role("button", name="Failure Compiler home", exact=True).click()
         page.get_by_role("button", name="Try the example", exact=True).click()
@@ -358,12 +388,20 @@ def main():
         reduced.close()
         checked.append("Reduced motion shows completed states without fragment or scroll animation")
         browser.close()
+    expected_console = [
+        item
+        for item in console_errors
+        if item[1] in controlled_failures and "status of 401" in item[0]
+    ]
+    assert len(expected_console) == len(controlled_failures) == 2
+    errors.extend(text for text, url in console_errors if (text, url) not in expected_console)
     assert not errors, dict(Counter(errors))
     report = {
         "checks": checked,
         "page_errors": errors,
         "viewports": [1440, 768, 390, 320],
         "sample_cells_clicked": 105,
+        "controlled_unauthorized_responses": len(controlled_failures),
     }
     (SCREENS / "v2-verification.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))

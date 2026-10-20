@@ -296,7 +296,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </div>
 <div style={{"minWidth": "0", "display": "flex", "flexDirection": "column", "gap": "16px", "gridColumn": "auto"} as CSSProperties}>
 <div style={{"border": `1px solid ${v.edBorder}`, "background": "#FBFAF6", "transition": "border-color 200ms"} as CSSProperties}>
-<div style={{"display": "flex", "justifyContent": "space-between", "padding": "12px 18px", "borderBottom": "1px solid #DAD6CB", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}><span >{"plan.txt"}</span><span style={{"whiteSpace": "nowrap"} as CSSProperties}>{`${v.lineCount} lines · ${v.charText} / 4,000`}</span></div>
+<div style={{"display": "flex", "justifyContent": "space-between", "padding": "12px 18px", "borderBottom": "1px solid #DAD6CB", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}><span >{"plan.txt"}</span><span style={{"whiteSpace": "nowrap", "color": v.charColor} as CSSProperties}>{`${v.lineCount} lines · ${v.charText} / 4,000`}</span></div>
 <div style={{"display": "grid", "gridTemplateColumns": "52px minmax(0,1fr)", "height": "456px", "overflow": "hidden"} as CSSProperties}>
 <div style={{"overflow": "hidden", "borderRight": "1px solid #E6E2D8", "background": "#F6F4EE"} as CSSProperties}>
 <div ref={v.gutRef} style={{"padding": "16px 0"} as CSSProperties}>
@@ -305,25 +305,28 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 </Fragment>)}
 </div>
 </div>
-<textarea value={v.text} onChange={v.onText} onScroll={v.onTaScroll} onFocus={v.edFocus} onBlur={v.edBlur} wrap={"off"} spellCheck={"false"} aria-label={"Your plan"} placeholder={"Paste your plan here."} style={{"width": "100%", "height": "100%", "resize": "none", "border": "0", "outline": "none", "background": "transparent", "padding": "16px 18px", "font": "400 14px/24px 'IBM Plex Mono',monospace", "color": "#1A1916", "whiteSpace": "pre", "overflow": "auto"} as CSSProperties} data-plan-editor="true"></textarea>
+<textarea value={v.text} onChange={v.onText} onScroll={v.onTaScroll} onFocus={v.edFocus} onBlur={v.edBlur} wrap={"off"} spellCheck={"false"} aria-label={"Your plan"} disabled={v.readingPlan} placeholder={"Paste your plan here."} style={{"width": "100%", "height": "100%", "resize": "none", "border": "0", "outline": "none", "background": "transparent", "padding": "16px 18px", "font": "400 14px/24px 'IBM Plex Mono',monospace", "color": "#1A1916", "whiteSpace": "pre", "overflow": "auto"} as CSSProperties} data-plan-editor="true"></textarea>
 </div>
 </div>
 <div style={{"display": "flex", "alignItems": "center", "gap": "24px", "flexWrap": "wrap"} as CSSProperties}>
-<button ref={v.readRef} onClick={v.readPlan} aria-disabled={v.noTextS === "true"} style={{"all": "unset", "cursor": v.readCursor, "background": v.readBg, "color": v.readColor, "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 24px", "display": "flex", "alignItems": "center", "gap": "16px", "borderRadius": "2px", "outline": v.readOutline, "outlineOffset": "3px", "transition": "background 300ms,color 300ms"} as CSSProperties} type="button" disabled={v.noTextS === "true"}>{"Read plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button>
-<button onClick={v.loadExample} style={{"all": "unset", "cursor": "pointer", "font": "400 15px 'IBM Plex Sans',sans-serif", "display": "flex", "alignItems": "center", "gap": "8px"} as CSSProperties} type="button" className="landing-effect-14">
+<button ref={v.readRef} onClick={v.readPlan} aria-disabled={v.noTextS === "true"} aria-busy={v.readingPlan} style={{"all": "unset", "cursor": v.readCursor, "background": v.readBg, "color": v.readColor, "font": "500 16px 'IBM Plex Sans',sans-serif", "height": "54px", "padding": "0 24px", "display": "flex", "alignItems": "center", "gap": "16px", "borderRadius": "2px", "outline": v.readOutline, "outlineOffset": "3px", "transition": "background 300ms,color 300ms"} as CSSProperties} type="button" disabled={v.noTextS === "true"}>{v.readingPlan ? "Reading plan…" : "Read plan"}<span style={{"fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"→"}</span></button>
+<button onClick={v.loadExample} disabled={v.readingPlan} style={{"all": "unset", "cursor": "pointer", "font": "400 15px 'IBM Plex Sans',sans-serif", "display": "flex", "alignItems": "center", "gap": "8px"} as CSSProperties} type="button" className="landing-effect-14">
 {v.exampleLoaded && <><svg width={"14"} height={"14"} aria-hidden="true"><path d={"M2 7.5 L5.5 11 L12 3.5"} style={{"fill": "none", "stroke": "#1E6B47", "strokeWidth": "1.6", "strokeLinecap": "round", "strokeLinejoin": "round"} as CSSProperties}></path></svg></>}
 <span style={{"textDecoration": "underline", "textUnderlineOffset": "4px", "textDecorationThickness": "1px"} as CSSProperties}>{v.exampleLabel}</span>
 </button>
 <button onClick={v.toggleKey} style={{"all": "unset", "cursor": "pointer", "marginLeft": "auto", "font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "display": "flex", "gap": "8px", "alignItems": "center"} as CSSProperties} type="button" aria-expanded={v.keyOpen} aria-controls="landing-key" className="landing-effect-15"><span style={{"display": "inline-block", "transform": `rotate(${v.keyRot})`, "transition": "transform 200ms", "fontFamily": "'IBM Plex Mono',monospace"} as CSSProperties} aria-hidden="true">{"›"}</span>{"Use your own AI key"}</button>
 </div>
 {v.keyOpen && <>
-<div style={{"display": "flex", "flexDirection": "column", "gap": "8px", "alignItems": "flex-end"} as CSSProperties}>
-<input type={"password"} placeholder={"Paste your key"} aria-label={"AI key"} style={{"width": "min(360px,100%)", "font": "400 13px 'IBM Plex Mono',monospace", "padding": "10px 12px", "border": "1px solid #CFC9BB", "background": "#FBFAF6", "borderRadius": "2px", "outline": "none"} as CSSProperties} value={v.apiKey} onChange={v.onKey} autoComplete="off" id="landing-key" />
-<span style={{"font": "400 12px 'IBM Plex Sans',sans-serif", "color": "#57544C"} as CSSProperties}>{"Live AI reading is planned. The example works without a key."}</span>
+<div className="live-key-fields">
+<label>Key provider<select aria-label="AI key provider" value={v.keyProvider} onChange={v.onKeyProvider} disabled={v.readingPlan}><option value="gemini">Gemini</option><option value="groq">Groq</option></select></label>
+<label>AI key<input type={"password"} placeholder={"Paste your key"} aria-label={"AI key"} value={v.apiKey} onChange={v.onKey} autoComplete="off" id="landing-key" disabled={v.readingPlan} /></label>
+<span>{"Leave blank to use a key from .env or this session. Typed keys stay in server memory for this session only."}</span>
 </div>
 </>}
+<p className="gemini-data-notice">Gemini is the default reader. Google may use content to improve its models, so don’t paste personal details. The example plan is fictional.</p>
+{v.readingPlan && <p className="reading-status mono" role="status">Reading the plan and checking the AI’s response…</p>}
 </div>
-{v.error && <p className="landing-error" role="alert">{v.error}</p>}{v.text.length > 4000 && <p className="landing-error" role="alert">Your plan has {v.charText} characters. Keep it under 4,000 before reading.</p>}</section>
+{v.error && <div className="landing-error" role="alert"><p>{v.error}</p><div className="choice-row"><button className="button button-secondary" type="button" disabled={v.noTextS === "true"} onClick={v.readPlan}>Try again</button><button className="button button-text" type="button" disabled={v.readingPlan} onClick={v.loadExample}>Try the example plan instead</button></div></div>}{v.text.length > 4000 && <p className="landing-error" role="alert">Your plan has {v.charText} characters. Keep it under 4,000 before reading.</p>}</section>
 </>}
 </main>
 {v.hasNext && <>

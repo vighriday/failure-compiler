@@ -1,17 +1,30 @@
-import type { AppliedFix, CaseDetail, ExampleReading, PlanMap, ReviewState, RunCount, RunMeta, ScenarioResult } from "../types";
+import type { AIProvider, AIStatus, AppliedFix, CaseDetail, ExampleReading, PlanMap, ReviewState, RunCount, RunMeta, ScenarioResult } from "../types";
+
+export class APIError extends Error {
+  constructor(message: string, public code: string, public status: number, public caseDetail?: CaseDetail) { super(message); this.name = "APIError"; }
+}
+
+async function errorFor(response: Response): Promise<APIError> {
+  const payload = await response.json().catch(() => null);
+  const detail = typeof payload?.detail === "string" ? payload.detail : "The local server could not complete this request. Try again.";
+  return new APIError(detail, typeof payload?.error_code === "string" ? payload.error_code : "request_failed", response.status, payload?.case_detail);
+}
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, {
     method: body === undefined ? "GET" : "POST",
+    credentials: "same-origin",
     headers: body === undefined ? undefined : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error(typeof payload.detail === "string" ? payload.detail : JSON.stringify(payload.detail));
-  }
-  return payload as T;
+  }).catch(() => { throw new APIError("Could not reach the local server. Check that the app is running, then try again.", "connection_failed", 0); });
+  if (!response.ok) throw await errorFor(response);
+  return response.json() as Promise<T>;
 }
+
+export const aiStatus = () => request<AIStatus>("/api/ai-status");
+
+export const readPlan = (text: string, apiKey?: string, keyProvider?: AIProvider) =>
+  request<ExampleReading>("/api/read-plan", { text, example: false, ...(apiKey ? {api_key: apiKey, key_provider: keyProvider} : {}) });
 
 export const readExample = (text: string) =>
   request<ExampleReading>("/api/read-plan", { text, example: true });
@@ -26,7 +39,8 @@ type RunEvent = ({ type: "start" } & RunMeta) | { type: "result"; result: Scenar
 
 export async function streamTests(fingerprint: string, reducedMotion: boolean, onEvent: (event: RunEvent) => void, signal: AbortSignal) {
   const response = await fetch(`/api/run-tests?map=${encodeURIComponent(fingerprint)}&reduced_motion=${reducedMotion}`, { signal });
-  if (!response.ok || !response.body) throw new Error("Could not start the crash test. Confirm the map and try again.");
+  if (!response.ok) throw await errorFor(response);
+  if (!response.body) throw new Error("Could not start the crash test. Confirm the map and try again.");
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -45,8 +59,8 @@ export async function streamTests(fingerprint: string, reducedMotion: boolean, o
   } finally { reader.releaseLock(); }
 }
 
-export const suggestFixes = (fingerprint: string, scenario_id: string) =>
-  request<CaseDetail>("/api/suggest-fixes", { fingerprint, scenario_id });
+export const suggestFixes = (fingerprint: string, scenario_id: string, options: {retry?: boolean; live?: boolean} = {}) =>
+  request<CaseDetail>("/api/suggest-fixes", { fingerprint, scenario_id, ...options });
 
 export const applyFix = (fingerprint: string, scenario_id: string, fix_id: string) =>
   request<{ fingerprint: string; plan_map: PlanMap; applied_fix: AppliedFix }>("/api/apply-fix", { fingerprint, scenario_id, fix_id });
