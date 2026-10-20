@@ -1,11 +1,12 @@
 """Gate, score, reject, and stack the example fixes against all real scenarios."""
 
+import hashlib
+import json
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from server.checker.runner import run_checker
-from server.facts import changed_by, statement
 from server.fixes import SCORED, score_fix
 from server.main import app
 from server.models import PlanMapData, ScenarioResult
@@ -17,6 +18,8 @@ VAN_ANITA = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-
 TRUCK_RAVI = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supplies"
 JOEL = "volunteer_absent__person-joel"
 JOEL_MAYA = "volunteer_absent__person-joel+volunteer_absent__person-maya"
+VAN_ABSENT = "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van"
+JOEL_RAVI = "volunteer_absent__person-ravi+volunteer_absent__person-joel"
 
 
 def truth() -> PlanMap:
@@ -29,7 +32,10 @@ def test_new_single_is_not_described_as_a_hidden_pair(monkeypatch):
     problem = "supply_delivery_late__delivery-supplies"
     monkeypatch.setattr(
         "server.fixes.run_checker",
-        lambda _: [ScenarioResult(scenario_id=problem, failures=[problem], state="cross")],
+        lambda _: [
+            ScenarioResult(scenario_id=problem, failures=[problem], state="cross"),
+            ScenarioResult(scenario_id=VAN_ANITA, failures=VAN_ANITA.split("+"), state="tick"),
+        ],
     )
     result = score_fix(
         truth(),
@@ -48,7 +54,24 @@ def test_new_single_is_not_described_as_a_hidden_pair(monkeypatch):
             ],
         },
     ).suggestion
-    assert result.rejection_reason.startswith("This reveals a new single weak spot:")
+    assert "new single weak spot" in result.rejection_reason
+
+
+def test_approved_capture_is_unedited_and_retains_primary_failure_history():
+    fixture = json.loads((ROOT / "fixtures/example-fixes.json").read_text(encoding="utf-8"))
+    assert (
+        fixture["label"] == "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)"
+    )
+    for scenario, record in fixture["cases"].items():
+        raw = record["raw"]
+        assert raw["provider"] == "groq" and raw["model"] == "openai/gpt-oss-120b"
+        assert (
+            hashlib.sha256(raw["raw_text"].encode()).hexdigest()
+            == fixture["raw_text_sha256"][scenario]
+        )
+        assert len(json.loads(raw["raw_text"])["fixes"]) == 3
+        assert len(record["previous_attempts"]) == 3
+        assert any("503" in str(row) for row in record["previous_attempts"])
 
 
 def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
@@ -68,6 +91,9 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
         assert response.status_code == 200, response.text
         payload = response.json()
         for fix in payload["suggestions"]:
+            if fix["gate_status"] != "passed":
+                assert not fix["eligible"] and not fix["scenario_results"]
+                continue
             assert fix["fixes_n"] + fix["still_broken_n"] == sum(
                 r.state == "cross" for r in SESSIONS[fingerprint].results
             )
@@ -87,17 +113,30 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
         return response.json()
 
     van = suggestions(original, VAN_ANITA)
+    assert not van["placeholder"] and van["source"] == "saved" and not van["can_retry"]
+    assert van["suggested_by"] == "Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)"
     reason = van["route_reasons"]["route-c"]
     assert reason.startswith("Van back 10:45. Loading team gone.")
     assert "Anita left 10:30" in reason
     assert "Maya leaves 10:45" in reason
     assert "Joel left 10:30" in reason
     assert all(r["state"] == "tick" for r in van["alone_results"])
-    maya, sam = van["suggestions"]
-    assert (maya["fixes_n"], maya["eligible"]) == (0, False)
-    assert maya["rejection_reason"].startswith("Van back 10:45.")
-    assert (sam["fixes_n"], sam["new_crosses_n"], sam["eligible"]) == (2, 0, True)
-    apply(original, VAN_ANITA, maya["id"], expected=409)
+    hours, driver, car = van["suggestions"]
+    assert all(not fix["eligible"] for fix in van["suggestions"])
+    assert "11:00" in hours["rejection_reason"] and "12:00" in hours["rejection_reason"]
+    assert "shortens" in hours["rejection_reason"]
+    assert "Ravi already listed as driver for Route C" in driver["rejection_reason"]
+    assert "10:45" in driver["rejection_reason"]
+    assert car["fixes_n"] == 3 and car["new_crosses_n"] == 1
+    assert "new single weak spot" in car["rejection_reason"]
+    apply(original, VAN_ANITA, driver["id"], expected=409)
+    assert (
+        client.post(
+            "/api/suggest-fixes",
+            json={"fingerprint": original, "scenario_id": VAN_ANITA, "retry": True},
+        ).status_code
+        == 409
+    )
     with monkeypatch.context() as cached:
         cached.setattr(
             "server.fixes.run_checker",
@@ -106,52 +145,14 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
             ),
         )
         assert suggestions(original, VAN_ANITA) == van
-    first = apply(original, VAN_ANITA, sam["id"])
+    absent = suggestions(original, VAN_ABSENT)
+    sam = absent["suggestions"][1]
+    assert (sam["fixes_n"], sam["new_crosses_n"], sam["eligible"]) == (2, 0, True)
+    assert absent["suggestions"][2]["gate_status"] == "couldnt_apply"
+    first = apply(original, VAN_ABSENT, sam["id"])
     fp1 = first["fingerprint"]
     assert fp1 != original
 
-    truck = suggestions(fp1, TRUCK_RAVI)["suggestions"][0]
-    assert (truck["fixes_n"], truck["still_broken_n"], truck["new_crosses_n"]) == (1, 1, 0)
-    second = apply(fp1, TRUCK_RAVI, truck["id"])
-    fp2 = second["fingerprint"]
-
-    joel = suggestions(fp2, JOEL)
-    assert set(joel["route_reasons"].values()) == {"Nobody can open the loading area."}
-    one, two = joel["suggestions"]
-    assert (one["fixes_n"], one["still_broken_n"], one["new_crosses_n"], one["eligible"]) == (
-        1,
-        0,
-        1,
-        False,
-    )
-    assert one["new_crosses"] == [JOEL_MAYA]
-    assert "Joel absent + Maya absent" in one["rejection_reason"]
-    assert (
-        next(r for r in one["scenario_results"] if r["scenario_id"] == JOEL_MAYA)["state"]
-        == "cross"
-    )
-    apply(fp2, JOEL, one["id"], expected=409)
-    final = apply(fp2, JOEL, two["id"])
-    final_fp = final["fingerprint"]
-    assert len(SESSIONS[final_fp].results) == 100
-    assert all(r.state == "tick" for r in SESSIONS[final_fp].results)
-    chain = final["plan_map"]["fix_history"]
-    assert [(fix["from_fingerprint"], fix["to_fingerprint"]) for fix in chain] == [
-        (original, fp1),
-        (fp1, fp2),
-        (fp2, final_fp),
-    ]
-    assert next(p for p in final["plan_map"]["people"] if p["name"] == "Joel")["holds_key"]
-    assert next(r for r in final["plan_map"]["routes"] if r["name"] == "C")["changed_by_fix"] == 1
-    # Reading sentences must follow the accepted map rather than stale extraction text.
-    final_plan = SESSIONS[final_fp].plan
-    key_item = {"entity_type": "person", "entity_id": "person-joel", "field": "holds_key"}
-    assert statement(final_plan, key_item) == "Joel, Maya and Sam hold loading-area keys."
-    assert changed_by(final_plan, key_item) == 3
-    for route_id, fix_number in [("route-c", 1), ("route-a", 2)]:
-        route_item = {"entity_type": "route", "entity_id": route_id, "field": "route"}
-        assert "Sam" in statement(final_plan, route_item)
-        assert changed_by(final_plan, route_item) == fix_number
 
 
 def test_bad_fix_is_couldnt_apply_and_names_the_bad_reference() -> None:

@@ -1,7 +1,6 @@
 """Gate fixed operations, score every scenario, and apply only server-approved fixes."""
 
 import json
-from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
@@ -11,11 +10,12 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from server.ai import adapter
-from server.ai.types import AIError
-from server.checker.explain import route_reasons
+from server.ai.types import AIError, AIFixResponse
+from server.checker.explain import clock, route_reasons
 from server.checker.runner import run_checker
 from server.credentials import CLIENTS, available_keys, public_attempts
 from server.evaluation import align_entities
+from server.labels import route_label
 from server.models import AppliedFix, FixOperation, FixSuggestion, PlanMapData, ScenarioResult
 from server.session import (
     MapSession,
@@ -175,11 +175,12 @@ def fix_context(plan: PlanMap, result: ScenarioResult, results: list[ScenarioRes
 
 
 def example_case(plan: PlanMap, scenario_id: str, fixture: dict) -> dict:
-    """Align hand-written example suggestions to the reviewed map's entity identities."""
-    truth = PlanMap.from_truth_map(
-        PlanMapData.model_validate_json((ROOT / "fixtures/example-truth.json").read_text())
+    """Parse the unedited capture, then align references on a separate runtime copy."""
+    first = next(iter(fixture["cases"].values()))
+    reference = PlanMap.from_truth_map(
+        PlanMapData.model_validate(first["context"]["confirmed_map"])
     )
-    _, mapping, unmatched = align_entities(plan, truth)
+    _, mapping, unmatched = align_entities(plan, reference)
     if unmatched:
         return {}
 
@@ -192,7 +193,9 @@ def example_case(plan: PlanMap, scenario_id: str, fixture: dict) -> dict:
         (value for key, value in fixture["cases"].items() if set(key.split("+")) == aligned_case),
         {},
     )
-    saved = deepcopy(saved)
+    if not saved:
+        return {}
+    saved = AIFixResponse.model_validate_json(saved["raw"]["raw_text"]).model_dump(mode="json")
     inverse = {target: source for source, target in mapping.items()}
     for fix in saved.get("fixes", []):
         for operation in fix["operations"]:
@@ -203,6 +206,51 @@ def example_case(plan: PlanMap, scenario_id: str, fixture: dict) -> dict:
             elif isinstance(value, list):
                 operation["value"] = [inverse.get(item, item) for item in value]
     return saved
+
+
+def rejection_reason(plan: PlanMap, candidate: PlanMap, suggestion: FixSuggestion, result) -> str:
+    """Explain operations and proven outcomes, independently of the AI's description."""
+    from server.checker.scenarios import _instantiate_problems
+    from server.grid import problem_labels
+
+    people = {p.id: p for p in plan.people}
+    routes = {r.id: r for r in plan.routes}
+    for operation in suggestion.operations:
+        if operation.op == "set_person_availability" and operation.field == "available_until":
+            person = people[operation.target_id]
+            if operation.value < person.available_until:
+                return (
+                    f"This change sets {person.name}'s finish to {clock(operation.value)}, "
+                    f"earlier than their planned {clock(person.available_until)}. "
+                    "The operation shortens their hours; the selected case still fails."
+                    if result.state != "tick"
+                    else f"This change shortens {person.name}'s hours and creates a new cross."
+                )
+    if suggestion.new_crosses:
+        labels = {
+            p["id"]: p["label"] for p in problem_labels(_instantiate_problems(plan.checker_data()))
+        }
+        case = suggestion.new_crosses[0]
+        problems = case.split("+")
+        if len(result.failures) == 1:
+            problems.sort(key=lambda problem: problem not in result.failures)
+        name = " + ".join(labels[p] for p in problems)
+        if "+" not in case:
+            return f"Fixes {suggestion.fixes_n} crosses but makes '{name}' a new single weak spot."
+        return f"Creates a new hidden pair: {name}."
+    reasons = route_reasons(candidate.checker_data(), result)
+    # Keep the decisive checker fact on the card; the full facts remain above the cards.
+    reason = next(iter(reasons.values()), result.human_cost or "The selected case still fails.")
+    short = ". ".join(reason.split(". ")[:2]).rstrip(".") + "."
+    for operation in suggestion.operations:
+        if operation.op in {"add_driver", "add_loader"}:
+            route = routes[operation.target_id]
+            ids = [operation.value] if isinstance(operation.value, str) else operation.value
+            if all(pid in getattr(route, operation.field) for pid in ids):
+                names = " and ".join(people[pid].name for pid in ids)
+                role = "driver" if operation.op == "add_driver" else "loader"
+                return f"{names} already listed as {role} for {route_label(route.name)}. {short}"
+    return short
 
 
 def score_fix(
@@ -234,26 +282,9 @@ def score_fix(
     suggestion.still_broken_n = len(current_crosses & after_crosses)
     suggestion.fixes_n = len(current_crosses) - suggestion.still_broken_n
     suggestion.eligible = states.get(scenario_id) == "tick" and not suggestion.new_crosses
-    if suggestion.new_crosses:
-        from server.checker.scenarios import _instantiate_problems
-        from server.grid import problem_labels
-
-        labels = {
-            p["id"]: p["label"] for p in problem_labels(_instantiate_problems(plan.checker_data()))
-        }
-        name = " + ".join(labels[p] for p in suggestion.new_crosses[0].split("+"))
-        category = (
-            "single weak spot" if len(suggestion.new_crosses[0].split("+")) == 1 else "hidden pair"
-        )
-        suggestion.rejection_reason = f"This reveals a new {category}: {name}."
-    elif not suggestion.eligible:
+    if not suggestion.eligible:
         result = next(r for r in results if r.scenario_id == scenario_id)
-        reasons = route_reasons(candidate.checker_data(), result)
-        suggestion.rejection_reason = (
-            " ".join(dict.fromkeys(reasons.values()))
-            or result.human_cost
-            or "The checker could not prove that this fixes the selected case."
-        )
+        suggestion.rejection_reason = rejection_reason(plan, candidate, suggestion, result)
     return ScoredFix(suggestion, candidate)
 
 
@@ -283,8 +314,19 @@ def suggest_fixes(request: SuggestRequest, http_request: Request) -> dict[str, A
         retry = (
             request.retry
             and cached is not None
-            and not any(suggestion["eligible"] for suggestion in cached["suggestions"])
+            and cached["source"] == "live"
+            and not any(
+                suggestion["eligible"]
+                for suggestion in cached["suggestions"]
+                if suggestion["origin"] == "ai"
+            )
         )
+        if request.retry and not retry:
+            raise HTTPException(
+                409,
+                "New suggestions are available once, only for a live case "
+                "with no eligible AI card.",
+            )
         if retry and key in RETRIED:
             raise HTTPException(409, "The extra suggestion attempt has already been used.")
         if cached is not None and not upgrade and not retry:
@@ -332,10 +374,16 @@ def suggest_fixes(request: SuggestRequest, http_request: Request) -> dict[str, A
         else:
             fixture = json.loads((ROOT / "fixtures/example-fixes.json").read_text(encoding="utf-8"))
             saved = example_case(plan, request.scenario_id, fixture)
-            source, suggested_by, attempts = "placeholder", None, []
+            source, suggested_by = "saved", fixture["suggested_by"]
+            attempts = [
+                {"provider": "gemini", "status": "unavailable"},
+                {"provider": "groq", "status": "passed"},
+            ]
         scored = [
             score_fix(plan, results, request.scenario_id, raw) for raw in saved.get("fixes", [])
         ]
+        yours = [entry for entry in SCORED.get(key, []) if entry.suggestion.origin == "yours"]
+        scored.extend(yours)
         details = {
             "placeholder": source == "placeholder",
             "source": source,
@@ -349,7 +397,10 @@ def suggest_fixes(request: SuggestRequest, http_request: Request) -> dict[str, A
                 r.model_dump(mode="json") for r in results if r.scenario_id in result.failures
             ],
             "suggestions": [entry.suggestion.model_dump(mode="json") for entry in scored],
-            "can_retry": live and not retry and key not in RETRIED,
+            "can_retry": live
+            and not retry
+            and key not in RETRIED
+            and any(available_keys(http_request.state.owner).values()),
         }
         with session.lock:
             require_current(session, captured, request.fingerprint)
@@ -383,6 +434,7 @@ def apply_fix(request: ApplyRequest, http_request: Request) -> dict[str, Any]:
     fingerprint = fingerprint_plan_map(plan)
     applied = AppliedFix(
         fix_id=entry.suggestion.id,
+        origin=entry.suggestion.origin,
         description=entry.suggestion.description,
         operations=entry.suggestion.operations,
         from_fingerprint=request.fingerprint,

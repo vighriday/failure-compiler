@@ -166,7 +166,8 @@ def test_saved_then_live_identical_map_gets_live_suggestions(monkeypatch):
     fp = saved["fingerprint"]
     run(client, fp)
     body = {"fingerprint": fp, "scenario_id": JOEL}
-    assert client.post("/api/suggest-fixes", json=body).json()["placeholder"]
+    saved_detail = client.post("/api/suggest-fixes", json=body).json()
+    assert saved_detail["source"] == "saved" and not saved_detail["placeholder"]
     assert not calls
     _, live = read_and_confirm(client)
     assert live["fingerprint"] == fp
@@ -347,9 +348,7 @@ def test_none_worked_can_request_one_extra_successful_response(monkeypatch):
     ],
 )
 def test_optional_recorded_fix_replays_through_live_http(monkeypatch, scenario_id):
-    path = os.environ.get("RECORDED_AI_FIXES_PATH")
-    if not path:
-        pytest.skip("Set RECORDED_AI_FIXES_PATH to an approved or local raw capture; no network.")
+    path = os.environ.get("RECORDED_AI_FIXES_PATH", str(ROOT / "fixtures/example-fixes.json"))
     captures = json.loads(Path(path).read_text(encoding="utf-8"))
     recorded = captures["cases"][scenario_id]["raw"]
     fake_providers(monkeypatch)

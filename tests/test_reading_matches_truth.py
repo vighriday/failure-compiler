@@ -52,7 +52,7 @@ def test_reading_matches_truth():
     assert plan.places[0].name == "Loading bay"
 
 
-def test_placeholder_fix_story_uses_the_reviewed_delivery_identity():
+def test_real_fix_capture_uses_the_reviewed_delivery_identity():
     plan = reviewed_example()
     fingerprint = remember_map(plan, run_checker(plan.checker_data()))
     scenario = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck"
@@ -65,7 +65,8 @@ def test_placeholder_fix_story_uses_the_reviewed_delivery_identity():
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["placeholder"] is True
-    suggestion = next(fix for fix in body["suggestions"] if fix["id"] == "sam-route-a-driver")
-    assert suggestion["eligible"] and suggestion["new_crosses_n"] == 0
+    assert body["placeholder"] is False and body["source"] == "saved"
+    assert "Groq / openai/gpt-oss-120b" in body["suggested_by"]
+    suggestion = body["suggestions"][0]
+    assert not suggestion["eligible"] and suggestion["new_crosses_n"] > 0
     assert len(suggestion["scenario_results"]) == 100

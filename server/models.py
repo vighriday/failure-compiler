@@ -145,6 +145,7 @@ class FixOperation(BaseModel):
 class AppliedFix(BaseModel):
     model_config = ConfigDict(extra="forbid")
     fix_id: str
+    origin: Literal["ai", "yours"] = "ai"
     description: str
     operations: list[FixOperation]
     from_fingerprint: str
@@ -154,6 +155,7 @@ class AppliedFix(BaseModel):
 class FixSuggestion(BaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
+    origin: Literal["ai", "yours"] = "ai"
     description: str
     operations: list[FixOperation]
     scenario_results: list[ScenarioResult] = []
