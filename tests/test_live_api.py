@@ -338,6 +338,45 @@ def test_none_worked_can_request_one_extra_successful_response(monkeypatch):
     assert len(calls) == 3  # One read, first suggestions, one explicit extra.
 
 
+def test_live_retry_preserves_your_change_and_only_checks_ai_eligibility(monkeypatch):
+    payload = json.dumps({"explanation": "Synthetic empty response.", "fixes": []})
+    calls = fake_providers(monkeypatch, fixes=synthetic_fixes(payload=payload))
+    client = TestClient(app)
+    _, confirmed = read_and_confirm(client)
+    fp = confirmed["fingerprint"]
+    run(client, fp)
+    body = {"fingerprint": fp, "scenario_id": JOEL}
+    assert client.post("/api/suggest-fixes", json=body).json()["can_retry"]
+    operations = [
+        {"op": "give_spare_key", "target_id": f"person-{name}", "field": "holds_key", "value": True}
+        for name in ("maya", "sam")
+    ]
+    own = client.post("/api/test-change", json={**body, "operations": operations})
+    assert own.status_code == 200 and own.json()["eligible"]
+    retried = client.post("/api/suggest-fixes", json={**body, "retry": True})
+    assert retried.status_code == 200
+    assert retried.json()["suggestions"] == [own.json()]
+    assert not retried.json()["can_retry"]
+    assert client.post("/api/suggest-fixes", json={**body, "retry": True}).status_code == 409
+    assert len(calls) == 3
+
+
+def test_saved_example_retry_never_calls_a_provider(monkeypatch):
+    fake_providers(monkeypatch)
+    client = TestClient(app)
+    _, confirmed = read_and_confirm(client, example=True)
+    fp = confirmed["fingerprint"]
+    run(client, fp)
+
+    def never_call(*args, **kwargs):
+        pytest.fail("A saved example retry must not request another AI response")
+
+    monkeypatch.setattr(adapter, "suggest_fixes", never_call)
+    body = {"fingerprint": fp, "scenario_id": JOEL}
+    assert not client.post("/api/suggest-fixes", json=body).json()["can_retry"]
+    assert client.post("/api/suggest-fixes", json={**body, "retry": True}).status_code == 409
+
+
 @pytest.mark.parametrize(
     "scenario_id",
     [
@@ -347,7 +386,7 @@ def test_none_worked_can_request_one_extra_successful_response(monkeypatch):
         "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
     ],
 )
-def test_optional_recorded_fix_replays_through_live_http(monkeypatch, scenario_id):
+def test_recorded_fix_replays_through_live_http(monkeypatch, scenario_id):
     path = os.environ.get("RECORDED_AI_FIXES_PATH", str(ROOT / "fixtures/example-fixes.json"))
     captures = json.loads(Path(path).read_text(encoding="utf-8"))
     recorded = captures["cases"][scenario_id]["raw"]

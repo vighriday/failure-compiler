@@ -121,6 +121,8 @@ def main_cli():
     fix_record = (
         json.loads(args.fix_record.read_text(encoding="utf-8")) if args.fix_record else None
     )
+    if fix_record and "cases" in fix_record:
+        fix_record = fix_record["cases"][MAIN_PAIR]["raw"]
     if fix_record and "raw" in fix_record:
         fix_record = fix_record["raw"]
     providers = OfflineProviders(fix_record)
@@ -205,7 +207,9 @@ def main_cli():
                 f"Suggested by {fix_provider} / {fix_model}", timeout=60000
             )
             if fix_provider == "groq":
-                expect(page.locator(".ai-sentence")).to_contain_text("fallback provider")
+                expect(page.locator(".ai-sentence")).to_contain_text(
+                    "fallback: primary unavailable"
+                )
             else:
                 expect(page.locator(".ai-sentence")).not_to_contain_text("fallback provider")
             expect(page.locator(".fix-card").first).to_be_visible()
@@ -235,7 +239,7 @@ def main_cli():
                 # attempt is available; reopening still does not call a provider.
                 providers.mode = "success"
                 page.locator('[data-scenario="volunteer_absent__person-joel"]').click()
-                retry = page.get_by_role("button", name="None worked. Try once more", exact=True)
+                retry = page.get_by_role("button", name="Ask for new suggestions", exact=True)
                 expect(retry).to_be_visible(timeout=60000)
                 retry.click()
                 expect(page.locator(".suggestion-loading")).to_have_count(0, timeout=60000)
