@@ -273,7 +273,7 @@
         <div class="step-icon">2</div>
         <div class="step-body">
           <div class="step-label">AI reads it into a structured map</div>
-          <div class="step-desc">Asks 1 to 2 clarifying questions; flags guesses; plain rules validate before confirmation</div>
+          <div class="step-desc">Flags guesses and questions; plain rules validate before confirmation</div>
         </div>
       </div>
       <div class="loop-step">
@@ -318,7 +318,7 @@
 
   <!-- Four screens -->
   <section>
-    <h2>Four Screens</h2>
+    <h2>Five Screens</h2>
     <div class="screens">
       <div class="screen-card">
         <div class="screen-num">1</div>
@@ -392,7 +392,9 @@
           </div>
         </div>
       </div>
+      <div class="screen-card"><div class="screen-num">5</div><div><div class="screen-title">Report</div><div class="screen-desc">Available after the first completed run, even with crosses left. Actual before/after counts, accepted AI/yours totals, suggestion verdict totals and main human cost open the report. Confirmed facts and source tags, exact tests and sizes, original breaks and dimmed groups, changes and scores, final results and explicit limits follow. The full example prints to five A4 or Letter pages with intact cards and a fingerprint footer.</div></div></div>
     </div>
+    <p>The broken-case panel also offers "Test your own change": up to three fixed-choice operations through the same gate and all-scenario scorer. The actual report records three accepted fixes (one AI, two yours) and 12 AI suggestions (ten turned down, one not applicable, one accepted). Current visual design is final; keyboard, visible focus, reduced motion, text at least 12px and contrast at least 4.5:1 remain required.</p>
   </section>
 
   <hr>
@@ -402,9 +404,10 @@
     <h2>Example Mode (No Key Required)</h2>
     <div class="fixture-callout">
       <div class="fixture-label">Example mode: using a saved AI reading</div>
-      <p>The example plan is run through the real AI once. The result (structured map, questions, explanations, fix suggestions) is saved and shipped with the app. In example mode, the app loads that saved reading; the full flow still runs: plan map screen, rules check, questions, confirmation gate. The checker always runs live and is never saved or faked. Pasting your own plan requires a key.</p>
+      <p>The example ships with one unedited Gemini <code>read-v4</code> reading and four unedited Groq fallback suggestion responses. The reading has 39 reviewed field citations and 10 null citations; missing evidence stays a labelled mention. The full flow still runs: plan map, rules, questions and confirmation gate. The checker scores the confirmed plan live; previews and Before/After use stored results rather than re-solving. Saved mode makes no provider calls. Pasting your own plan requires a key.</p>
     </div>
-    <p style="font-size:0.83rem;color:var(--muted);margin-top:0.75rem;">The example plan has Route A with 10 households, Route B with 12, and Route C with 8. The van returns from an early pickup at 9:30; Joel has the only loading-area key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving. Sam loads Route C and backs up Route A. One spare key is turned down because it reveals Joel + Maya absent; spare keys for Maya and Sam make all 100 scenarios survive. Target: 12 to 15 failure types, around 100 tests, finished in a few seconds.</p>
+    <p style="font-size:0.83rem;color:var(--muted);margin-top:0.75rem;">The example plan has Route A with 10 households, Route B with 12, and Route C with 8. The van returns from an early pickup at 9:30; Joel has the only loading-area key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. All three van + Anita leaves early AI cards fail; another driver cannot fix loading. The accepted Sam loader card fixes both van pairs. The AI's spare key for Ravi reveals Joel + Ravi absent and is turned down. Coordinator-built spare keys for Maya and Sam fix Joel; Sam as Route A backup fixes the truck pair. All fixes together give 100 survived. Five fixed problem types instantiate 14 example problems and 100 scenarios, with a full checker-run target below three seconds.</p>
+    <p>The 2:30 path in <code>demo-runbook.md</code> confirms the Hall identity question, guessed rows and four arrival questions, opens the main van cross, accepts Sam's loader card, then the two coordinator changes, and compares Before/After before the report. <code>/demo</code> resets only that browser before each take. The same confirmed map always gets the same verdicts.</p>
   </section>
 
   <hr>
@@ -460,7 +463,7 @@
     <div class="tag-list">
       <span class="tag in">Community food distribution plan</span>
       <span class="tag in">Paste-in plan input</span>
-      <span class="tag in">AI map + 1 to 2 questions</span>
+      <span class="tag in">AI map + explicit guesses and questions</span>
       <span class="tag in">Constrained map correction</span>
       <span class="tag in">Rule validation gate</span>
       <span class="tag in">Singles and pairs only</span>

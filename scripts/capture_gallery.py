@@ -53,7 +53,7 @@ def main():
                 scroll_to(".ai-sentence")
                 capture("04-broken-case.png")
             elif stage in {"before-sam", "after-sam"}:
-                page.evaluate("window.scrollTo(0, 0)")
+                scroll_to(".crash-count")
                 target = proof / f"gallery-{stage}.png"
                 page.screenshot(path=str(target), full_page=False)
                 frames.append(target)

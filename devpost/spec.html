@@ -399,7 +399,7 @@
   <p>The app is a browser page talking to a small Python server running on your laptop. The server binds to 127.0.0.1 only, because it holds AI keys in memory.</p>
   <p>When you paste a plan, the server sends it to an AI (Gemini first, Groq as a fallback). The AI reads messy text and returns a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. The AI returns an <code>AIPlanReading</code>. The server wraps it into a <code>PlanMap</code>, adding its own metadata. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.</p>
   <p>That description comes back as JSON and the server runs it through a strict format check before it touches anything else. This is the core learning goal made concrete: <strong>the AI produces output, the gate decides whether it is usable, and nothing downstream ever sees an unchecked map.</strong></p>
-  <p>The browser calls <code>POST /api/validate-map</code> on every correction (debounced, fast, same Python code that runs at Confirm). Rules are implemented once, in Python. No TypeScript reimplementation.</p>
+  <p>The browser calls <code>POST /api/update-map</code> on every correction against the server-owned draft, using the same Python rules that run at Confirm. Rules are implemented once. No TypeScript reimplementation.</p>
   <p>The checker is a constraint solver (CP-SAT). Singles run first. Any pair that contains a broken single is marked dimmed without solving. For remaining pairs, the solver finds the best possible schedule using only the people and vehicles the plan names. Zero lateness proved = tick. Minimum above zero proved = cross, with that minimum as the human cost. Some scenarios leave a route with no driver or the loading area with no key holder; rather than failing with no number, every route may be "not delivered," carrying a penalty larger than any possible lateness (households times the full horizon). The solver always returns a number. Deterministic time limit hit = question mark, never a pass.</p>
   <p>After the format gate, the server normalises all entity ids to stable slugs from type and name (<code>person-ravi</code>, <code>vehicle-van</code>, <code>route-c</code>) and updates every reference. Two runs of the same plan always produce the same ids and the same fingerprint.</p>
   <p>Clicking a cross triggers one AI call that returns both a plain explanation sentence and up to three fix suggestions. The server caches the result per fingerprint and scenario, so reopening a cross never calls the AI again. The checker's facts are always shown; the AI sentence sits next to them, labelled. Turned-down reasons come from the checker. Preview draws from stored fix results without re-solving.</p>
@@ -501,7 +501,7 @@
       <dl>
         <dt>SDK</dt><dd><code>groq</code> (official)</dd>
         <dt>Output</dt><dd>strict structured JSON against <code>AIPlanReading</code></dd>
-        <dt>Limits</dt><dd>30 req/min &middot; 1,000/day &middot; 8k tok/min</dd>
+        <dt>App budget</dt><dd>One call per 61 seconds with conservative token reservation; account quotas may differ</dd>
         <dt>Docs</dt><dd><a href="https://console.groq.com/docs/openai">console.groq.com</a></dd>
       </dl>
     </div>
@@ -533,20 +533,20 @@
       <tr><td>Client contracts</td><td><code>web/src/types.ts</code> and the production TypeScript build</td><td>Contracts maintained beside the API client. Automatic OpenAPI generation is deferred.</td></tr>
     </tbody>
   </table>
-  <p style="font-size:13px;color:var(--ink-mid);">Rules are implemented only in Python (<code>server/validation/rules.py</code>). The browser never reimplements them; it calls <code>POST /api/validate-map</code>.</p>
+  <p style="font-size:13px;color:var(--ink-mid);">Rules are implemented only in Python (<code>server/validation/rules.py</code>). The browser never reimplements them; corrections call <code>POST /api/update-map</code> against the server-owned draft.</p>
 </section>
 
 <!-- WHERE IT RUNS -->
 <section id="runs">
   <h2>Where It Runs and How Someone Tries It</h2>
   <div class="card">
-    <p><strong>Start command</strong> (after <code>uv sync --extra dev --extra ai</code> and <code>npm install</code>):</p>
+    <p><strong>Start command</strong> (after <code>uv sync</code> and <code>npm install</code> in the repository root):</p>
     <pre><code>uv run -- python scripts/dev.py</code></pre>
     <p>Starts <code>uvicorn server.main:app --host 127.0.0.1 --port 8000</code> and <code>vite --port 5173</code> in parallel. Cross-platform; no <code>make</code>. Server binds to 127.0.0.1 only.</p>
-    <p style="margin-top:10px;"><strong>Open:</strong> <code>http://localhost:5173</code></p>
+    <p style="margin-top:10px;"><strong>Open:</strong> <code>http://127.0.0.1:5173</code>. Default <code>uv sync</code> includes live SDKs and development tools; install Chromium separately with <code>uv run -- python -m playwright install chromium</code>.</p>
     <p style="margin-top:6px;"><strong>Keys:</strong> <code>GEMINI_API_KEY</code> in <code>.env</code> for the default primary; <code>GROQ_API_KEY</code> enables fallback. Either provider can be used alone. Not needed for the saved example. <code>.env.example</code> ships with placeholders; <code>.env</code> is gitignored. Or expand <strong>Use your own AI key</strong>, choose the provider and enter a session-only key that overrides its environment key.</p>
     <p style="margin-top:6px;"><strong>Gemini data notice:</strong> Screen 1 always warns that Google may use content to improve its products. Avoid personal details; the example plan is fictional.</p>
-    <p style="margin-top:6px;"><strong>Demo recording:</strong> load example, walk the full flow, record screen. Submission = video + public GitHub repo. Deployment is optional and post-PoC.</p>
+    <p style="margin-top:6px;"><strong>Demo recording:</strong> <code>http://127.0.0.1:5173/demo</code> resets only this browser and returns to the landing page; the built app served by FastAPI uses port 8000. <code>demo-runbook.md</code> specifies the 2:30 click path at 1440x900 and 100% zoom. <code>scripts/capture_submission.py</code> captures real Overview thumbnails at 1280x720 and 1500x1000. Submission = video + public GitHub repo. A public deployment requires a separate host choice and approval.</p>
   </div>
 </section>
 
@@ -735,6 +735,7 @@
 
   <h3>Screen 5: Report <span class="prd-ref">prd.md &rsaquo; Screen 5</span></h3>
   <p>The opening <code>overview</code> derives accepted AI/yours counts, requested AI-card verdict counts and the largest original household cost from stored evidence. Review answers resolve actual confirmed values. Facts include entity_id for concise grouping; plain gate_reason and technical gate_detail stay separate. Read-by names are formatted consistently on the map, SSE and report. Text grouping removes repetition without changing stylesheets. The full example fits five A4 and five Letter pages; every fix card is checked to stay on one page.</p>
+  <p>The full example records 3 accepted fixes (1 AI, 2 yours), 12 AI suggestions (10 turned down, 1 couldn't apply, 1 accepted), original 84 survived and final 100 survived. Its largest original cost is 30 households not delivered because nobody can open the loading area.</p>
   <p><code>web/src/screens/Report.tsx</code> renders the six PRD sections using descriptive <code>report-*</code> classes and <code>report.css</code>. <code>GET /api/report?map=&lt;fingerprint&gt;</code> in <code>server/report.py</code> resolves the session owner and requires a completed first run, even if crosses remain. Unknown or foreign maps return 404; unrun maps or missing history return 409. The endpoint calls neither a provider nor a solver.</p>
   <p>Confirmation stores review evidence outside checker inputs: original AI count, corrected/added counts, bindings, sources and explicit answers. The example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Current statements come from the accepted map. Fix provenance matches operation fields, so changing a key cannot label unrelated hours as changed.</p>
   <p>Report facts use the same explicit <code>source_tags</code> distinction as the plan map: field citations, labelled entity mentions, or "No source line". An entity mention is not proof of a field value, and retained citations describe the original reading when the value was corrected.</p>
@@ -742,8 +743,9 @@
   <p>The report includes confirmed facts and the review summary; the exact 14 example problems and their sizes; &ldquo;100 tests: every single problem and every pair that can happen&rdquo;; original weak spots and hidden pairs with human costs; dimmed pairs grouped under their weak spot; accepted (AI)/(yours) operations and scores; turned-down and couldn't-apply cards with reasons and providers; and the final count. Other maps use actual counts. Unknown results are named for original and current runs and never counted as survived.</p>
   <p>Explicit limits: three or more problems at once; bad weather, partway illness, wrong addresses, food shortages and volunteers arriving late; other sizes of the same problems; anything the plan omitted; and named question-mark results. The saved-example notice and fingerprint remain visible.</p>
   <p><code>window.print()</code> uses an <code>@media print</code> stylesheet with automatic A4/Letter size, no controls, black text and SVG marks, intact cards and limitations kept with the footer. <code>scripts/capture_report.py</code> prints the full real example story to <code>docs/sample-report.pdf</code>; <code>scripts/verify_report_pdf.py</code> checks text, bounds, minimum size and rendered pages. Letter proof stays ignored.</p>
-  <p>Slice 7 retains the current look; new mockup styling is a separate pass. Native keyboard verification, visible focus, text at least 12px, text contrast at least 4.5:1 and reduced motion are checked by <code>scripts/verify_accessibility.py</code>, development-only axe-core and computed text checks. Gemini remains primary, Groq fallback. Two-pass natural schedules minimize start times after fixing best lateness, preserving verdicts. The fixed-choice builder uses the same gate and scorer.</p>
+  <p>Current visual design is final and stays intact. Native keyboard verification, visible focus, text at least 12px, text contrast at least 4.5:1 and reduced motion are checked by <code>scripts/verify_accessibility.py</code>, development-only axe-core and computed text checks. Gemini remains primary, Groq fallback. Two-pass natural schedules minimize start times after fixing best lateness, preserving verdicts. The fixed-choice builder uses the same gate and scorer.</p>
   <p><code>scripts/capture_gallery.py</code> creates six actual-app 1500x1000 PNGs under <code>docs/images</code> using the README names. <code>scripts/check_readme_links.py</code> checks file targets, heading anchors and optionally external URLs. The demo video is explicitly pending. Browser verification uses isolated offline previews and no provider calls.</p>
+  <p>After <code>uv sync</code> and <code>npm install</code>, run <code>uv run -- python -m pytest -q</code>, <code>uv run -- ruff check .</code> and <code>npm run build</code>. Install Chromium once with <code>uv run -- python -m playwright install chromium</code>, then run <code>uv run -- python scripts/verify_browser.py</code>. It starts and stops its own offline server and runs story, review/editing, landing and accessibility checks; <code>--story</code> selects only the full example story.</p>
 </section>
 
 <!-- DATA MODEL -->
@@ -822,9 +824,10 @@ fixes_n, still_broken_n, new_crosses_n       <span class="comment"># Derived by 
 eligible:            bool
 rejection_reason:    str | None              <span class="comment"># Checker-derived, not AI-written</span>
 gate_status:         "passed" | "format_error" | "rules_error" | "couldnt_apply"
-gate_reason:         str | None</code></pre>
+gate_reason:         str | None
+gate_detail:         str | None              <span class="comment"># Original technical error, shown in small mono</span></code></pre>
 
-  <div class="card" style="font-size:13.5px;"><strong>State storage:</strong> no database. Review drafts, maps, results, suggestions and typed keys stay in server memory, associated with the session owner. Maps/results use fingerprints; successful suggestions also use scenario IDs. Keys never enter map data, fingerprints, logs, files or responses. Closing a tab does not clear server memory; restarting the server clears these sessions. Environment keys remain in local ignored <code>.env</code>.</div>
+  <div class="card" style="font-size:13.5px;"><strong>State storage:</strong> no database. Review drafts, maps, results, suggestions and typed keys stay in server memory, associated with the session owner. Maps/results use fingerprints; successful suggestions also use scenario IDs. Keys never enter map data, fingerprints, logs, files or responses. Closing a tab does not clear server memory. <code>/demo</code> calls <code>POST /api/demo/reset</code>, clears browser storage and replaces the page with <code>/</code>. The endpoint clears only that browser's typed keys, reviews, maps/results/evidence/ancestors/suggestion batches and scoped fix caches, then rotates its HttpOnly SameSite=Lax cookie. Responses use <code>Cache-Control: no-store</code>. Revision bumps and active-owner guards prevent late reads or scoring responses from restoring discarded state. Other browsers and trusted unowned helpers are unaffected. Server restart clears every session; environment keys remain in local ignored <code>.env</code>.</div>
 </section>
 
 <!-- FIXTURES AND TESTS -->
@@ -835,8 +838,8 @@ gate_reason:         str | None</code></pre>
     <thead><tr><th>File</th><th>Contents</th><th>Who writes it</th></tr></thead>
     <tbody>
       <tr><td><code>fixtures/example-truth.json</code></td><td>Correct confirmed map for the Saturday plan</td><td>Hand-authored by you</td></tr>
-      <tr><td><code>fixtures/example-reading.json</code></td><td>Chosen provider's real output, saved as-is</td><td>Captured from bakeoff</td></tr>
-      <tr><td><code>fixtures/example-fixes.json</code></td><td>Explanation and per-scenario fix results for each broken case</td><td>Captured from one real AI call</td></tr>
+      <tr><td><code>fixtures/example-reading.json</code></td><td>Unedited Gemini reading-v2/read-v4 output; 39 reviewed citations and 10 nulls</td><td>One successful new-schema bake-off response</td></tr>
+      <tr><td><code>fixtures/example-fixes.json</code></td><td>Four unedited Groq fallback explanations and operation cards; scores are computed live</td><td>One successful real response per broken case</td></tr>
       <tr><td><code>fixtures/expected-results.json</code></td><td>Hand-checked verdict and human cost for all 100 cells</td><td>Hand-authored by you</td></tr>
     </tbody>
   </table>
@@ -854,7 +857,9 @@ gate_reason:         str | None</code></pre>
   </table>
 
   <p><strong>Offline HTTP end-to-end:</strong> <code>test_live_api.py</code> replays the real saved reading and all four approved Groq captures in <code>fixtures/example-fixes.json</code>, simulating Gemini 503 fallback, review, confirmation, all scenarios, scored suggestions and eligible acceptance. <code>RECORDED_AI_FIXES_PATH</code> optionally selects another local capture. A separate explicitly synthetic response exercises failures. <code>test_fix_pipeline.py</code> plays the real-card story and coordinator changes to all 100 survived. <code>test_change_builder.py</code> checks all five operations, bounds, invalid picks, score forgery and concurrent edits.</p>
+  <p>The accepted Gemini capture comes from the third read-v4 slot. Existing identity and confirmation controls produce 32 AI items, one correction, zero additions and 30 facts, with every aligned checker input and all 100 verdicts equal to truth. <code>source-line-review.md</code> records support and failed attempts. No successful reading was retried or edited.</p>
   <p><strong>Real-network tests:</strong> <code>test_live_network.py</code> requires both explicit <code>RUN_LIVE_AI_TESTS=1</code> and the matching provider key in <code>.env</code> or the process environment. Its two reading smoke tests skip in normal <code>uv run -- python -m pytest -q</code> runs even when keys exist. Offline tests cover HTTP 503 fallback success, both-provider failure, missing/invalid keys, malformed output, unsupported plans, provider attribution, caching and key privacy. <code>test_live_transport.py</code> checks safe retryable read-timeout and connection-failure errors.</p>
+  <p><code>test_fact_sources.py</code> and <code>test_example_reading_sources.py</code> cover closed nullable source objects, strict outgoing schemas, legacy replay, physical source ranges/non-blank lines and the accepted capture. <code>test_demo_reset.py</code> covers browser isolation, cleanup, cookie rotation, repeat resets and late responses.</p>
 
   <div class="card" style="font-size:13.5px;margin-top:12px;">
     <p><strong>bakeoff.py:</strong> runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input including extra inputs, and runs the truth map's 100 scenarios on the aligned reading. Ranking is exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned fields, consistency, then tokens. No corrections are applied; raw responses and failed attempts are preserved. Every prompt version and its scores are logged in <code>ai-reading-review.md</code>. The dated winner becomes primary in <code>server/config.py</code>.</p>
@@ -869,6 +874,7 @@ gate_reason:         str | None</code></pre>
 <pre>failure-compiler/
 ├── server/
 │   ├── main.py                  # FastAPI routes, gate, confirmation, SSE and fixes
+│   ├── demo.py                  # Browser-only reset and retired-request cleanup
 │   ├── models.py                # Reading, plan, scenario and fix models
 │   ├── config.py                # Gemini primary, Groq fallback, sizes and caps
 │   ├── ai/                      # Provider adapters, prompts and safe metadata
@@ -888,6 +894,7 @@ gate_reason:         str | None</code></pre>
 │   ├── landing/                 # Approved v2 tabs, source story and illustrative grid
 │   ├── components/
 │   │   ├── FactEditor.tsx       # Constrained fact corrections
+│   │   ├── SourceTags.tsx       # Field evidence versus entity mentions
 │   │   ├── MissingFactQuestion.tsx
 │   │   ├── CrashGrid.tsx        # SVG states and keyboard-readable explanations
 │   │   ├── CasePanel.tsx        # Scored AI and coordinator cards
@@ -909,10 +916,12 @@ gate_reason:         str | None</code></pre>
 │   ├── dev.py                   # Local API and web launcher
 │   ├── bakeoff.py               # Recorded provider comparison
 │   ├── local_preview.py         # Isolated offline browser verification
+│   ├── verify_browser.py        # One isolated runner for all four browser checks
 │   ├── browser_story.py         # Shared full example flow
 │   ├── capture_report.py        # Real A4 and Letter browser printing
 │   ├── verify_report_pdf.py     # PDF text, bounds and rendered proof
 │   ├── capture_gallery.py       # 1500x1000 actual-app images and Before/After GIF
+│   ├── capture_submission.py    # Real YouTube and Devpost thumbnail candidates
 │   ├── check_readme_links.py
 │   └── verify_accessibility.py  # Keyboard story, axe and computed text checks
 ├── tests/                       # Locked solver, API, review, fix, report and asset tests
@@ -938,7 +947,7 @@ gate_reason:         str | None</code></pre>
     Endpoint: <code>POST https://api.groq.com/openai/v1/chat/completions</code><br>
     Auth: <code>Authorization: Bearer $GROQ_API_KEY</code><br>
     Structured output: <code>response_format: { type: "json_schema", json_schema: { strict: true, schema: &lt;AIPlanReading JSON schema&gt; } }</code><br>
-    Free limits: 30 req/min &middot; 1,000/day &middot; 8k tok/min &middot; 200k tok/day<br>
+    App budget: one call per 61 seconds, disabled SDK retries and conservative token reservation in <code>groq_provider.py</code>. Provider account quotas may differ; they are not a product guarantee.<br>
     Docs: <a href="https://console.groq.com/docs/openai">console.groq.com/docs/openai</a>
   </div>
 
@@ -952,7 +961,7 @@ gate_reason:         str | None</code></pre>
 
   <h3>OR-Tools 9.15</h3>
   <div class="card" style="font-size:13.5px;">
-    Install: <code>uv add ortools==9.15.*</code> - wheels for Windows, macOS (Intel + Apple Silicon), Linux.<br>
+    Install: <code>uv sync</code> uses the committed lockfile and <code>ortools&gt;=9.15,&lt;9.16</code> requirement.<br>
     No API key. Runs locally.<br>
     Docs: <a href="https://developers.google.com/optimization/reference/python/sat/python/cp_model">developers.google.com/optimization</a>
   </div>
@@ -983,7 +992,7 @@ gate_reason:         str | None</code></pre>
     <li><strong>In-memory session store.</strong><span>Same shape of data, zero infrastructure. Server restart loses the session; acceptable for a demo.</span></li>
     <li><strong>Browser print for the report.</strong><span>Covers the submission requirement. Nicer download is in scope.md Later.</span></li>
     <li><strong>Fixed failure-type taxonomy.</strong><span>Keeps all results reproducible and the example story reliable. AI-suggested types deferred in scope.md.</span></li>
-    <li><strong>No deployment.</strong><span>Local recording satisfies submission. Live public link is in scope.md Later.</span></li>
+    <li><strong>Local recording.</strong><span>Satisfies submission without deployment. A public link requires the learner's host choice and approval.</span></li>
     <li><strong>Volunteer arrives late out of scope.</strong><span>Listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's three hidden pairs.</span></li>
     <li><strong>Hall key as a person attribute.</strong><span>"Joel absent (only key holder)" is the single weak spot. Keeps the taxonomy clean without losing the story.</span></li>
     <li><strong>Preview draws from stored fix results.</strong><span>No re-solve in the browser. One fewer round trip; one fewer failure mode during the demo.</span></li>
@@ -1016,7 +1025,7 @@ gate_reason:         str | None</code></pre>
   </div>
   <div class="decision">
     <h4>Rules implemented only in Python</h4>
-    <p>One implementation, tested in pytest. The browser calls <code>POST /api/validate-map</code>. No drift possible.</p>
+    <p>One implementation, tested in pytest. Corrections call <code>POST /api/update-map</code> against the server-owned draft. No duplicate browser rules.</p>
   </div>
   <div class="decision">
     <h4>Fingerprint hashes only checker inputs</h4>
@@ -1058,8 +1067,8 @@ gate_reason:         str | None</code></pre>
   <h3>Open Issues</h3>
   <ul>
     <li><strong>Gemini structured output parameter name, resolved.</strong> The installed SDK supports <code>models.generate_content</code> with <code>response_mime_type</code> and <code>response_json_schema</code>. The finding is recorded in <code>gemini_provider.py</code> and covered by the provider tests.</li>
-    <li><strong><code>openapi-typescript</code> generation step</strong> is manual for the PoC.</li>
-    <li><strong>Bakeoff result:</strong> Gemini is primary after the 19 October 2026 read-v3 verdict-only re-score: 100/100 mean verdicts and 94.34% aligned fields; Groq has 55/100 and 84%. See <code>server/config.py</code> and <code>ai-reading-review.md</code>.</li>
+    <li><strong>Client contracts:</strong> TypeScript types are maintained manually beside the API client and checked by the production build. Automatic OpenAPI generation is deferred.</li>
+    <li><strong>Bakeoff result:</strong> Gemini remains primary from the last complete campaign, the 19 October 2026 read-v3 verdict-only re-score: 100/100 mean verdicts and 94.34% aligned fields; Groq has 55/100 and 84%. In read-v4, Gemini's sole successful slot scored 100/100 and 94.34%; Groq's sole success scored 12/100 and 88%. Both three-slot campaigns are incomplete because of recorded provider failures, so no new ranking supersedes the complete one. The accepted Gemini capture reaches 100% aligned fields after the existing identity control. See <code>server/config.py</code>, <code>source-line-review.md</code> and <code>ai-reading-review.md</code>.</li>
   </ul>
 </section>
 

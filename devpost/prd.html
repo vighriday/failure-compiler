@@ -709,6 +709,7 @@
           </ul>
           <p>Constrained choices only: pick from known people, vehicles, places; time picker; no free text. AI does not re-read after corrections.</p>
           <p>An extra place with no loading activity or supply arrival gets an individual question: keep it separate, or identify it as another listed loading or supply place. Use a place picker and review the selected place's facts individually again. The original listing and source stay in the question history; Change restores it. Bulk confirmation never answers this question.</p>
+          <p>The saved example is an unedited Gemini <code>reading-v2</code> / <code>read-v4</code> response with 39 reviewed non-null citations and 10 null sources. Existing identity and confirmation controls bring all checker inputs and 100 verdicts into agreement with truth. Null sources remain labelled mentions; older captures do not gain invented evidence. The source review records the capture and incomplete new bake-off.</p>
           <p><strong>Bottom: "What we'll test."</strong> Each failure type with its size. Preset picks: 15, 30, 45, 60, 90 minutes only.</p>
           <p><strong>Confirm button:</strong> active only when every item is confirmed and every plain rule passes.</p>
         </div>
@@ -721,7 +722,7 @@
           <div class="step-arrow">›</div>
         </div>
         <div class="screen-card-body">
-          <p>A live-filling grid: 12 to 15 failure types across and down, around 100 tests. Cells fill in order as the checker runs. Accepted fixes flip changed cells with a short animation.</p>
+          <p>A live-filling grid: concrete problems across and down. The example has 14 problems from five fixed types and exactly 100 tests. Cells fill in order as the checker runs. Accepted fixes flip changed cells with a short animation.</p>
           <p><strong>Count line</strong> (live): <span class="mono" style="font-size:13px;">"100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived."</span></p>
           <p><strong>Before/After toggle</strong> above the grid once any fix is accepted. Before shows the original confirmed plan's metadata, results and count, reconstructed from frozen snapshots in the AppliedFix chain. After shows the current run. Before is read-only; switching cancels previews and never calls the checker or AI. Re-confirmed manual edits are identified separately from accepted fixes.</p>
           <p><strong>Preview banner</strong> when a fix is selected: "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked, count line shows projected numbers. "Cancel preview" restores exactly.</p>
@@ -764,7 +765,7 @@
 
   <!-- LOOK AND FEEL -->
   <section id="look">
-    <p><strong>Slice 7:</strong> keep the current look and descriptive report, history and builder classes. New mockups will drive a separate grid, panel and report design pass. Keyboard operation, visible focus, text at least 12px, text contrast of at least 4.5:1 and reduced motion are required now. Natural schedules select the earliest sensible morning after proving the best lateness, without changing verdicts. Gemini remains primary; saved Groq suggestions retain their fallback label. The fixed-choice builder uses the same gate and scorer.</p>
+    <p><strong>Completion pass:</strong> current visual design is final. Grid, panel, report, history and builder styles stay intact, with descriptive classes for maintenance. Keyboard operation, visible focus, text at least 12px, text contrast of at least 4.5:1 and reduced motion remain required. Natural schedules select the earliest sensible morning after proving the best lateness, without changing verdicts. Gemini remains primary; saved Groq suggestions retain their fallback label. The fixed-choice builder uses the same gate and scorer.</p>
     <p><strong>Approved Landing v2:</strong> Overview, Plan, Read, Crash test, Trust and Start share the paper interface. The Start tab contains the editor. Source highlights follow the plan story on scroll; the pipeline can be replayed. The page-break effect restores every fragment and control, including when navigating away. All motion respects reduced motion. Illustrative previews are labelled; the confirmed-map flow runs the live checker.</p>
     <h2>Look and Feel</h2>
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;"><span class="source-ref">scope.md &gt; Inspiration and Identity</span></p>
@@ -839,7 +840,7 @@
   <!-- GRID -->
   <section id="grid">
     <h2>The Crash Test Grid</h2>
-    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">Illustration using 5 of the 14 problem types. The real grid has 14 types across and down (100 tests). Each scenario appears once: the diagonal plus the cells below it. Key holder absent is the single weak spot. Supply truck late + Ravi absent, Van late + Anita leaves early, and Van late + Anita absent are the three hidden pairs. Every pair that includes Key holder absent is dimmed because that single failure already breaks the plan alone.</p>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">Illustration using 5 of the 14 concrete problems. The real grid has 14 problems across and down (100 tests), instantiated from five fixed types. Each scenario appears once: the diagonal plus the cells below it. Key holder absent is the single weak spot. Supply truck late + Ravi absent, Van late + Anita leaves early, and Van late + Anita absent are the three hidden pairs. Every pair that includes Key holder absent is dimmed because that single failure already breaks the plan alone.</p>
     <div class="grid-demo">
       <table>
         <thead>
@@ -998,6 +999,7 @@
   <section id="report">
     <h2>The Report</h2>
     <p>The opening summary shows before/after counts, accepted AI/yours counts, requested AI suggestions and checker verdict totals, and the main original human cost. Review decisions include actual confirmed answers. The full example fits five A4 or Letter pages with intact fix cards, using the current visual design.</p>
+    <p>The complete example summary reads "3 fixes accepted: 1 from the AI, 2 yours" and "The AI suggested 12 fixes. The checker turned down 10 and couldn't apply 1." The largest original cost is 30 households not delivered because nobody can open the loading area.</p>
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px;">Screen 5. Available any time after the first run. Six sections plus an example-mode notice. Browser print to PDF.</p>
 
     <details class="report-section">
@@ -1112,7 +1114,7 @@
       </div>
       <div class="decision">
         <div class="decision-choice">Persistence</div>
-        <div class="decision-reason">None. No accounts, no saved sessions. Closing the tab loses the run.</div>
+        <div class="decision-reason">No database or accounts. Closing the tab does not clear server memory, although the browser view is not restored. /demo clears only that browser's typed keys, reading, maps, results and fixes, rotates its cookie, clears browser storage and returns to the landing page. Server restart clears every session; .env keys remain in the ignored file.</div>
       </div>
     </div>
   </section>
@@ -1151,7 +1153,7 @@
       </div>
       <div class="decision">
         <div class="decision-choice">Desktop-first</div>
-        <div class="decision-reason">Side-by-side grid and panel layout requires screen width. Mobile is post-PoC.</div>
+        <div class="decision-reason">The desktop view keeps grid and panel beside each other. Narrow layouts stack content and allow horizontal grid scrolling; landing, review and saved-story controls are checked at phone widths.</div>
       </div>
       <div class="decision">
         <div class="decision-choice">Panel, not a separate screen</div>
@@ -1179,7 +1181,6 @@
   <section id="deferred">
     <h2>Deferred and Non-Goals</h2>
     <ul style="padding-left:20px;font-size:14px;color:var(--text-muted);line-height:2.2;">
-      <li>Mobile layout <span class="tag">deferred</span></li>
       <li>Custom file export / nicer report download <span class="tag">deferred</span></li>
       <li>AI-suggested plan-specific failure types <span class="tag">deferred</span></li>
       <li>Live public link <span class="tag">deferred</span></li>
@@ -1192,6 +1193,8 @@
       <li>AI having the final word on pass or fail <span class="tag cut">cut</span></li>
     </ul>
   </section>
+
+<section><h2>Resolved Planning Questions</h2><p>The five fixed problem types instantiate 14 example problems, 14 singles and 86 possible pairs. The AI-key disclosure stays collapsed until needed; missing, invalid and failed-provider states offer retry/example actions. <code>/demo</code> provides a browser-only clean take, with the 2:30 path at 1440x900 and 100% zoom in <code>demo-runbook.md</code>.</p></section>
 
 </div>
 

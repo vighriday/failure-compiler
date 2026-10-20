@@ -1,6 +1,6 @@
 # Submission assets
 
-All artwork and website screenshots are saved in this folder. This pack represents the current example-mode build, captured on 17 October 2026.
+This is the archived 17 October 2026 asset pack. Its screenshots show the earlier handmade reading and suggestions, before live AI and reports were complete. Use the refreshed [final gallery](../../docs/images/README.md) for the submission and the [recording runbook](../../devpost/demo-runbook.md) for the current story. The original generated covers remain available here.
 
 ## Covers
 
@@ -33,9 +33,11 @@ The screenshots come directly from the running website. Text, counts, notices an
 
 Use the wide thumbnail as the cover, then the plan map, live grid, broken case, rejected fix and all-survived result. The square cover is an alternative crop format. Keep the complete reading and single-key preview as supporting detail.
 
-## Refresh the screenshots
+## Historical capture command
 
-Start the app in one terminal:
+The old script below targets the earlier placeholder flow. It is retained as build history, not the current recording path. To refresh the final assets, follow [the final gallery instructions](../../docs/images/README.md).
+
+The earlier capture used:
 
 ```powershell
 uv run -- python scripts/dev.py
@@ -47,6 +49,6 @@ Then capture the real journey in another:
 uv run -- python scripts/capture_submission.py
 ```
 
-The script checks the expected counts and fix outcomes before saving each state. It replaces this pack's screenshot outputs. It does not change application code or fixtures. Set `FAILURE_COMPILER_URL` to capture another local frontend address.
+The original script checked that build's counts and outcomes before saving. Its outputs are historical and are not evidence of the current live-provider flow.
 
 [captures.json](captures.json) records the capture source and browser errors. [files.json](files.json) records PNG dimensions and file sizes. The fresh capture completed with no page errors.

@@ -17,7 +17,7 @@ A volunteer coordinator running a Saturday morning food distribution for a commu
 
 ## The Core Loop
 
-Paste a messy written plan. The AI reads it into a structured map and asks one or two clarifying questions. The user confirms or corrects the map using constrained choices. The checker tests every single failure and every pair of failures from a fixed list. The grid fills in live with ticks, crosses, dimmed marks, and question marks. Open a cross to see the exact broken morning, including how many households are affected and by how much. Ask for fixes. Watch the obvious fix turned down and the real one pass. Accept fixes one at a time; each accepted fix becomes part of the plan and everything re-tests. The grid reaches all ticks.
+Paste a messy written plan. The AI reads it into a structured map and flags guesses and questions. The user confirms or corrects the map using constrained choices. The checker tests every single failure and every pair of failures from a fixed list. The grid fills in live with ticks, crosses, dimmed marks, and question marks. Open a cross to see the exact broken morning, including how many households are affected and by how much. Ask for fixes or build a change from fixed choices. Watch the obvious fix turned down and the real one pass. Accept fixes one at a time; each accepted fix becomes part of the plan and everything re-tests. The grid reaches all ticks.
 
 ## Inspiration and Identity
 
@@ -33,19 +33,19 @@ The personal stake is the thing everyone has seen: a plan that looked complete o
 
 ## What "Working" Looks Like
 
-Under a minute, on screen: paste the example plan, answer one question, hit test, watch the grid fill in, open a cross and see the not-delivered route and reason on the timeline, ask for fixes, watch the obvious fix rejected and the real one pass, accept both fixes in sequence, grid reaches all ticks. The same confirmed map always gets the same results: the demo never surprises.
+The 2:30 recording path is in `demo-runbook.md`: load the example, answer the Hall identity question, confirm guesses individually and answer the four arrival questions, then run the checker. Open the main van cross to see the not-delivered route and three real suggestions turned down. Accept the Sam loader card on the other van cross, then build and accept spare keys for Maya and Sam and Sam as Route A backup. Three accepted fixes reach all 100 survived. Before/After restores the original and current results; the report shows the whole history and its limits. `/demo` resets only that browser before each take. The same confirmed map always gets the same verdicts.
 
 The example plan is the one to build around: Saturday food distribution, Route A with 10 households, Route B with 12, and Route C with 8. The van returns from an early pickup at 9:30. Joel has the only loading-area key and leaves at 10:30; Maya leaves at 10:45; Sam is not on the loading team. Three hidden pairs break the plan: Supply truck late + Ravi absent; Van late + Anita leaves early; Van late + Anita absent. Joel absent is the only single weak spot. Written the messy way a real coordinator would write it.
 
-The example is designed so the story is true: “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving. The checker-backed fixes are Sam loads Route C and Sam backs up Route A. One spare key is turned down because it reveals Joel + Maya absent; spare keys for Maya and Sam make all 100 scenarios survive. A test locks in those results so they never change.
+The real AI cards make the story concrete: all three van + Anita leaves early suggestions are turned down. Adding Ravi as another Route C driver cannot fix loading. The accepted AI card adds Sam as Route C loader and fixes both van pairs. The AI's spare key for Ravi is turned down because it reveals Joel + Ravi absent. Coordinator-built spare keys for Maya and Sam fix Joel; Sam as Route A backup fixes the truck pair. All fixes together make all 100 scenarios survive. Tests lock those results.
 
-The example works without an AI key. The AI reading of the example plan is done once using the real AI, and the result (the structured map, the questions, the explanations, the fix suggestions) is saved and shipped with the app. In example mode the app loads that saved reading; the full flow still runs (plan map screen, rules check, questions, confirmation gate). The checker always runs live. A small label reads: "Example mode: using a saved AI reading." Pasting your own plan requires a key.
+The example works without an AI key. It ships with one unedited Gemini `read-v4` reading and four unedited Groq fallback suggestion responses. The reading has 39 reviewed field citations and 10 null citations; missing evidence stays a labelled mention. The full flow still runs (plan map, rules, questions and confirmation gate). The checker scores the confirmed plan live; later previews and Before/After use stored results rather than re-solving. Saved mode makes no provider calls. Pasting your own plan requires a key.
 
-Target: about 12 to 15 failure types, around 100 tests, finished in a few seconds.
+The five fixed problem types instantiate 14 example problems and exactly 100 single-or-pair scenarios. A full example checker run is expected to finish within three seconds; the last local measurements and limits are recorded in `ai-reading-review.md`.
 
 ## The POC Boundary
 
-**Four screens:**
+**Five screens:**
 
 1. Paste plan. A text area. No checklist yet; the "looks complete" view belongs to the plan map screen where the AI reading is available.
 
@@ -59,6 +59,10 @@ Target: about 12 to 15 failure types, around 100 tests, finished in a few second
    Count at the top adds up to the total and reads like: "100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived."
 
 4. Broken case detail. For a hidden pair: shows the two failures and that each one alone was fine. For a single weak spot: shows the one failure. Either way: a timeline of the morning. A not-delivered route is drawn as never leaving, with the reason shown, e.g. “Van back 10:45. Loading team gone.” A plain sentence explaining why. The human cost: how many households are affected and by how much, like “Route C: 8 households not delivered.” Then fix suggestions (up to 3), each showing fixes-N / breaks-N / new-crosses before acceptance. Selecting a fix previews its grid with changed cells outlined. Accepting a fix updates the main plan and re-tests everything. Fixes stack: accept one, then another; each becomes part of the plan. One fix can contain more than one change. A Before/After toggle compares the original plan against the current fixed version. If a fix creates a new cross, that cell is marked differently so it cannot hide.
+
+5. Report. Available after the first completed run, even while crosses remain. Opens with actual before/after counts, accepted AI/yours totals, suggestion verdict totals and the main human cost. Includes confirmed facts and source tags, exact tests and sizes, original breaks and dimmed groups, accepted and rejected changes, final results and named limits. The full example fits five A4 or Letter pages via browser print, with intact cards and a fingerprint footer.
+
+The broken-case panel also offers "Test your own change": up to three fixed-choice operations through the same gate and all-scenario scorer. The actual report records three accepted fixes (one AI, two yours) and 12 AI suggestions (ten turned down, one not applicable, one accepted). Current visual design is final; keyboard, visible focus, reduced motion, text at least 12px and contrast at least 4.5:1 remain required.
 
 **The validation pipeline (the learning goal made concrete):**
 - AI produces the structured map as fixed-schema output.

@@ -44,6 +44,8 @@ Uses the supplied Landing v2 Start layout: prompt and assurances on the left, a 
 
 If an extra place listing has no loading activity or supply arrival, a rule question asks whether it is separate or the same place as another listed loading or supply place. The user chooses from existing places. Keeping it preserves its tests; identifying it as another place uses that place's details and requires those facts to be checked individually again. The original listing and source stay in the question history. Change restores it. Bulk confirmation never answers this question.
 
+The saved example is an unedited Gemini `reading-v2` / `read-v4` response with 39 reviewed non-null citations and 10 null sources. Existing identity and confirmation controls bring all checker inputs and 100 verdicts into agreement with truth. Null sources remain labelled mentions; older captures do not gain invented evidence. The source review records the capture and incomplete new bake-off.
+
 Confirmed items get a small "confirmed" mark. Corrections use constrained choices only: pick from known people, vehicles, or places; use a time picker; no free text. Corrections go directly into the map; the AI does not re-read.
 
 **Below: "What we'll test."** Each failure type with its size, for example:
@@ -57,7 +59,7 @@ Sizes come with sensible defaults chosen so the example plan tells its story. Th
 **Confirm button.** Active only when every item is confirmed and every plain rule passes. Rule failures surface as questions before the button becomes available. Confirming the map confirms the "What we'll test" list too.
 
 ### Screen 3: Crash Test
-A live-filling grid. Failure types across the top and down the side; roughly 12 to 15 types, around 100 tests. Each scenario appears once: the diagonal plus the cells below it. The grid shows one triangle, not two.
+A live-filling grid. Concrete problems appear across the top and down the side: the example has 14 problems from five fixed types and exactly 100 tests. Each scenario appears once: the diagonal plus the cells below it. The grid shows one triangle, not two.
 
 **Four cell states:**
 - **Tick:** the plan survives this scenario.
@@ -105,6 +107,8 @@ Reached from "See report." One page in the app.
 
 Open with a summary of the before and after count lines, accepted fixes split between AI and yours, AI suggestions turned down or not applicable, and the main original human cost. These are actual history counts, including when the coordinator stops early. Review questions show their actual confirmed answer, not "Use the reviewed details". The full example report fits five pages on A4 and Letter, without splitting fix cards or changing the visual design.
 
+The complete example summary reads "3 fixes accepted: 1 from the AI, 2 yours" and "The AI suggested 12 fixes. The checker turned down 10 and couldn't apply 1." The largest original cost is 30 households not delivered because nobody can open the loading area.
+
 **Sections:**
 1. **The plan:** current confirmed facts with field citations, labelled entity mentions or "No source line", with "AI read N items, N corrected by you, N added by you" and "Read by provider / model". Mention tags are not proof of field values; retained citations refer to the original reading when a value was corrected. The example starts with 32 AI items; identifying Hall as Loading bay leaves 30 facts and counts as one correction. A fix marks only facts its operations actually changed.
 2. **What was tested:** the exact problem list with sizes. The example has 14 problems and "100 tests: every single problem and every pair that can happen". Other maps show their actual counts.
@@ -150,7 +154,7 @@ Motion only where it means something: cells fill in order over a few seconds as 
 
 Timelines use natural schedules: after proving the best lateness, the checker selects the earliest sensible morning without changing the verdict. Gemini remains primary; the approved Groq example suggestions are labelled fallback responses. The fixed-choice coordinator builder uses the same gate and scorer.
 
-Slice 7 keeps the current look. New mockups will drive a separate grid, panel and report design pass. This slice adds functional layout, printing and accessibility: keyboard operation, visible focus, text contrast of at least 4.5:1, text at least 12px, and reduced motion. Report, history and builder components keep descriptive classes for restyling.
+The current visual design is final for this completion pass. Report, grid, panel, history and builder styling stays intact. Keyboard operation, visible focus, text contrast of at least 4.5:1, text at least 12px, and reduced motion remain required. Components retain descriptive classes for maintenance.
 
 V2 also includes tab entrances and underline movement, reading progress, scroll-linked source highlights, a replayable pipeline, example-plan typing, and the clickable “breaks” effect. The page-break effect restores every fragment and control after completion or navigation. All motion respects reduced-motion settings; keyboard users can operate every control.
 
@@ -274,7 +278,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - **AI reading fails the format check:** "The AI's reading did not pass the format check." Retry button offered. Nothing reaches the plan map unchecked; the format check is part of the validation pipeline.
 - **Pasted text is not a distribution plan:** "This version only supports community distribution plans." Offer to load the example plan.
 - **None of the suggested fixes pass:** "None of these suggestions worked". Live mode only offers "Ask for new suggestions" once, using a key. The coordinator can build a change in either mode.
-- **Persistence:** none. No accounts, no saved sessions. Closing the tab loses the run.
+- **Persistence:** no database or accounts. Closing the tab does not clear server memory, although the browser view is not restored. `/demo` clears only that browser's typed keys, reading, maps, results and fixes, rotates its cookie, clears browser storage and returns to the landing page. Server restart clears every session; local `.env` keys remain in the ignored file.
 
 ---
 
@@ -286,7 +290,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - **Turned-down fixes are visible with checker-derived reasons.** All three real van + Anita leaves early cards fail. The AI's one spare key reveals Joel + Ravi absent. Real cards are unedited; the checker explains the failures. The coordinator can build and test their own changes through the same gate and scorer.
 - **Dimmed pairs re-test after a weak spot is removed.** A fix can unmask a hidden pair the weak spot was covering. The report shows this honestly. Keeps the checker's results accurate across fix iterations.
 - **Report is a page in the app with browser print.** No custom export for the PoC. Nicer download is explicitly in Later.
-- **Desktop-first.** The side-by-side grid + panel layout requires screen width. Mobile layout is post-PoC.
+- **Desktop-first.** The desktop view keeps grid and panel beside each other. Narrow layouts stack content and allow horizontal grid scrolling; landing, review and saved-story controls are checked at phone widths.
 - **The broken case detail opens as a panel, not a separate screen.** Grid stays visible throughout the fix flow. Spatial continuity: the user never loses sight of where they are in the full picture.
 
 ---
@@ -306,7 +310,6 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 
 ## Deferred From the POC
 
-- **Mobile layout.** Side-by-side panel requires desktop width.
 - **Custom file export / nicer report download.** Browser print covers the PoC.
 - **AI-suggested plan-specific failure types.** Fixed taxonomy only for now; reproducibility depends on it.
 - **Live public link / deployment.** Out of scope for the demo.
@@ -331,7 +334,8 @@ A second example plan type (event setup) using the same checker, to show the pat
 
 ---
 
-## Open Questions
+## Resolved Planning Questions
 
-- **Exact failure type taxonomy** (the 12 to 15 types and their labels): needs to be locked in before `4-spec`. Does not block PRD approval; it is a `4-spec` input, not a product-defining decision. Can be finalised when the checker is designed.
-- **AI key UX on Screen 1:** field placement and error messaging for an invalid key; minor, does not block approval.
+- **Failure taxonomy:** five fixed types instantiate 14 example problems, 14 singles and 86 possible pairs. The locked count is 100.
+- **AI key UX:** the disclosure stays collapsed until needed. Typed provider keys stay in private server session memory; missing, invalid and failed-provider states have explicit retry/example actions.
+- **Recording start:** `/demo` provides a clean take without affecting another browser. `demo-runbook.md` specifies the 2:30 path at 1440x900 and 100% zoom.

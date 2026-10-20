@@ -15,7 +15,7 @@ The AI returns an `AIPlanReading`. The server wraps it into a `PlanMap`, adding 
 
 Once the map passes the format check, the server runs plain rules and surfaces any failures as questions on screen. The browser sends constrained actions to `POST /api/update-map`; the server updates its own reading draft and validates with the same rules used at Confirm. The user confirms or corrects using constrained choices only. The AI does not re-read.
 
-When everything is confirmed and all rules pass, the browser sends the map to `POST /api/confirm-map`. The server re-validates and returns a fingerprint: a SHA-256 hash of the canonical sorted checker inputs (people, vehicles, places, deliveries, routes, finish time, problem sizes). Two identical plans get the same fingerprint; changing a problem size changes it. Timestamps and status marks are excluded.
+When everything is confirmed and all rules pass, the browser sends its reading ID to `POST /api/confirm-map`. The server re-validates its own draft, confirmations and answers and returns a fingerprint: a SHA-256 hash of the canonical sorted checker inputs (people, vehicles, places, deliveries, routes, finish time, problem sizes). Two identical plans get the same fingerprint; changing a problem size changes it. Timestamps and status marks are excluded.
 
 The checker then runs. It is a constraint solver (CP-SAT) that treats the plan as a scheduling problem. Singles run first. Any pair that contains a single already broken is marked dimmed without solving, because every problem type only removes options, so a pair can never be better than its singles. For remaining pairs, the solver tries to find the best possible schedule using only the people and vehicles the plan names. If it can find one where everyone finishes on time, the plan survives. If the best it can find is still late, the plan breaks, and the lateness is the human cost - proved optimal. The time limit is CP-SAT's deterministic limit (`max_deterministic_time`), not wall clock, so results are the same on every machine.
 
@@ -105,23 +105,23 @@ Doc links:
 | Landing conversion and motion | htmlparser2 at development time; GSAP, ScrollTrigger and `@gsap/react` in the UI | Converts the supplied v2 templates to typed React; scoped animation cleanup, scroll progress and source highlights. No editor runtime or HTML interpreter in production. |
 | Client contracts | `web/src/types.ts` and the production TypeScript build | Contracts are maintained alongside the API client. Automatic OpenAPI generation is deferred. |
 
-Rules are implemented only in Python (`server/validation/rules.py`). The browser never reimplements them; it calls `POST /api/validate-map` instead.
+Rules are implemented only in Python (`server/validation/rules.py`). The browser never reimplements them; corrections call `POST /api/update-map` against the server-owned draft.
 
 ## Where It Runs and How Someone Tries It
 
 Runtime: local, two processes. Started with one cross-platform command (PowerShell-compatible, no `make`).
 
-Start command (after `uv sync --extra dev --extra ai` and `npm install`):
+Start command (after `uv sync` and `npm install` in the repository root):
 ```
 uv run -- python scripts/dev.py
 ```
 This starts `uvicorn server.main:app --host 127.0.0.1 --port 8000` and `vite --port 5173` in parallel. The server binds to 127.0.0.1 only because AI keys are held in memory.
 
-What to open: `http://localhost:5173`
+What to open: `http://127.0.0.1:5173`. Default `uv sync` includes the live SDKs and development tools. Playwright's Chromium binary is installed separately with `uv run -- python -m playwright install chromium`.
 
-Demo recording: load the example plan, walk the full flow (paste / plan map / crash test / open a cross / preview the turned-down fix / accept the real fix / report), record the screen. No deployment needed.
+Demo recording: `http://127.0.0.1:5173/demo` resets only that browser and returns to the landing page. `demo-runbook.md` specifies the 2:30 click path at 1440x900 and 100% zoom. For the built app served by FastAPI, the same path is at port 8000. `scripts/capture_submission.py` captures actual Overview thumbnail candidates at 1280x720 and 1500x1000. No deployment is needed for local recording.
 
-Submission: short demo video plus public GitHub repository. Deployment is optional and explicitly post-PoC.
+Submission: short demo video plus public GitHub repository. A public deployment requires a separate host choice and approval; local recording remains available.
 
 Environment requirements:
 - Python 3.12 (managed by uv)
@@ -130,8 +130,8 @@ Environment requirements:
 - `.env.example` ships with placeholders; `.env` is gitignored
 - Alternatively, expand "Use your own AI key" on Screen 1, choose the provider and enter a session-only key. A typed key overrides that provider's environment key without editing `.env`.
 
-Free tier constraints:
-- Groq: 30 req/min, 1,000 req/day, 8,000 tokens/min, 200,000 tokens/day. Pasted plans capped at ~4,000 characters; visible counter on Screen 1. Prompts kept lean; reasoning at lowest setting.
+Provider constraints:
+- Groq: the app reserves one call per 61 seconds with a conservative token budget and no SDK retries. Provider account quotas may differ. Pasted plans are capped at 4,000 characters with a visible counter. Prompts stay lean and reasoning uses the lowest setting.
 - Gemini free tier: Google may use content to improve its products. Screen 1 always displays a Gemini data notice now that Gemini is the default primary: "If you use a Gemini key, don't paste personal details - Google may use them to improve its models. The example plan is fictional."
 
 ## Look and Feel
@@ -323,6 +323,8 @@ Implements `prd.md > Screen 5`, `prd.md > The Checker's Three Honest Answers`.
 
 The opening `overview` derives accepted AI/yours counts, requested AI-card verdict counts and the largest original household cost from stored evidence. Confirmed review answers resolve the real reviewed value at confirmation time. Facts include `entity_id` for concise grouping, without dropping fields or citations. Failed operations expose plain `gate_reason` separately from technical `gate_detail`. Read-by names are formatted consistently on the map, SSE results and report. The existing stylesheet is unchanged; text grouping removes repetition. The full example is five pages on A4 and Letter, with every fix card verified to remain on one page by `verify_report_pdf.py`.
 
+The full example records 3 accepted fixes (1 AI, 2 yours), 12 AI suggestions (10 turned down, 1 couldn't apply, 1 accepted), original 84 survived and final 100 survived. Its largest original cost is 30 households not delivered because nobody can open the loading area.
+
 Confirmation stores review evidence outside checker inputs: original AI item count, corrected/added counts, item bindings and sources, and explicit answers. The example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Current statements come from the accepted map. Fix provenance matches operation fields, so changing a key cannot label unrelated hours as changed.
 
 Report facts use the same explicit `source_tags` distinction as the plan map: field citations, labelled entity mentions, or "No source line". An entity mention is not proof of a field value, and retained citations describe the original reading when the value was corrected.
@@ -509,11 +511,12 @@ FixSuggestion
   rejection_reason:      str | None           # Checker-derived, not AI-written
   gate_status:           "passed" | "format_error" | "rules_error" | "couldnt_apply"
   gate_reason:           str | None
+  gate_detail:           str | None           # Original technical error, shown in small mono
 ```
 
 ### State storage
 
-No database. Review drafts, confirmed maps, test results, fix suggestions and typed keys stay in server memory, associated with the session owner. Maps/results use fingerprints; successful suggestions additionally use scenario IDs. Keys never enter map data, fingerprints, logs, files or responses. Closing a tab does not clear server memory. Restarting the server clears these sessions; environment keys remain in the local ignored `.env` file.
+No database. Review drafts, confirmed maps, test results, fix suggestions and typed keys stay in server memory, associated with the session owner. Maps/results use fingerprints; successful suggestions additionally use scenario IDs. Keys never enter map data, fingerprints, logs, files or responses. Closing a tab does not clear server memory. `/demo` calls `POST /api/demo/reset`, clears browser storage and replaces the page with `/`. The endpoint clears only that browser's typed keys, reviews, maps/results/evidence/ancestors/suggestion batches and owner-scoped fix caches, then rotates its HttpOnly SameSite=Lax cookie. Responses use `Cache-Control: no-store`. Dropped maps get revision bumps; late reads and scoring responses cannot reinstall expired state. Other browsers and unowned trusted helpers are unaffected. Restarting the server clears every session; environment keys remain in the local ignored `.env` file.
 
 Review evidence and frozen ancestors also live only in this store. They preserve the accepted-fix chain and suggestions checked at each stage independently of later registry revisions. They do not affect checker fingerprints or locked verdicts.
 
@@ -521,7 +524,7 @@ Review evidence and frozen ancestors also live only in this store. They preserve
 
 `fixtures/example-truth.json`: the correct confirmed map for the Saturday food distribution plan. Written by hand. This is the ground truth.
 
-`fixtures/example-reading.json`: the chosen provider's real output for the example plan, saved as-is. It may have small mistakes; the demo corrects them, which shows the correction trail working.
+`fixtures/example-reading.json`: the unedited Gemini `reading-v2` / `read-v4` response from the third new-schema bake-off slot. It has 39 reviewed non-null citations and 10 null citations. The existing Hall identity choice, confirmations and arrival questions produce 32 AI items, one correction, zero additions and 30 facts with every aligned checker input and all 100 verdicts equal to truth. `source-line-review.md` records source support and retained failed attempts. No successful reading was retried or edited.
 
 `fixtures/example-fixes.json`: four unedited real Groq / openai/gpt-oss-120b responses with raw provider metadata, raw-text digests, contexts and the previous Gemini 503/504 attempts. Approved on 20 October 2026. Label: "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)". Runtime parsing and ID alignment happen on a separate copy; original responses stay untouched. The gate and checker score these suggestions live against the current map. No second round is captured. Ten cards are turned down, one fails the gate, and only the Sam loader card is initially eligible.
 
@@ -541,20 +544,23 @@ Review evidence and frozen ancestors also live only in this store. They preserve
 
 `test_determinism.py`: runs the example truth map twice and compares every result.
 
+`test_fact_sources.py` and `test_example_reading_sources.py` cover closed nullable source objects, strict outgoing schemas, legacy replay without invented evidence, physical source ranges/non-blank lines, and the accepted capture. `test_demo_reset.py` covers browser isolation, scoped cleanup, cookie rotation, repeat resets and late read/stream/suggestion responses.
+
 `test_live_api.py` replays the saved real provider reading through Read plan, the gate, review, confirmation, all scenarios, a cross, scored suggestions and application. Four offline cases replay the approved actual Groq responses from `fixtures/example-fixes.json` with simulated Gemini 503 fallback. `RECORDED_AI_FIXES_PATH` can override that path for local capture review. A separate explicitly synthetic response exercises transport failures. `test_fix_pipeline.py` plays the real-card story and the two coordinator-built changes to all 100 survived; `test_change_builder.py` checks all five operation types, bounds, invalid picks, score forgery and concurrent edits.
 
 `test_live_network.py` requires both explicit `RUN_LIVE_AI_TESTS=1` and the matching provider key from `.env` or the process environment. Its two provider reading smoke tests skip in the ordinary `uv run -- python -m pytest -q` run, even if `.env` contains keys. Deterministic offline tests cover primary HTTP 503 to fallback success, both-provider failures, missing/invalid keys, malformed output, unsupported plans, attribution, successful-response caching and key privacy. `test_live_transport.py` covers read timeouts and connection failures as safe retryable errors.
 
-`bakeoff.py`: runs the example plan through both providers three times. It aligns entities by type and role, ignores names, compares every checker input (including extra inputs), and runs the truth map's 100 scenarios on the aligned reading. It ranks providers by exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned field match, consistency, then tokens. It applies no corrections and preserves raw responses and failed attempts. Every prompt version and its scores are logged in `ai-reading-review.md`; the winner becomes primary in `server/config.py` with the date and scores.
+`bakeoff.py`: gives each provider three slots. It aligns entities by type and role, ignores names, compares every checker input (including extra inputs), and runs the truth map's 100 scenarios on the aligned reading. Loader lists are sets; drivers retain primary-first order. Complete campaigns rank by exact verdict matches (state, lateness_minutes and human_cost; timelines excluded), aligned field match, consistency, then tokens. It applies no corrections and preserves raw responses and failed attempts. Incomplete campaigns establish no winner or consistency claim. Every prompt version and its scores are logged in `ai-reading-review.md`; a complete winner becomes primary in `server/config.py` with the date and scores.
 
 ## File Structure
 
-The paths below describe the implementation through slice 7. `Report.tsx`, `CrashTest.tsx`, `CasePanel.tsx` and `ChangeBuilder.tsx` keep descriptive classes for the separate mockup design pass.
+The paths below describe the completed seven-slice implementation and recording support. `Report.tsx`, `CrashTest.tsx`, `CasePanel.tsx` and `ChangeBuilder.tsx` keep descriptive classes for maintenance; current visual design is final.
 
 ```
 failure-compiler/
 ├── server/
 │   ├── main.py                  # FastAPI routes, gate, confirmation, SSE and fixes
+│   ├── demo.py                  # Browser-only reset and retired-request cleanup
 │   ├── models.py                # Reading, plan, scenario and fix models
 │   ├── config.py                # Gemini primary, Groq fallback, sizes and caps
 │   ├── ai/                      # Provider adapters, prompts and safe metadata
@@ -574,6 +580,7 @@ failure-compiler/
 │   ├── landing/                 # Approved v2 tabs, source story and illustrative grid
 │   ├── components/
 │   │   ├── FactEditor.tsx       # Constrained fact corrections
+│   │   ├── SourceTags.tsx       # Field evidence versus entity mentions
 │   │   ├── MissingFactQuestion.tsx
 │   │   ├── CrashGrid.tsx        # SVG states and keyboard-readable explanations
 │   │   ├── CasePanel.tsx        # Scored AI and coordinator cards
@@ -595,10 +602,12 @@ failure-compiler/
 │   ├── dev.py                   # Local API and web launcher
 │   ├── bakeoff.py               # Recorded provider comparison
 │   ├── local_preview.py         # Isolated offline browser verification
+│   ├── verify_browser.py        # One isolated runner for all four browser checks
 │   ├── browser_story.py         # Shared full example flow
 │   ├── capture_report.py        # Real A4 and Letter browser printing
 │   ├── verify_report_pdf.py     # PDF text, bounds and rendered proof
 │   ├── capture_gallery.py       # 1500x1000 actual-app images and Before/After GIF
+│   ├── capture_submission.py    # Real YouTube and Devpost thumbnail candidates
 │   ├── check_readme_links.py
 │   └── verify_accessibility.py  # Keyboard story, axe and computed text checks
 ├── tests/                       # Locked solver, API, review, fix, report and asset tests
@@ -616,9 +625,9 @@ failure-compiler/
 
 ### Slice 7 verification and submission assets
 
-`uv run -- python -m pytest -q`, Ruff and the production build cover the server contracts and client compilation. `scripts/verify_story.py`, `verify_review.py` and `verify_landing.py` exercise the real saved flow, original/current comparison, preview cancellation, reconfirmation, responsive layouts and animation recovery without provider calls.
+After `uv sync` and `npm install`, `uv run -- python -m pytest -q`, `uv run -- ruff check .` and `npm run build` cover server contracts and client compilation. Install Chromium once with `uv run -- python -m playwright install chromium`, then run `uv run -- python scripts/verify_browser.py`. It starts and stops its own offline preview and runs the saved story, review/editing, landing and accessibility checks without provider calls; `--story` runs only the full example story.
 
-`scripts/verify_accessibility.py` completes the story using native Tab, Enter and select keys, checks visible focus, scans with the development-only `axe-core` dependency, and measures rendered text contrast and size. It covers the actual screens and all illustrative tabs with reduced motion. Text must be at least 12px with contrast at least 4.5:1. The current look is retained; a separate mockup design pass is deferred.
+`scripts/verify_accessibility.py` completes the story using native Tab, Enter and select keys, checks visible focus, scans with the development-only `axe-core` dependency, and measures rendered text contrast and size. It covers the actual screens and all illustrative tabs with reduced motion. Text must be at least 12px with contrast at least 4.5:1. The final visual design stays intact.
 
 `scripts/capture_gallery.py` produces six actual-app 1500x1000 PNGs using the README filenames under `docs/images`. `scripts/check_readme_links.py` verifies local targets, heading anchors and optionally external URLs. The demo video is explicitly pending, with no fabricated video link. The committed A4 sample report follows the full example story; Letter and rendered page proofs remain ignored under `devpost/screens`.
 
@@ -628,7 +637,7 @@ failure-compiler/
 - Endpoint: `POST https://api.groq.com/openai/v1/chat/completions`
 - Auth: `Authorization: Bearer $GROQ_API_KEY`
 - Structured output: `response_format: { type: "json_schema", json_schema: { strict: true, schema: <AIPlanReading JSON schema> } }`
-- Rate limits (free tier): 30 req/min, 1,000 req/day, 8,000 tokens/min, 200,000 tokens/day
+- App budget: one call per 61 seconds, disabled SDK retries, and a conservative prompt/output token reservation in `groq_provider.py`. Provider account quotas may differ; they are not a product guarantee.
 - Docs: https://console.groq.com/docs/openai
 - Key: `GROQ_API_KEY` in `.env`, or a Groq key typed into the session-only input.
 
@@ -641,7 +650,7 @@ failure-compiler/
 - Key: `GEMINI_API_KEY` in `.env`, or a Gemini key typed into the session-only input.
 
 ### OR-Tools 9.15
-- Install: `uv add ortools==9.15.*`
+- Install: `uv sync` uses the committed lockfile and `ortools>=9.15,<9.16` requirement.
 - Wheels for Windows, macOS (Intel + Apple Silicon), Linux. No API key; runs locally.
 - Docs: https://developers.google.com/optimization/reference/python/sat/python/cp_model
 
@@ -666,7 +675,7 @@ Implements `prd.md > States and Boundaries`.
 - **In-memory session store** instead of a database. Same shape of data, zero infrastructure. Server restart loses the session; acceptable for a demo.
 - **Browser print for the report** instead of custom export. Covers the submission requirement. Nicer download is in scope.md > Later.
 - **Fixed failure-type taxonomy** instead of AI-suggested types. Keeps results reproducible and the example story reliable. Deferred in scope.md.
-- **No deployment** - local recording satisfies submission. Live public link is in scope.md > Later.
+- **Local recording** satisfies submission without deployment. A public link requires the learner's host choice and approval.
 - **Volunteer arrives late out of scope** - listed under "What was NOT tested." Modelling a departure delay differently from a duration cut adds complexity without serving the demo's three hidden pairs.
 - **Hall key as a person attribute** (`holds_key: true` on Joel) rather than a separate problem type. "Joel absent (only key holder)" is the single weak spot. Keeps the taxonomy clean without losing the story.
 - **Preview never re-solves** - fix results are cached by fingerprint at scoring time. The browser draws from them. One less round trip; one less failure mode during the demo.
@@ -685,7 +694,7 @@ Implements `prd.md > States and Boundaries`.
 
 **Id normalisation after the gate.** The server rewrites AI-assigned ids to stable type-and-name slugs and updates every reference. Two runs of the same plan always produce the same ids and the same fingerprint, regardless of what the AI chose. The gate also rejects duplicate ids within a reading.
 
-**Rules implemented only in Python.** One implementation, tested in pytest. The browser calls `POST /api/validate-map` for immediate feedback. No drift possible. The explicit rule that every id in a route's `driver_ids` must belong to someone with `can_drive: true` is what the cascade test in `test_rules.py` relies on: flipping `can_drive` to false makes the route's driver assignment immediately invalid.
+**Rules implemented only in Python.** One implementation, tested in pytest. The browser calls `POST /api/update-map` for immediate feedback on its server-owned draft. No duplicate browser rules. The explicit rule that every id in a route's `driver_ids` must belong to someone with `can_drive: true` is what the cascade test in `test_rules.py` relies on: flipping `can_drive` to false makes the route's driver assignment immediately invalid.
 
 **Fingerprint hashes only checker inputs.** People, vehicles, places (including `opens_at`), deliveries, routes, finish time, problem sizes - sorted canonically. Excludes timestamps and status marks so two identical plans always get the same fingerprint, and changing a problem size always changes it.
 
@@ -716,5 +725,5 @@ Verified by: `test_rules.py` includes a case where a person's `can_drive` is set
 ### Open Issues
 
 - **Gemini structured output parameter name, resolved.** The installed SDK supports `models.generate_content` with `response_mime_type` and `response_json_schema`. The finding is recorded in `gemini_provider.py` and covered by the provider tests.
-- **`openapi-typescript` generation step** is manual for the PoC. A CI step would catch drift; out of scope.
-- **Bakeoff result:** Gemini is primary after the 19 October 2026 read-v3 verdict-only re-score: 100/100 mean verdicts and 94.34% aligned fields; Groq has 55/100 and 84%. See `server/config.py` and `ai-reading-review.md`.
+- **Client contracts:** TypeScript types are maintained manually beside the API client and checked by the production build. Automatic OpenAPI generation is deferred.
+- **Bakeoff result:** Gemini remains primary from the last complete campaign, the 19 October 2026 read-v3 verdict-only re-score: 100/100 mean verdicts and 94.34% aligned fields; Groq has 55/100 and 84%. In read-v4, Gemini's sole successful slot scored 100/100 and 94.34%; Groq's sole success scored 12/100 and 88%. Both three-slot campaigns are incomplete because of recorded provider failures, so no new ranking supersedes the complete one. The accepted Gemini capture reaches 100% aligned fields after the existing identity control. See `server/config.py`, `source-line-review.md` and `ai-reading-review.md`.

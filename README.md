@@ -1,13 +1,5 @@
-<!--
-  README notes for the author (invisible on GitHub):
-  - Every "REPLACE" comment marks an image, link or video you still need to add.
-  - Every "VERIFY" comment marks a fact to re-check on a clean clone before submitting.
-  - Every "UPDATE" comment marks a section that changes as slices land.
-  - The example is locked at 100 tests; same-person pairs are skipped.
--->
-
 > [!NOTE]
-> **Submission draft.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The demo video is still pending.
+> **All seven build slices are implemented.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The learner's final hands-on review, learning wrap-up, video and submission answers remain separate completion steps.
 
 <div align="center">
 
@@ -157,7 +149,9 @@ Two actual Playwright frames, before and after accepting the real Sam loader car
 
 ### Demo video
 
-The video has not been recorded or linked yet. The gallery, before/after frames and [sample report](docs/sample-report.pdf) are available now.
+**Video link: pending recording.** The gallery, before/after frames and [five-page sample report](docs/sample-report.pdf) are available now. The [2:30 click runbook](devpost/demo-runbook.md) uses a 1440x900 viewport at 100% zoom. Start each take at **http://127.0.0.1:5173/demo** when using the development launcher, or **http://127.0.0.1:8000/demo** when serving the built app. This clears only that browser's state and returns to the landing page.
+
+Actual-app thumbnail candidates: [YouTube, 1280x720](docs/images/youtube-thumbnail.png) · [Devpost, 1500x1000](docs/images/devpost-thumbnail.png).
 
 ---
 
@@ -329,7 +323,7 @@ sequenceDiagram
     S->>S: Gate. Parse, schema, ids, rules
     S-->>App: Facts with field citations or labelled mentions, guesses, questions
     You->>App: Confirm or correct, picks only
-    App->>S: validate-map on every change
+    App->>S: update-map on every change
     You->>App: Confirm plan
     App->>S: confirm-map
     S->>S: Check everything again, then fingerprint
@@ -339,14 +333,14 @@ sequenceDiagram
 
 **The gate.** Nothing the AI returns reaches the screen until it passes every step:
 1. It parses as JSON.
-2. It matches the schema exactly. Missing fields or extra fields are rejected ([Pydantic](https://docs.pydantic.dev/latest/), `extra="forbid"`).
+2. It matches the schema exactly. Required fields and types are checked and extra fields are rejected ([Pydantic](https://docs.pydantic.dev/latest/), `extra="forbid"`). New provider schemas require every nullable field citation; replaying an older capture without per-field sources supplies nulls, never invented evidence.
 3. No duplicate ids, and every reference points to something that exists.
-4. Ids are rewritten to stable names (`person-ravi`, `vehicle-van`), so the same plan always gets the same fingerprint.
+4. Ids and references are normalised (`person-ravi`, `vehicle-van`, `route-a`), without doubling type words. Display names are labels; the fingerprint uses canonical checker inputs.
 5. Plain rules pass: every route has a vehicle and a listed driver who can drive, the times make sense, there's a finish time, and the plan is under the size limit.
 6. You confirm every fact. Guesses and questions need their own answer.
 7. The server checks the whole map again on Confirm, and the checker refuses any map that fails.
 
-Rejections name the problem, for example: *Unknown person id 'person-dave' in route-c driver_ids.* Suggested fixes go through the same gate. A fix that fails shows **Couldn't apply** and is never scored.
+Rejections name the problem, for example: *Unknown person id 'person-dave' in route-c driver_ids.* Suggested fixes go through the same gate. A fix that fails shows **Couldn't apply** and is never scored. Wrong-kind targets have a plain reason, such as *it named the van where a route was needed*, with the technical detail underneath.
 
 **Every fact has a status, and changes ripple through.**
 
@@ -372,6 +366,8 @@ If you correct Ravi to "can't drive", every route that lists him as a driver los
 ## How the checker decides
 
 Each test is one run of [Google OR-Tools CP-SAT](https://developers.google.com/optimization/cp/cp_solver), a free, open-source constraint solver. It searches for the best possible morning, the one with the least **households × minutes late**, using only what your plan allows.
+
+**Natural schedules:** once the best lateness is proved, a second pass holds it fixed and minimises the sum of load and drive start times. Timelines show the earliest sensible morning without changing the verdict. A timeout in this display pass keeps the already-proved verdict.
 
 ```mermaid
 flowchart LR
@@ -411,7 +407,7 @@ flowchart LR
 > Any "?" result is listed by name in the report and never counted as a pass. This version supports community distribution plans with up to 24 problems. It is a proof of concept, not a guarantee for real-world operations.
 
 > [!NOTE]
-> **Build status:** example mode uses one unedited saved Gemini reading. The review controls identify Hall as the same place as Loading bay. Loader order needs no correction: eligible loaders are compared as a set. A regression verifies every checker input and all 100 locked verdicts against the independent hand-checked truth map. The approved saved suggestions are real Groq fallback responses, scored live; coordinator-built changes use the same gate and scorer.
+> **Saved example:** one unedited Gemini `read-v4` response has 39 reviewed field citations and 10 null citations. Missing evidence stays a labelled entity mention. The review controls identify Hall as the same place as Loading bay. Loader order needs no correction: eligible loaders are compared as a set. A regression verifies every checker input and all 100 locked verdicts against the independent hand-checked truth map. The approved saved suggestions are real Groq fallback responses, scored live; coordinator-built changes use the same gate and scorer. [Source and capture review](devpost/source-line-review.md).
 
 ---
 
@@ -419,7 +415,8 @@ flowchart LR
 
 Every number in this README can be reproduced from the repository.
 
-<!-- UPDATE: tick the last rows as slices 5 and 6 land. VERIFY every test file name against tests/. -->
+Verified on 20 October 2026: **219 passed, 2 opt-in network tests skipped**. Ruff and the production build pass. The test run reports one Starlette/httpx dependency deprecation warning.
+
 | Claim | How to check it |
 |---|---|
 | 1 single weak spot, 3 hidden pairs, 12 dimmed, 84 survived | `uv run -- python scripts/check_map.py fixtures/example-truth.json` |
@@ -430,15 +427,29 @@ Every number in this README can be reproduced from the repository.
 | Bad AI output is rejected, and the error names the field | [`tests/test_format_gate.py`](tests/test_format_gate.py) |
 | Changing one fact un-confirms everything that depends on it | [`tests/test_rules.py`](tests/test_rules.py) |
 | The fingerprint changes only when the checker's inputs change | [`tests/test_fingerprint.py`](tests/test_fingerprint.py) |
-| The whole demo story plays end to end in a real browser | [`scripts/verify_story.py`](scripts/verify_story.py), with the dev server running and Playwright installed |
+| The whole demo story plays end to end in a real browser | `uv run -- python scripts/verify_browser.py --story`, using an isolated offline server |
 | V2 navigation, animation recovery, every sample square, editor controls and responsive layouts work | [`scripts/verify_landing.py`](scripts/verify_landing.py), at desktop, tablet and phone sizes |
 | The saved AI reading plus the demo's corrections equals the hand-checked map | [`tests/test_reading_matches_truth.py`](tests/test_reading_matches_truth.py) |
 | Live paste, review, checker, suggestions and apply work offline; keys and caches stay session-scoped | [`tests/test_live_api.py`](tests/test_live_api.py), recorded real reading and all four approved real suggestion responses |
 | Coordinator picks pass the same gate; real-card story reaches all 100 survived | [`tests/test_change_builder.py`](tests/test_change_builder.py), [`tests/test_fix_pipeline.py`](tests/test_fix_pipeline.py), [`scripts/verify_story.py`](scripts/verify_story.py) |
 | Provider read/connect timeouts become safe retryable errors | [`tests/test_live_transport.py`](tests/test_live_transport.py) |
 | Real provider smoke tests require explicit opt-in and a key | [`tests/test_live_network.py`](tests/test_live_network.py) |
+| Every saved field citation is in range, non-blank and reviewed for support | [`tests/test_example_reading_sources.py`](tests/test_example_reading_sources.py), [`tests/test_fact_sources.py`](tests/test_fact_sources.py), [`devpost/source-line-review.md`](devpost/source-line-review.md) |
+| A clean take resets only this browser and rejects late stale requests | [`tests/test_demo_reset.py`](tests/test_demo_reset.py) |
+| Reports preserve original breaks, actual review answers, scored fixes and final counts | [`tests/test_report.py`](tests/test_report.py), [`tests/test_fix_pipeline.py`](tests/test_fix_pipeline.py) |
 
-Run the Python tests with `uv run -- python -m pytest -q`. Browser checks run separately with `uv run -- python scripts/verify_landing.py` and `uv run -- python scripts/verify_story.py`.
+Run the complete local verification after installation:
+
+```bash
+uv run -- python -m pytest -q
+uv run -- ruff check .
+npm run build
+uv run -- python -m playwright install chromium
+uv run -- python scripts/verify_browser.py
+uv run -- python scripts/check_map.py fixtures/example-truth.json
+```
+
+The browser runner starts and stops its own isolated local server, blocks provider calls, and runs the saved story, review/editing regression, landing interactions and accessibility pass. Use `--story` for only the full example story. Accessibility checks cover keyboard operation, visible focus, reduced motion, text contrast of at least 4.5:1 and text at least 12px.
 
 The ordinary test run makes no provider requests, even when `.env` contains keys. Offline end-to-end coverage replays the real saved reading and all four approved Groq suggestion responses through HTTP, including simulated Gemini 503 fallback, scoring and any eligible acceptance. `RECORDED_AI_FIXES_PATH` optionally selects another local recorder file. A separate explicitly synthetic response tests failure handling. Only the two opt-in real-network reading tests skip by default.
 
@@ -448,18 +459,17 @@ Real-network smoke tests run only when you explicitly set `RUN_LIVE_AI_TESTS=1` 
 
 ## Run it in 60 seconds
 
-<!-- VERIFY on a clean clone before submitting: install folder for npm, and the dev.py command. -->
 You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, and Node.js 20 or newer.
 
 ```bash
 git clone https://github.com/vighriday/failure-compiler.git
 cd failure-compiler
-uv sync --extra dev --extra ai
+uv sync
 npm install
 uv run -- python scripts/dev.py
 ```
 
-Open **http://localhost:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed.
+Open **http://127.0.0.1:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed. `uv sync` includes the AI SDKs and the Python test/browser tools; install Chromium separately using the verification command above.
 
 For the saved reading, answer the Hall question with **Same place as another listing**, choose **Loading bay**, and review its facts individually. Confirm guesses individually, answer the arrival questions after reviewing the associated facts, then confirm the plan. These steps produce the locked 100-scenario example.
 
@@ -473,7 +483,7 @@ The interface follows the supplied Landing v2 design: Overview, a scroll-linked 
 2. Open **Start** and paste your plan. Or expand **Use your own AI key**, choose its provider and enter a key for this session. A typed key takes precedence for that provider; the selected provider is tried first. With environment keys, Gemini is tried first and Groq is the fallback.
 3. Click **Read plan**, check the facts and their labelled field citations or entity mentions, and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted.
 
-Typed keys stay only in the local server's session memory. They are never written to files, logged, added to a map or returned in an API response. The server sends an HttpOnly session cookie; that cookie contains no key. Closing a tab does not clear server memory; restarting the server clears session keys, maps and results. `.env` keys remain in your local ignored file.
+Typed keys stay only in the local server's session memory. They are never written to files, logged, added to a map or returned in an API response. The server sends an HttpOnly session cookie; that cookie contains no key. Closing a tab does not clear server memory. Opening `/demo` clears that browser's typed keys, reviews, maps, results and fixes, rotates its cookie, clears browser storage and returns to the landing page; other browsers are unaffected. Restarting the server clears all sessions. `.env` keys remain in your local ignored file.
 
 The plan map and results show **Read by provider / model**; live suggestions show who supplied them. A Gemini server error such as HTTP 503, timeout, rate limit or failed output format check triggers one Groq attempt when a Groq key is available. Missing or invalid keys, unsupported plans and both-provider failures have clear errors and retry/example actions. A failed suggestion request leaves the checker's facts available.
 
@@ -485,10 +495,24 @@ Screen 1 shows the Gemini data notice: Google may use content to improve its pro
 | Run all tests | `uv run -- python -m pytest -q` |
 | Print the results for any map file | `uv run -- python scripts/check_map.py fixtures/example-truth.json` |
 | Lint | `uv run -- ruff check .` |
-| Re-score saved provider readings without API calls | `uv run -- python scripts/bakeoff.py --rescore devpost/bakeoff-read-v3.json --output devpost/bakeoff-read-v3.json` |
+| Browser checks, isolated and offline | `uv run -- python scripts/verify_browser.py` |
+| Re-score saved provider readings without API calls | `uv run -- python scripts/bakeoff.py --rescore devpost/bakeoff-read-v4.json --output devpost/bakeoff-read-v4.json` |
 | Run a fresh three-call-per-provider bake-off | `uv run -- python scripts/bakeoff.py` *(uses keys and makes API calls)* |
 
-Playwright is a development dependency. Install its browser once with `uv run -- python -m playwright install chromium`. Start the app, then run either browser check. For a different frontend port, set `FAILURE_COMPILER_URL` to that local URL before running the scripts.
+Playwright is included by `uv sync`. Install its browser once with `uv run -- python -m playwright install chromium`, build with `npm run build`, then run the isolated browser runner. The story, review and landing scripts can also target an already-running app through `FAILURE_COMPILER_URL`.
+
+### Provider measurements
+
+Checker equivalence compares **state, lateness_minutes and human_cost** for the same 100 scenarios. It excludes timelines, because equally good schedules can differ. Field matching aligns entities by type and role, ignores names, compares loaders as sets and keeps drivers in primary-first order. Complete campaigns rank by verdict matches, then aligned fields, consistency across runs, then tokens.
+
+| Campaign / provider | Verdict matches across three slots | Aligned fields on successful runs | Successful runs |
+|---|---|---|---|
+| read-v3 / Gemini | 100, 100, 100 | 94.34%, 94.34%, 94.34% | 3/3 |
+| read-v3 / Groq | 55, 55, 55 | 84%, 84%, 84% | 3/3 |
+| read-v4 / Gemini | Timeout, HTTP 504, 100 | 94.34% | 1/3 |
+| read-v4 / Groq | 12, HTTP 400, timeout | 88% | 1/3 |
+
+Gemini remains primary from the last complete campaign, dated 19 October 2026. The new source-schema campaign is incomplete for both providers, so it establishes no new winner or consistency claim. Its one unedited successful Gemini response became the example after the existing UI controls brought it to **100% aligned fields and 100/100 verdicts**. [Capture and source review](devpost/source-line-review.md) · [Full measurement history](devpost/ai-reading-review.md).
 
 ---
 
@@ -505,9 +529,8 @@ This project was built with the **[Devpost Learn Skill Pack](https://github.com/
 | `5-build` | Small working slices, each tested and committed | [`checklist.md`](devpost/checklist.md); the app map is planned for the learning wrap-up |
 | `6-ship` | Repo, video, submission | Planned after the build and review are complete |
 
-**Every plan was approved and committed before any code.** Run `git log --oneline --reverse` to see the trail:
+**The scope, PRD and spec were approved before implementation.** Later decisions and revisions are recorded in the checklist and individual commits. Run `git log --oneline --reverse` to see the trail:
 
-<!-- UPDATE: add a commit line for each slice as it lands. -->
 ```mermaid
 gitGraph
     commit id: "Approved scope"
@@ -521,6 +544,10 @@ gitGraph
     commit id: "Slice 4 live grid"
     commit id: "Slice 5 fixes and flip"
     commit id: "Launcher cleanup"
+    commit id: "Slice 6 live AI and your changes"
+    commit id: "Slice 7 report and Before/After"
+    commit id: "Fact citations and report review"
+    commit id: "Clean recording start"
 ```
 
 **What planning caught before it became code:**
@@ -540,15 +567,15 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 
 ### Build progress
 
-<!-- UPDATE as slices land. -->
 - [x] **Slice 1:** the checker proves the example's story (no screens, no AI)
 - [x] **Slice 2:** the gate rejects bad AI output; rules catch broken maps
 - [x] **Slice 3:** the plan map screen
 - [x] **Slice 4:** the grid fills live
 - [x] **Slice 5:** broken case, fixes, flip
 - [x] **Slice 6:** live Gemini/Groq flow, real saved reading and approved real suggestions, fixed-choice coordinator changes, offline end-to-end verification
-- [x] **Slice 7:** report, Before/After, printable sample PDF, gallery assets and accessibility. New mockup styling is a separate pass.
-- [ ] Final review, learning wrap-up and app map
+- [x] **Slice 7:** report, Before/After, printable sample PDF, gallery assets and accessibility
+
+Implementation progress above is complete. The learner's hands-on final review and focused learning wrap-up are still pending; the app map will be produced during that wrap-up. Video recording and Devpost answers belong to the learner. A public deployment needs the learner's host choice and approval.
 
 <!-- Keep this paragraph truthful. Edit the wording however you like. -->
 **How it was built.** The skills ran across several coding agents. Each switch happened when a usage limit ran out, and nothing was lost because the `devpost/` files and git carry the state. I also used Claude in a separate chat as a reviewer, to stress-test my answers and check each draft before approving it.
@@ -561,14 +588,15 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 <summary><b>Repository map</b></summary>
 <br/>
 
-<!-- VERIFY against the final tree. -->
 ```text
 failure-compiler/
 ├── server/
 │   ├── main.py              FastAPI app and API routes
+│   ├── demo.py              Browser-only reset and stale-session cleanup
 │   ├── models.py            Checker, scenario and fix data shapes
 │   ├── grid.py              Live result stream and counts
 │   ├── fixes.py             Gate, score, cache and apply saved/live fixes
+│   ├── report.py            Report evidence, summary and accepted-fix history
 │   ├── session.py           In-memory maps and results by fingerprint
 │   ├── credentials.py       Private server-memory keys and browser-session ownership
 │   ├── config.py            Model names, problem types, size presets, limits
@@ -591,7 +619,7 @@ failure-compiler/
 │   ├── example-corrections.json Explicit review actions, separate from the AI output
 │   ├── example-fixes.json   Unedited Groq suggestions and Gemini failure history
 │   └── expected-results.json  All 100 locked results
-├── scripts/                 dev.py, check_map.py, verify_story.py
+├── scripts/                 Launch, offline browser checks, captures and measurement
 ├── tests/                   pytest, plus a Playwright end-to-end test
 └── devpost/                 scope, PRD, spec and checklist
 ```
@@ -605,7 +633,7 @@ failure-compiler/
 |---|---|
 | `GET /api/ai-status` | Reports configured provider/model names and whether keys are available; never returns keys |
 | `POST /api/read-plan` | Reads pasted text live, or returns the saved example with no AI call; creates a server-owned review draft |
-| `POST /api/validate-map` | Runs the rules after every correction, so the screen updates straight away |
+| `POST /api/validate-map` | Returns a current review snapshot or validation feedback for a supplied map; does not confirm it |
 | `POST /api/update-map` | Applies constrained corrections and review actions to the server's own reading draft |
 | `POST /api/confirm-map` | Checks the server's confirmations, answers and rules, then returns the fingerprint |
 | `GET /api/run-tests` | Streams each result as it finishes (server-sent events) |
@@ -613,6 +641,7 @@ failure-compiler/
 | `POST /api/test-change` | Gates and scores up to three coordinator-picked operations against every scenario; returns a server-owned "Your change" card |
 | `POST /api/apply-fix` | Applies an accepted fix, records the before and after fingerprints, re-tests |
 | `GET /api/report?map=<fingerprint>` | Session-owned report after the first completed run; original/current results, confirmed facts, scored change history and explicit limits; no AI calls or re-solving |
+| `POST /api/demo/reset` | Clears only this browser's state, rotates its cookie and returns a no-store response; `/demo` calls it before returning to the landing page |
 
 </details>
 
@@ -625,7 +654,7 @@ failure-compiler/
 | Checker | [OR-Tools 9.15, CP-SAT](https://developers.google.com/optimization/cp/cp_solver) | Built for scheduling, and it can *prove* the best possible result |
 | Server | [FastAPI](https://fastapi.tiangolo.com/), built-in server-sent events | Live streaming without another library |
 | Data shapes and gate | [Pydantic v2](https://docs.pydantic.dev/latest/) | One strict definition of every shape |
-| Python | 3.12 with [uv](https://docs.astral.sh/uv/) | Identical installs on Windows, macOS and Linux |
+| Python | 3.12 with [uv](https://docs.astral.sh/uv/) | Locked dependency installation; Windows is the clean-clone verification target |
 | AI, first choice | [Gemini](https://ai.google.dev/gemini-api/docs/structured-output), via `google-genai` | Won the 19 October verdict-only re-score: 100/100 mean verdicts, 94.34% aligned fields |
 | AI, fallback | [Groq](https://console.groq.com/docs/structured-outputs) | One bounded fallback attempt; provider/model attribution stays visible |
 | Frontend | React, Vite, TypeScript (strict) | The grid, panel, preview and report share a lot of state |
@@ -655,11 +684,11 @@ The app looks like a coordinator's run sheet, not a tech dashboard: warm paper, 
 
 ## Privacy and security
 
-- Runs on your own machine. The server only listens on `127.0.0.1`.
+- The local launcher runs on your own machine and binds to `127.0.0.1`.
 - Loading the saved reading and real saved suggestions makes **no AI calls**. Live requests for new suggestions do.
 - Live reading sends your plan to the selected provider; live suggestions send the confirmed map and checker facts for the selected case. Gemini is the default primary and Groq the fallback. Screen 1 displays the Gemini data notice. The example plan is fictional.
 - `.env` is ignored by Git and loaded only by the server. Typed keys stay only in server session memory and are never logged, saved to a file or returned in an API response. The browser's HttpOnly session cookie contains no key.
-- Maps, review drafts, keys and results stay in server memory until the server restarts. Nothing is written to a database. Closing the tab does not clear server memory. Successful suggestion caches belong to the session, fingerprint and broken case.
+- Maps, review drafts, keys and results stay in server memory until `/demo` clears that browser or the server restarts. Nothing is written to a database. Closing the tab does not clear server memory. Successful suggestion caches belong to the session, fingerprint and broken case. Reset invalidates old maps and rejects late reads or scoring responses, so they cannot restore the discarded state.
 
 ---
 
@@ -676,20 +705,15 @@ Not in this version, by choice:
 
 ## Why I built this
 
-<!--
-  WRITE THIS SECTION YOURSELF, in your own words. 3 to 5 sentences.
-  The honest version you already have: you haven't run a food distribution yourself; you've seen plans
-  that looked complete fall apart when two small things went wrong at once; you picked food
-  distribution because the people who pay for a broken plan are families waiting for food.
-  Add what surprised you most while building it.
--->
+I wanted to test a familiar failure: a plan looks complete, every job has a backup, and two small problems still bring it down. I chose food distribution because the cost of a broken plan is families waiting for food. The learning goal was a pattern I can reuse: AI reads, rules check, a human confirms, and only then a strict system acts. The build itself exposed why that matters: the checker proved my original example target impossible before any screen existed.
 
 ---
 
 ## Acknowledgements
 
 - [Devpost Learn](https://learn-ai-basics.devpost.com/) and the [Learn Skill Pack](https://github.com/challengepost/learn-ai-basics) (MIT), which shaped how this was planned and built
-- [Google OR-Tools](https://github.com/google/or-tools), [FastAPI](https://github.com/fastapi/fastapi), [Pydantic](https://github.com/pydantic/pydantic), [React](https://github.com/facebook/react), [Vite](https://github.com/vitejs/vite) and [IBM Plex](https://github.com/IBM/plex)
+- [Google OR-Tools](https://github.com/google/or-tools/blob/stable/LICENSE) (Apache-2.0); [FastAPI](https://github.com/fastapi/fastapi/blob/master/LICENSE), [Pydantic](https://github.com/pydantic/pydantic/blob/main/LICENSE), [React](https://github.com/facebook/react/blob/main/LICENSE) and [Vite](https://github.com/vitejs/vite/blob/main/LICENSE) (MIT); [IBM Plex Sans and Mono](https://github.com/IBM/plex/blob/master/LICENSE.txt) (SIL Open Font License 1.1)
+- GSAP and `@gsap/react` use the [GSAP Standard License](https://gsap.com/standard-license). [Bundled dependency notices](web/public/third-party-notices.txt) retain the shipped React and font notices.
 - The names and the plan in the example are invented.
 
 ## License

@@ -2,6 +2,8 @@
 
 Captured from the running app with Playwright at **1500 × 1000**, a 3:2 viewport. These are actual screenshots of the saved example, with its real provider responses and live checker. No DOM text, styles or results are replaced for the camera. Scrolling frames the relevant controls.
 
+Refreshed on 20 October 2026 after the source-citation, report and clean-demo changes. The recording candidates are [youtube-thumbnail.png](youtube-thumbnail.png), 1280x720, and [devpost-thumbnail.png](devpost-thumbnail.png), 1500x1000. The YouTube candidate is the intentional 16:9 exception; all README/gallery images use 3:2.
+
 | File | Shows |
 | --- | --- |
 | [01-paste-plan.png](01-paste-plan.png) | Landing hero. |

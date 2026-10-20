@@ -57,7 +57,7 @@ def main() -> None:
         with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
             loader_picker.focus()
             loader_picker.press("ArrowDown")
-        expect(route).to_contain_text("Loading cover: Joel, Anita, Maya and Ravi")
+        expect(route).to_contain_text("Loaders: Joel, Anita, Maya and Ravi")
         with page.expect_response(lambda response: response.url.endswith("/api/update-map")):
             route.get_by_role(
                 "button", name="Remove person-ravi from loader_ids", exact=True
@@ -65,7 +65,7 @@ def main() -> None:
         expect(
             route.get_by_role("button", name="Remove person-ravi from loader_ids", exact=True)
         ).to_have_count(0)
-        expect(route).to_contain_text("Loading cover: Joel, Anita and Maya")
+        expect(route).to_contain_text("Loaders: Joel, Anita and Maya")
         page.reload()
         page.get_by_role("tab", name="Start", exact=True).click()
         page.get_by_role("button", name="Load the example plan", exact=True).click()
@@ -85,9 +85,11 @@ def main() -> None:
         expect(page.locator(".result-cross")).to_have_count(4)
         page.get_by_role("button", name="See report", exact=True).click()
         expect(page.get_by_role("heading", name="The plan, tested.", exact=True)).to_be_focused()
-        expect(page.locator(".report-section")).to_have_count(6)
-        expect(page.locator(".report-before")).to_contain_text("3 hidden pairs")
-        expect(page.locator(".report-read-by")).to_contain_text("gemini / ")
+        expect(page.locator(".report-section")).to_have_count(7)
+        expect(page.locator(".report-section").first).to_contain_text("Summary")
+        expect(page.locator(".report-section").first).to_contain_text("3 hidden pairs")
+        expect(page.locator(".report-before h3")).to_have_count(4)
+        expect(page.locator(".report-read-by")).to_contain_text("Gemini / ")
         expect(page.locator(".report-review-summary")).to_contain_text(
             "AI read 32 items, 1 corrected by you, 0 added by you"
         )

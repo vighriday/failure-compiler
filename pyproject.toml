@@ -11,18 +11,15 @@ dependencies = [
     "pydantic>=2.10",
     "ortools>=9.15,<9.16",
     "python-dotenv>=1.1",
-]
-
-[project.optional-dependencies]
-ai = [
     "groq>=0.25",
     "google-genai>=1.14",
 ]
-dev = [
-    "pytest>=8.3",
-    "ruff>=0.11",
-    "httpx>=0.28",
-]
+
+# Compatibility aliases for earlier setup commands. Live AI is a runtime
+# feature; the standard uv sync also installs the default dev group below.
+[project.optional-dependencies]
+ai = []
+dev = []
 
 [tool.ruff]
 line-length = 100
@@ -37,4 +34,7 @@ testpaths = ["tests"]
 [dependency-groups]
 dev = [
     "playwright>=1.64.0",
+    "pytest>=8.3",
+    "ruff>=0.11",
+    "httpx>=0.28",
 ]
