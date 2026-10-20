@@ -104,8 +104,8 @@ The earlier after-slice-5 checkpoint was deferred by the learner's later instruc
 - [x] Part 2: report summary, plain reasons, real answers and sample PDF of five pages or fewer.
 - [x] Part 3: clean demo reset, timed click runbook and recording thumbnails.
 - [x] Part 4: final assets/docs, clean-clone and repository audit, complete regression.
-- [ ] Part 5: tested deployment container and host proposal; do not deploy yet.
-- [ ] Part 6: final verification report and pause for hands-on notes and deployment choice.
+- [x] Part 5: deployment container prepared and host proposal documented; local image run blocked by no Docker/Podman engine; do not deploy yet.
+- [x] Part 6: final verification completed; paused for hands-on notes and deployment choice.
 
 ## Code Tour and App Map
 
@@ -120,6 +120,8 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- Final completion pass Parts 5 and 6, 20 October 2026: `728634a` adds the single-container deployment contract, FastAPI-served production frontend, per-browser in-memory isolation, no-key public example guidance, 4,000-character plan limit, six-request-per-minute AI limit, and HTTPS-at-host requirements. `docs/deployment-readiness.md` compares Hugging Face Spaces, Render and Fly.io and recommends Render Starter. Docker/Podman is not installed on this Windows machine, so the image build and container run remain the only unexecuted verification. Final regression after that commit: 220 tests passed, 2 opt-in network tests skipped, Ruff clean, production build clean, the locked count line remained `100 tests: 1 single weak spot, 3 hidden pairs, 12 already broken by the weak spot, 84 survived.`, accessibility passed with 1,370 keyboard presses and 4.55:1 minimum measured contrast, and the full browser story/review/landing checks passed with 100 survived and no page or console errors. Final Review, hands-on feedback, learning wrap-up and app map remain pending by design.
 
 - Completion pass Part 4 completed: the final gallery, README, scope, PRD and spec companions match the real reading, cards, builder, natural schedules, report and reset. Every local README target resolves; 23 external targets return 200 and the Devpost link opens in the browser despite its automated-checker 403. No em dashes were added. A fresh authenticated Windows clone of `4a8cb00`, without an `.env` file, passes plain `uv sync`, `npm install` (zero reported vulnerabilities), the documented launcher, 219 tests with two opt-in skips, Ruff, the production build, Chromium install, the full browser story and the exact locked count line. The root suite also passes 219 tests with two skips. Upstream deprecation warnings are recorded in `release-review.md`; local proof stays ignored. The history/index scan finds no credentials, actual learner profile or ZIP; four intentional old example screenshots and a harmless TypeScript hook were reviewed without rewriting history. GitHub visibility is PRIVATE and anonymous access fails, so public release still needs explicit approval. The earlier deferred slice-5 hands-on check is folded into the learner's requested Part-6 checkpoint, with the focused gate/verdict learning activity afterward. Final Review and the wrap-up remain unchecked.
 
