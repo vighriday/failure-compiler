@@ -1,5 +1,5 @@
 > [!NOTE]
-> **All seven build slices are implemented.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The learner's final hands-on review, learning wrap-up, video and submission answers remain separate completion steps.
+> **All seven build slices are implemented.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The hands-on review, focused learning wrap-up and app map are complete; the video and submission answers remain separate learner-owned steps.
 
 <div align="center">
 
@@ -415,7 +415,7 @@ flowchart LR
 
 Every number in this README can be reproduced from the repository.
 
-Verified on 20 October 2026: **219 passed, 2 opt-in network tests skipped**. Ruff and the production build pass. The test run reports one Starlette/httpx dependency deprecation warning.
+Verified on 20 October 2026: **220 passed, 2 opt-in network tests skipped**. Ruff and the production build pass. The test run reports one Starlette/httpx dependency deprecation warning.
 
 | Claim | How to check it |
 |---|---|
@@ -461,7 +461,7 @@ Real-network smoke tests run only when you explicitly set `RUN_LIVE_AI_TESTS=1` 
 
 You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, and Node.js 20 or newer.
 
-The repository is currently private pending final publication approval, so cloning requires access. Setup below was verified in a fresh Windows clone without an `.env` file; download and cold-start time varies.
+The repository is public. Setup below was verified in a fresh Windows clone without an `.env` file; download and cold-start time varies.
 
 ```bash
 git clone https://github.com/vighriday/failure-compiler.git
@@ -503,9 +503,15 @@ Screen 1 shows the Gemini data notice: Google may use content to improve its pro
 
 Playwright is included by `uv sync`. Install its browser once with `uv run -- python -m playwright install chromium`, build with `npm run build`, then run the isolated browser runner. The story, review and landing scripts can also target an already-running app through `FAILURE_COMPILER_URL`.
 
-### Deployment preparation
+### Deployment status
 
-The app is prepared for a single-container deployment: the [Dockerfile](Dockerfile) builds the Vite frontend and FastAPI serves it. The container binds `0.0.0.0` only inside the container; local development remains on `127.0.0.1`. Do not set provider keys on the public service. Visitors can use the saved example or enter their own key for that browser session. HTTPS belongs at the hosting provider, and the live AI endpoints enforce the 4,000-character plan limit and an in-process six-request-per-minute limit. See the [deployment readiness comparison](docs/deployment-readiness.md) for the Render recommendation and the local Docker-engine limitation.
+This is a **local-first proof of concept**. The supported and tested behavior is the
+local launcher above: FastAPI binds to `127.0.0.1`, keys stay in local server
+memory, and the saved example runs without a key. No live deployment is included
+or required for the demo. A Dockerfile and deployment notes are retained as
+optional preparation, but they are not a claim that a public instance exists.
+If you deploy it yourself, review the session, HTTPS, rate-limit and secret
+requirements in the [deployment readiness notes](docs/deployment-readiness.md).
 
 ### Provider measurements
 
@@ -532,8 +538,8 @@ This project was built with the **[Devpost Learn Skill Pack](https://github.com/
 | `2-scope` | Finds the kernel, defines "done", cuts the idea down | [`scope.md`](devpost/scope.md) · [visual](devpost/scope.html) |
 | `3-prd` | Screens, behaviour, edge cases, look and feel. No code talk. | [`prd.md`](devpost/prd.md) · [visual](devpost/prd.html) |
 | `4-spec` | Stack, data, components, risks | [`spec.md`](devpost/spec.md) · [visual](devpost/spec.html) |
-| `5-build` | Small working slices, each tested and committed | [`checklist.md`](devpost/checklist.md); the app map is planned for the learning wrap-up |
-| `6-ship` | Repo, video, submission | Planned after the build and review are complete |
+| `5-build` | Small working slices, each tested and committed | [`checklist.md`](devpost/checklist.md) and the finished [`app-map.html`](devpost/app-map.html) |
+| `6-ship` | Repo, video, submission | Public repository prepared; video and submission remain learner-owned |
 
 **The scope, PRD and spec were approved before implementation.** Later decisions and revisions are recorded in the checklist and individual commits. Run `git log --oneline --reverse` to see the trail:
 
@@ -581,7 +587,7 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 - [x] **Slice 6:** live Gemini/Groq flow, real saved reading and approved real suggestions, fixed-choice coordinator changes, offline end-to-end verification
 - [x] **Slice 7:** report, Before/After, printable sample PDF, gallery assets and accessibility
 
-Implementation progress above is complete. The learner's hands-on final review and focused learning wrap-up are still pending; the app map will be produced during that wrap-up. Video recording and Devpost answers belong to the learner. A public deployment needs the learner's host choice and approval.
+Implementation progress, hands-on review, focused wrap-up and app map are complete. Video recording and Devpost answers belong to the learner. Deployment is optional and is not part of the tested demo path.
 
 <!-- Keep this paragraph truthful. Edit the wording however you like. -->
 **How it was built.** The skills ran across several coding agents. Each switch happened when a usage limit ran out, and nothing was lost because the `devpost/` files and git carry the state. I also used Claude in a separate chat as a reviewer, to stress-test my answers and check each draft before approving it.

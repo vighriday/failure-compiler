@@ -1,5 +1,8 @@
 # Completion verification, 20 October 2026
 
+> Historical release record. The current public-release state is summarized in
+> the final addendum below.
+
 ## Scope of this pass
 
 The final visual design, checker constraints, truth map, locked verdicts and real suggestion captures remain unchanged. The six-part completion request adds honest field citations, clearer report content, recording support, release verification and deployment preparation. Hands-on feedback, the focused learning activity and host selection are separate pending steps.
@@ -38,6 +41,21 @@ The final visual design, checker constraints, truth map, locked verdicts and rea
 - The browser checks exposed a focus/hover conflict during automatic scrolling. Source rows and tags now preserve the focused source when the pointer leaves; each Route C field tag is checked against its actual line. Styles are unchanged.
 - Fresh authenticated Windows clone of `4a8cb00`, with no `.env`: plain `uv sync`, `npm install`, the documented `scripts/dev.py` launcher, full tests, Ruff, production build, Chromium install, isolated full browser story and `check_map` all pass. npm reports zero vulnerabilities. Both local servers become ready within the 90-second allowance and stop cleanly. The clone suite is **219 passed, 2 skipped**, 196.55 seconds; it reports the Starlette/httpx warning and two upstream boolean-inversion deprecations. The root suite reports only the first warning. Existing activated-environment and cross-filesystem copy notices do not affect the selected clone environment or results. Logs and the command/commit manifest remain ignored under `devpost/screens/clean-clone-proof`.
 
-## Pending user checkpoint
+## Historical checkpoint
 
-The final hands-on review and focused learning wrap-up have not happened. The app map is therefore pending. No host has been selected and nothing has been deployed. The video link is explicitly pending; narration and Devpost answers remain the learner's own work.
+At the time of this record, the hands-on review and focused learning wrap-up
+were pending. They were completed later and recorded in the checklist.
+
+## Final addendum, 20 October 2026
+
+- The repository is public and the committed release history is pushed to
+  `origin/main` through commit `2e67b1c`.
+- The final offline suite is **220 passed, 2 skipped**; Ruff, the production
+  build, browser story, review checks, landing checks and accessibility checks
+  pass. The locked count remains 100 tests, with 1 single weak spot, 3 hidden
+  pairs, 12 dimmed and 84 survived.
+- The focused wrap-up and [`app-map.html`](app-map.html) are complete. The
+  timeline wording now says “One morning that gets this result” to make clear
+  that displayed schedules are examples, not unique verdicts.
+- No live deployment exists. The project is local-first; the video link and
+  learner-written submission answers remain pending.

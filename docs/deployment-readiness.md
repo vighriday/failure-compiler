@@ -30,14 +30,18 @@ cap.
 | Render | Free web service sleeps after inactivity; paid Starter is predictable and inexpensive | Free cold starts; paid service stays warm | Straightforward Docker deploy and enough CPU for the fixed checker | Best balance if a small paid instance is acceptable |
 | Fly.io | Small shared CPU VM is low cost, with usage-based billing | Can auto-stop unless configured to stay running | More control over CPU and region, but more operational setup | Reliable when `auto_stop_machines = false`; requires account and billing setup |
 
-## Recommendation
+## Current decision
 
-Use **Render Starter** for the live link: it has the least operational work,
-keeps the container warm for the recording window, and provides managed HTTPS.
-Deploy with an empty provider-key environment, set a health check to
-`/api/health`, and keep the service at one instance so the in-process session
-and rate-limit guarantees remain accurate. If a free-only deployment is
-required, use Hugging Face Spaces and disclose its sleep/wake behavior.
+The project is currently **local-first** and has no live deployment. This is the
+tested demo path and the README does not claim a public instance. The Dockerfile
+and this document remain optional preparation for a future host.
+
+Render Starter was previously considered, but it requires billing details for
+the user's account and is not being used. A new free Hugging Face Docker Space
+also requires a paid plan according to the current Hugging Face documentation.
+Do not use a cron job to defeat provider sleep policies. If a future deployment
+is wanted, choose a host explicitly, review its current terms, and verify the
+live URL before adding it to the README.
 
 ## Local verification limitation
 
