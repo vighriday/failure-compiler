@@ -2,6 +2,16 @@
 
 ## Status
 
+Final completion pass, 20 October: the new `reading-v2` / `read-v4` source schema and
+campaign are documented in [source-line-review.md](source-line-review.md). The sole
+successful Gemini response is now the unedited example, verified through actual
+controls to 100/100 verdicts and 100% aligned inputs. Its 39 non-null citations pass
+support review; null sources remain explicit mentions. Both new three-slot provider
+campaigns are incomplete because of recorded provider errors, so no new ranking
+supersedes the last complete campaign. Slice 7 is complete; the final completion
+pass and learner hands-on review are in progress. Historical status notes below
+describe their own checkpoints.
+
 The measurement was corrected on 19 October: checker equivalence compares only state, lateness_minutes and human_cost. Timelines are excluded because equal-quality schedules can differ. Saved read-v3 responses score Gemini 100/100 mean verdicts and 94.34% aligned fields, against Groq 55/100 and 84%; Gemini remains primary. This re-score made no API calls. The same original reading reaches every aligned input, all 100 locked verdicts and 100 actual scenarios after the explicit Hall identity choice, required confirmations and questions. Loader reordering has been removed. Natural schedules are verified below.
 
 As of 20 October, the user approved all four unedited Groq fallback responses. `fixtures/example-fixes.json` preserves the complete captures, original raw text and provider metadata, checker contexts, three previous Gemini attempts per case and raw-text digests. Gemini's additional attempts were at least ten minutes apart and all failed with HTTP 503/504; Groq answered each case once. The fixture and app label them "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)". No new capture or prompt revision was made. Historical checkpoints below describe their state at that time; fixture approval supersedes those pending-review notes. Slice 7 has not started.

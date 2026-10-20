@@ -17,7 +17,7 @@ CASES = [
         "86 survived",
     ),
     (
-        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck",
+        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck-drops",
         "yours-driver",
         "87 survived",
     ),

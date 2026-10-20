@@ -1,7 +1,7 @@
 {
-  "reading_sha256": "a8d1fa55d89adcced9f9884c537c2543155c6c762f6bccc6d7437f97e4d823ab",
+  "reading_sha256": "6d4c8825fb2571744a82f6b85b8edd552bac9024a5cb3cb8808934c013a7acd1",
   "provider": "gemini",
-  "prompt_version": "read-v3",
+  "prompt_version": "read-v4",
   "scripted_corrections": [
     {
       "action": "answer",
@@ -121,7 +121,9 @@
       "value": "Use the reviewed details"
     }
   ],
-  "captured_file_sha256": "6f30729d00eb041136d3594a62886ce3ee2dce5dd480fdac9eca39c62b234cfa",
+  "captured_file_sha256": "6d4c8825fb2571744a82f6b85b8edd552bac9024a5cb3cb8808934c013a7acd1",
   "digest_format": "UTF-8 text with LF line endings",
-  "raw_text_sha256": "082002295e5d2dd0b4a90dd679796b64dce8a3d0eab1af6c6f5cb1d7c2b60f92"
+  "raw_text_sha256": "31402a892a7e8ce43d2cde8f8bbc8b4232a8586524391a82a657bfadd19161e7",
+  "schema_version": "reading-v2",
+  "source_review": "39 non-null fact citations reviewed against the plan; null evidence remains labelled as an entity mention. See devpost/source-line-review.md."
 }

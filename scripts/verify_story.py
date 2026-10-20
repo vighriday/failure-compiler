@@ -13,7 +13,7 @@ SCREENS = ROOT / "devpost/screens"
 VAN_ANITA = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van"
 VAN_ANITA_ABSENT = "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van"
 JOEL_RAVI = "volunteer_absent__person-ravi+volunteer_absent__person-joel"
-TRUCK_RAVI = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck"
+TRUCK_RAVI = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck-drops"
 
 
 def main() -> None:

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { APIError, aiStatus, confirmMap, readExample, readPlan as readLivePlan, updateMap } from "./api/client";
 import type { AIProvider, ExampleReading, PlanMap, ReadingItem, RuleQuestion, ReviewState, Status } from "./types";
 import FactEditor from "./components/FactEditor";
+import SourceTags from "./components/SourceTags";
 import CrashTest from "./screens/CrashTest";
 import LandingPage from "./landing/LandingPage";
 import { TABS, type LandingTab } from "./landing/data";
@@ -177,7 +178,7 @@ function App() {
           <div className="source-paper">
             <LineNumbers text={reading.plan_text} activeLine={activeLine} onLineClick={setActiveLine} />
           </div>
-          <div className="source-legend"><span className="legend-dot" /> Hover a statement to trace its source</div>
+          <div className="source-legend"><span className="legend-dot" /> Hover or focus a source tag to trace its line</div>
         </aside>
 
         <section className="map-content" aria-label="Plan map">
@@ -220,13 +221,14 @@ function App() {
                 {items.filter((item) => item.group === group).map((item) => {
                   const changedBy = item.changed_by_fix;
                   const acceptedChange = changedBy ? planMap.fix_history?.[changedBy - 1] : undefined;
+                  const factLine = item.source_tags?.find((tag) => tag.kind === "fact")?.source_line;
                   return (
-                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} key={item.id} tabIndex={0} onFocus={() => setActiveLine(item.source_line ?? undefined)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => setActiveLine(item.source_line ?? undefined)} onMouseLeave={() => setActiveLine(undefined)}>
+                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} key={item.id} tabIndex={0} onFocus={(event) => { if (event.target === event.currentTarget) setActiveLine(factLine); }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActiveLine(undefined); }} onMouseEnter={() => setActiveLine(factLine)} onMouseLeave={() => setActiveLine(undefined)}>
                       <div className="reading-copy">
                         <div className="statement-line">
                           {item.status === "corrected" ? <><del>{item.original_statement}</del><span>{item.statement}</span></> : <span>{item.statement}</span>}
                         </div>
-                        {item.source_line && <button type="button" className="source-tag" onClick={() => setActiveLine(item.source_line ?? undefined)}>{item.source_line}</button>}
+                        <SourceTags tags={item.source_tags} onHighlight={setActiveLine} />
                         {acceptedChange && <div className="fix-map-note">{acceptedChange.description}</div>}
                       </div>
                       <div className="reading-controls">

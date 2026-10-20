@@ -33,6 +33,6 @@ export default function MissingFactQuestion({question, plan, disabled, onAnswer}
     type: field === "vehicle_id" ? "select" : "ordered_people", value: route?.[field] ?? "",
     options: (field === "vehicle_id" ? plan.vehicles : plan.people.filter((person) => field === "loader_ids" || person.can_drive)).map((entity) => ({value: entity.id, label: entity.name})),
   };
-  const item: ReadingItem = {id: question.id, entity_id: question.entity_id ?? "", entity_type: "route", group: "Routes", field, source_line: null, status: "added", statement: question.question_text, controls: [control]};
+  const item: ReadingItem = {id: question.id, entity_id: question.entity_id ?? "", entity_type: "route", group: "Routes", field, source_line: null, source_tags: [], status: "added", statement: question.question_text, controls: [control]};
   return <FactEditor item={item} disabled={disabled} onCorrect={(_, value) => onAnswer(value)} onConfirm={() => undefined} />;
 }

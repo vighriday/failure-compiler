@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.bakeoff import wait_for_groq  # noqa: E402
 from server.ai.adapter import read_plan  # noqa: E402
-from server.ai.prompts import READ_PROMPT_VERSION  # noqa: E402
+from server.ai.prompts import READ_PROMPT_VERSION, READ_SCHEMA_VERSION  # noqa: E402
 from server.ai.types import AIError  # noqa: E402
 from server.config import PRIMARY_PROVIDER  # noqa: E402
 from server.models import PlanMapData  # noqa: E402
@@ -84,7 +84,13 @@ def main():
         raise SystemExit(str(error)) from error
     # Preserve the raw provider record exactly; comparisons are saved separately.
     target.write_text(
-        json.dumps(result.raw.record(), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        json.dumps(
+            {**result.raw.record(), "schema_version": READ_SCHEMA_VERSION},
+            indent=2,
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
     )
     attempts.append(
         {

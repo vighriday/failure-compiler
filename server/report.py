@@ -5,7 +5,7 @@ from copy import deepcopy
 from fastapi import APIRouter, HTTPException, Query, Request
 
 from server.checker.scenarios import _instantiate_problems, generate_scenarios
-from server.facts import changed_by, statement
+from server.facts import changed_by, source_tags, statement
 from server.grid import count_results, problem_labels
 from server.labels import route_label
 from server.reading import items_for_plan
@@ -147,6 +147,7 @@ def build_report(chain: list[tuple[str, MapSnapshot]]) -> dict:
             "group": row["group"],
             "statement": statement(current.plan, row),
             "source_line": row.get("source_line"),
+            "source_tags": source_tags(current.plan, row),
             "status": row["status"],
             "original_statement": row.get("original_statement"),
             "changed_by_fix": changed_by(current.plan, row),

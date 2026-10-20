@@ -8,7 +8,7 @@ from uuid import uuid4
 from fastapi import HTTPException
 from pydantic import TypeAdapter
 
-from server.facts import changed_by, controls, entity_for, loading_team, statement
+from server.facts import changed_by, controls, entity_for, loading_team, source_tags, statement
 from server.place_review import answer_place_question, reopen_place_question
 from server.rule_questions import answer_rule_question, sync_rule_questions
 from server.session import capture_map, get_map, remember_map
@@ -84,6 +84,7 @@ def snapshot(reading_id: str) -> dict:
         {
             **item,
             "statement": statement(review.plan, item),
+            "source_tags": source_tags(review.plan, item),
             "controls": controls(review.plan, item),
             "changed_by_fix": changed_by(review.plan, item),
         }

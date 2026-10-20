@@ -58,7 +58,7 @@ def main():
             )
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.on("request", lambda request: requests.append(request.url))
-            page.goto(f"http://127.0.0.1:{args.port}/#start")
+            page.goto(f"http://127.0.0.1:{listener.getsockname()[1]}/#start")
             page.get_by_role("button", name="Load the example plan", exact=True).click()
             page.get_by_role("button", name="Read plan", exact=True).click()
             expect(page.locator(".placeholder-notice")).to_contain_text("saved AI reading")

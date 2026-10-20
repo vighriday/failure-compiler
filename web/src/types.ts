@@ -1,5 +1,7 @@
 export type Status = "unconfirmed" | "confirmed" | "corrected" | "added" | "guessed" | "stale";
 
+export type SourceTag = {label: string; source_line: string; kind: "fact" | "mention"};
+
 export type ReadingItem = {
   id: string;
   group: "People" | "Vehicles" | "Routes" | "Times";
@@ -8,6 +10,7 @@ export type ReadingItem = {
   field: string;
   statement: string;
   source_line: string | null;
+  source_tags: SourceTag[];
   status: Status;
   guessed?: boolean;
   value?: number | boolean;
@@ -45,7 +48,7 @@ export type PlanMap = {
   deliveries: Array<Record<string, any>>;
   routes: Array<Record<string, any>>;
   finish_time: number;
-  finish_time_source: string;
+  finish_time_source: string | null;
   finish_time_guessed: boolean;
   problem_sizes: Record<string, number>;
   questions: Array<Record<string, any>>;
@@ -112,7 +115,7 @@ export type ReportRun = RunMeta & { results: ScenarioResult[]; count: RunCount }
 export type ReportData = {
   fingerprint: string; source: ReadingSource; read_by: string;
   summary: {ai_read: number; corrected: number; added: number};
-  facts: Array<{id: string; group: string; statement: string; source_line: string | null; status: Status; original_statement?: string; changed_by_fix?: number | null}>;
+  facts: Array<{id: string; group: string; statement: string; source_line: string | null; source_tags: SourceTag[]; status: Status; original_statement?: string; changed_by_fix?: number | null}>;
   review_answers: Array<{question: string; answer: string}>;
   before: ReportRun; after: ReportRun;
   broken_before: Array<ScenarioResult & {label: string}>;

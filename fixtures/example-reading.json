@@ -1,12 +1,12 @@
 {
   "provider": "gemini",
   "model": "gemini-3.8-flash",
-  "prompt_version": "read-v3",
-  "timestamp": "2026-10-17T16:33:28.918243+00:00",
-  "raw_text": "{\n  \"people\": [\n    {\n      \"id\": \"person_joel\",\n      \"name\": \"Joel\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 630,\n      \"holds_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false\n    },\n    {\n      \"id\": \"person_ravi\",\n      \"name\": \"Ravi\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 780,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"person_maya\",\n      \"name\": \"Maya\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 645,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"person_sam\",\n      \"name\": \"Sam\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"person_anita\",\n      \"name\": \"Anita\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true\n    }\n  ],\n  \"vehicles\": [\n    {\n      \"id\": \"vehicle_van\",\n      \"name\": \"Van\",\n      \"available_from\": 570,\n      \"source_line\": \"L5\",\n      \"guessed\": false\n    },\n    {\n      \"id\": \"vehicle_car\",\n      \"name\": \"Car\",\n      \"available_from\": 540,\n      \"source_line\": \"L5\",\n      \"guessed\": false\n    }\n  ],\n  \"places\": [\n    {\n      \"id\": \"place_hall\",\n      \"name\": \"Hall\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": false,\n      \"needs_key\": false,\n      \"source_line\": \"L3\",\n      \"guessed\": false\n    },\n    {\n      \"id\": \"place_bay\",\n      \"name\": \"Loading bay\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": true,\n      \"needs_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false\n    }\n  ],\n  \"deliveries\": [\n    {\n      \"id\": \"delivery_supply_truck\",\n      \"name\": \"Supply truck\",\n      \"arrives_at\": 540,\n      \"place_id\": \"place_bay\",\n      \"source_line\": \"L4\",\n      \"guessed\": false\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"route_a\",\n      \"name\": \"Route A\",\n      \"households\": 10,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"vehicle_car\",\n      \"driver_ids\": [\n        \"person_ravi\",\n        \"person_maya\",\n        \"person_joel\"\n      ],\n      \"loader_ids\": [\n        \"person_joel\",\n        \"person_anita\",\n        \"person_maya\",\n        \"person_ravi\"\n      ],\n      \"source_line\": \"L8\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"route_b\",\n      \"name\": \"Route B\",\n      \"households\": 12,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 35,\n      \"vehicle_id\": \"vehicle_van\",\n      \"driver_ids\": [\n        \"person_sam\",\n        \"person_anita\",\n        \"person_ravi\"\n      ],\n      \"loader_ids\": [\n        \"person_joel\",\n        \"person_anita\",\n        \"person_maya\"\n      ],\n      \"source_line\": \"L9\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"route_c\",\n      \"name\": \"Route C\",\n      \"households\": 8,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"vehicle_van\",\n      \"driver_ids\": [\n        \"person_anita\",\n        \"person_sam\",\n        \"person_ravi\"\n      ],\n      \"loader_ids\": [\n        \"person_joel\",\n        \"person_anita\",\n        \"person_maya\"\n      ],\n      \"source_line\": \"L10\",\n      \"guessed\": true\n    }\n  ],\n  \"finish_time\": 720,\n  \"finish_time_source\": \"L6\",\n  \"finish_time_guessed\": false,\n  \"problem_sizes\": {\n    \"volunteer_leaves_early\": 90,\n    \"vehicle_returns_late\": 30,\n    \"supply_delivery_late\": 45,\n    \"place_blocked\": 30\n  },\n  \"questions\": [\n    {\n      \"item_id\": \"person_ravi\",\n      \"question_text\": \"What time does Ravi arrive?\"\n    },\n    {\n      \"item_id\": \"person_maya\",\n      \"question_text\": \"What time does Maya arrive?\"\n    },\n    {\n      \"item_id\": \"person_sam\",\n      \"question_text\": \"What time does Sam arrive?\"\n    },\n    {\n      \"item_id\": \"person_anita\",\n      \"question_text\": \"What time does Anita arrive?\"\n    }\n  ],\n  \"is_distribution_plan\": true,\n  \"not_distribution_reason\": null\n}",
-  "input_tokens": 907,
-  "output_tokens": 1573,
-  "total_tokens": 2480,
+  "prompt_version": "read-v4",
+  "timestamp": "2026-10-20T13:45:02.491431+00:00",
+  "raw_text": "{\n  \"people\": [\n    {\n      \"id\": \"joel\",\n      \"name\": \"Joel\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 630,\n      \"holds_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"available_from\": \"L3\",\n        \"available_until\": \"L3\",\n        \"can_drive\": \"L16\",\n        \"holds_key\": \"L3\"\n      }\n    },\n    {\n      \"id\": \"ravi\",\n      \"name\": \"Ravi\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 780,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L8\",\n        \"holds_key\": null\n      }\n    },\n    {\n      \"id\": \"maya\",\n      \"name\": \"Maya\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 645,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L16\",\n        \"holds_key\": null\n      }\n    },\n    {\n      \"id\": \"sam\",\n      \"name\": \"Sam\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L9\",\n        \"holds_key\": null\n      }\n    },\n    {\n      \"id\": \"anita\",\n      \"name\": \"Anita\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L10\",\n        \"holds_key\": null\n      }\n    }\n  ],\n  \"vehicles\": [\n    {\n      \"id\": \"van\",\n      \"name\": \"Van\",\n      \"available_from\": 570,\n      \"source_line\": \"L5\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"available_from\": \"L5\"\n      }\n    },\n    {\n      \"id\": \"car\",\n      \"name\": \"Car\",\n      \"available_from\": 540,\n      \"source_line\": \"L5\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"available_from\": \"L5\"\n      }\n    }\n  ],\n  \"places\": [\n    {\n      \"id\": \"hall\",\n      \"name\": \"Hall\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": false,\n      \"needs_key\": false,\n      \"source_line\": \"L3\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"opens_at\": \"L3\",\n        \"one_vehicle_at_a_time\": null,\n        \"needs_key\": null\n      }\n    },\n    {\n      \"id\": \"loading_bay\",\n      \"name\": \"Loading bay\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": true,\n      \"needs_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"opens_at\": \"L3\",\n        \"one_vehicle_at_a_time\": \"L12\",\n        \"needs_key\": \"L3\"\n      }\n    }\n  ],\n  \"deliveries\": [\n    {\n      \"id\": \"supply_truck_drop\",\n      \"name\": \"Supply truck drops\",\n      \"arrives_at\": 540,\n      \"place_id\": \"loading_bay\",\n      \"source_line\": \"L4\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"arrives_at\": \"L4\",\n        \"place_id\": \"L4\"\n      }\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"route_a\",\n      \"name\": \"Route A\",\n      \"households\": 10,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"car\",\n      \"driver_ids\": [\n        \"ravi\",\n        \"maya\",\n        \"joel\"\n      ],\n      \"loader_ids\": [\n        \"ravi\",\n        \"joel\",\n        \"anita\",\n        \"maya\"\n      ],\n      \"source_line\": \"L8\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"households\": \"L8\",\n        \"load_minutes\": \"L12\",\n        \"drive_minutes\": \"L8\",\n        \"vehicle_id\": \"L8\",\n        \"driver_ids\": \"L8\",\n        \"loader_ids\": \"L13\"\n      }\n    },\n    {\n      \"id\": \"route_b\",\n      \"name\": \"Route B\",\n      \"households\": 12,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 35,\n      \"vehicle_id\": \"van\",\n      \"driver_ids\": [\n        \"sam\",\n        \"anita\",\n        \"ravi\"\n      ],\n      \"loader_ids\": [\n        \"joel\",\n        \"anita\",\n        \"maya\"\n      ],\n      \"source_line\": \"L9\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"households\": \"L9\",\n        \"load_minutes\": \"L12\",\n        \"drive_minutes\": \"L9\",\n        \"vehicle_id\": \"L9\",\n        \"driver_ids\": \"L9\",\n        \"loader_ids\": \"L13\"\n      }\n    },\n    {\n      \"id\": \"route_c\",\n      \"name\": \"Route C\",\n      \"households\": 8,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"van\",\n      \"driver_ids\": [\n        \"anita\",\n        \"sam\",\n        \"ravi\"\n      ],\n      \"loader_ids\": [\n        \"joel\",\n        \"anita\",\n        \"maya\"\n      ],\n      \"source_line\": \"L10\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"households\": \"L10\",\n        \"load_minutes\": \"L12\",\n        \"drive_minutes\": \"L10\",\n        \"vehicle_id\": \"L10\",\n        \"driver_ids\": \"L10\",\n        \"loader_ids\": \"L13\"\n      }\n    }\n  ],\n  \"finish_time\": 720,\n  \"finish_time_source\": \"L6\",\n  \"finish_time_guessed\": false,\n  \"problem_sizes\": {\n    \"volunteer_leaves_early\": 90,\n    \"vehicle_returns_late\": 30,\n    \"supply_delivery_late\": 45,\n    \"place_blocked\": 30\n  },\n  \"questions\": [\n    {\n      \"item_id\": \"ravi\",\n      \"question_text\": \"What time is Ravi available from?\"\n    },\n    {\n      \"item_id\": \"maya\",\n      \"question_text\": \"What time is Maya available from?\"\n    },\n    {\n      \"item_id\": \"sam\",\n      \"question_text\": \"What time is Sam available from?\"\n    },\n    {\n      \"item_id\": \"anita\",\n      \"question_text\": \"What time is Anita available from?\"\n    }\n  ],\n  \"is_distribution_plan\": true,\n  \"not_distribution_reason\": null\n}",
+  "input_tokens": 1019,
+  "output_tokens": 2197,
+  "total_tokens": 3216,
   "response": {
     "sdk_http_response": {
       "headers": {
@@ -14,12 +14,12 @@
         "content-type": "application/json; charset=UTF-8",
         "vary": "Origin, X-Origin, Referer",
         "content-encoding": "gzip",
-        "date": "Sat, 17 Oct 2026 16:33:28 GMT",
+        "date": "Tue, 20 Oct 2026 13:45:02 GMT",
         "server": "scaffolding on HTTPServer2",
         "x-xss-protection": "0",
         "x-frame-options": "SAMEORIGIN",
         "x-content-type-options": "nosniff",
-        "server-timing": "gfet4t7; dur=10181",
+        "server-timing": "gfet4t7; dur=39956",
         "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
         "transfer-encoding": "chunked"
       },
@@ -37,9 +37,9 @@
               "function_call": null,
               "function_response": null,
               "inline_data": null,
-              "text": "{\n  \"people\": [\n    {\n      \"id\": \"person_joel\",\n      \"name\": \"Joel\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 630,\n      \"holds_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false\n    },\n    {\n      \"id\": \"person_ravi\",\n      \"name\": \"Ravi\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 780,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"person_maya\",\n      \"name\": \"Maya\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 645,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"person_sam\",\n      \"name\": \"Sam\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"person_anita\",\n      \"name\": \"Anita\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true\n    }\n  ],\n  \"vehicles\": [\n    {\n      \"id\": \"vehicle_van\",\n      \"name\": \"Van\",\n      \"available_from\": 570,\n      \"source_line\": \"L5\",\n      \"guessed\": false\n    },\n    {\n      \"id\": \"vehicle_car\",\n      \"name\": \"Car\",\n      \"available_from\": 540,\n      \"source_line\": \"L5\",\n      \"guessed\": false\n    }\n  ],\n  \"places\": [\n    {\n      \"id\": \"place_hall\",\n      \"name\": \"Hall\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": false,\n      \"needs_key\": false,\n      \"source_line\": \"L3\",\n      \"guessed\": false\n    },\n    {\n      \"id\": \"place_bay\",\n      \"name\": \"Loading bay\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": true,\n      \"needs_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false\n    }\n  ],\n  \"deliveries\": [\n    {\n      \"id\": \"delivery_supply_truck\",\n      \"name\": \"Supply truck\",\n      \"arrives_at\": 540,\n      \"place_id\": \"place_bay\",\n      \"source_line\": \"L4\",\n      \"guessed\": false\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"route_a\",\n      \"name\": \"Route A\",\n      \"households\": 10,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"vehicle_car\",\n      \"driver_ids\": [\n        \"person_ravi\",\n        \"person_maya\",\n        \"person_joel\"\n      ],\n      \"loader_ids\": [\n        \"person_joel\",\n        \"person_anita\",\n        \"person_maya\",\n        \"person_ravi\"\n      ],\n      \"source_line\": \"L8\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"route_b\",\n      \"name\": \"Route B\",\n      \"households\": 12,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 35,\n      \"vehicle_id\": \"vehicle_van\",\n      \"driver_ids\": [\n        \"person_sam\",\n        \"person_anita\",\n        \"person_ravi\"\n      ],\n      \"loader_ids\": [\n        \"person_joel\",\n        \"person_anita\",\n        \"person_maya\"\n      ],\n      \"source_line\": \"L9\",\n      \"guessed\": true\n    },\n    {\n      \"id\": \"route_c\",\n      \"name\": \"Route C\",\n      \"households\": 8,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"vehicle_van\",\n      \"driver_ids\": [\n        \"person_anita\",\n        \"person_sam\",\n        \"person_ravi\"\n      ],\n      \"loader_ids\": [\n        \"person_joel\",\n        \"person_anita\",\n        \"person_maya\"\n      ],\n      \"source_line\": \"L10\",\n      \"guessed\": true\n    }\n  ],\n  \"finish_time\": 720,\n  \"finish_time_source\": \"L6\",\n  \"finish_time_guessed\": false,\n  \"problem_sizes\": {\n    \"volunteer_leaves_early\": 90,\n    \"vehicle_returns_late\": 30,\n    \"supply_delivery_late\": 45,\n    \"place_blocked\": 30\n  },\n  \"questions\": [\n    {\n      \"item_id\": \"person_ravi\",\n      \"question_text\": \"What time does Ravi arrive?\"\n    },\n    {\n      \"item_id\": \"person_maya\",\n      \"question_text\": \"What time does Maya arrive?\"\n    },\n    {\n      \"item_id\": \"person_sam\",\n      \"question_text\": \"What time does Sam arrive?\"\n    },\n    {\n      \"item_id\": \"person_anita\",\n      \"question_text\": \"What time does Anita arrive?\"\n    }\n  ],\n  \"is_distribution_plan\": true,\n  \"not_distribution_reason\": null\n}",
+              "text": "{\n  \"people\": [\n    {\n      \"id\": \"joel\",\n      \"name\": \"Joel\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 630,\n      \"holds_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"available_from\": \"L3\",\n        \"available_until\": \"L3\",\n        \"can_drive\": \"L16\",\n        \"holds_key\": \"L3\"\n      }\n    },\n    {\n      \"id\": \"ravi\",\n      \"name\": \"Ravi\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 780,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L8\",\n        \"holds_key\": null\n      }\n    },\n    {\n      \"id\": \"maya\",\n      \"name\": \"Maya\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 645,\n      \"holds_key\": false,\n      \"source_line\": \"L8\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L16\",\n        \"holds_key\": null\n      }\n    },\n    {\n      \"id\": \"sam\",\n      \"name\": \"Sam\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L9\",\n        \"holds_key\": null\n      }\n    },\n    {\n      \"id\": \"anita\",\n      \"name\": \"Anita\",\n      \"can_drive\": true,\n      \"can_drive_guessed\": false,\n      \"available_from\": 540,\n      \"available_until\": 720,\n      \"holds_key\": false,\n      \"source_line\": \"L9\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"available_from\": null,\n        \"available_until\": \"L15\",\n        \"can_drive\": \"L10\",\n        \"holds_key\": null\n      }\n    }\n  ],\n  \"vehicles\": [\n    {\n      \"id\": \"van\",\n      \"name\": \"Van\",\n      \"available_from\": 570,\n      \"source_line\": \"L5\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"available_from\": \"L5\"\n      }\n    },\n    {\n      \"id\": \"car\",\n      \"name\": \"Car\",\n      \"available_from\": 540,\n      \"source_line\": \"L5\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"available_from\": \"L5\"\n      }\n    }\n  ],\n  \"places\": [\n    {\n      \"id\": \"hall\",\n      \"name\": \"Hall\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": false,\n      \"needs_key\": false,\n      \"source_line\": \"L3\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"opens_at\": \"L3\",\n        \"one_vehicle_at_a_time\": null,\n        \"needs_key\": null\n      }\n    },\n    {\n      \"id\": \"loading_bay\",\n      \"name\": \"Loading bay\",\n      \"opens_at\": 540,\n      \"one_vehicle_at_a_time\": true,\n      \"needs_key\": true,\n      \"source_line\": \"L3\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"opens_at\": \"L3\",\n        \"one_vehicle_at_a_time\": \"L12\",\n        \"needs_key\": \"L3\"\n      }\n    }\n  ],\n  \"deliveries\": [\n    {\n      \"id\": \"supply_truck_drop\",\n      \"name\": \"Supply truck drops\",\n      \"arrives_at\": 540,\n      \"place_id\": \"loading_bay\",\n      \"source_line\": \"L4\",\n      \"guessed\": false,\n      \"fact_sources\": {\n        \"arrives_at\": \"L4\",\n        \"place_id\": \"L4\"\n      }\n    }\n  ],\n  \"routes\": [\n    {\n      \"id\": \"route_a\",\n      \"name\": \"Route A\",\n      \"households\": 10,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"car\",\n      \"driver_ids\": [\n        \"ravi\",\n        \"maya\",\n        \"joel\"\n      ],\n      \"loader_ids\": [\n        \"ravi\",\n        \"joel\",\n        \"anita\",\n        \"maya\"\n      ],\n      \"source_line\": \"L8\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"households\": \"L8\",\n        \"load_minutes\": \"L12\",\n        \"drive_minutes\": \"L8\",\n        \"vehicle_id\": \"L8\",\n        \"driver_ids\": \"L8\",\n        \"loader_ids\": \"L13\"\n      }\n    },\n    {\n      \"id\": \"route_b\",\n      \"name\": \"Route B\",\n      \"households\": 12,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 35,\n      \"vehicle_id\": \"van\",\n      \"driver_ids\": [\n        \"sam\",\n        \"anita\",\n        \"ravi\"\n      ],\n      \"loader_ids\": [\n        \"joel\",\n        \"anita\",\n        \"maya\"\n      ],\n      \"source_line\": \"L9\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"households\": \"L9\",\n        \"load_minutes\": \"L12\",\n        \"drive_minutes\": \"L9\",\n        \"vehicle_id\": \"L9\",\n        \"driver_ids\": \"L9\",\n        \"loader_ids\": \"L13\"\n      }\n    },\n    {\n      \"id\": \"route_c\",\n      \"name\": \"Route C\",\n      \"households\": 8,\n      \"load_minutes\": 10,\n      \"drive_minutes\": 60,\n      \"vehicle_id\": \"van\",\n      \"driver_ids\": [\n        \"anita\",\n        \"sam\",\n        \"ravi\"\n      ],\n      \"loader_ids\": [\n        \"joel\",\n        \"anita\",\n        \"maya\"\n      ],\n      \"source_line\": \"L10\",\n      \"guessed\": true,\n      \"fact_sources\": {\n        \"households\": \"L10\",\n        \"load_minutes\": \"L12\",\n        \"drive_minutes\": \"L10\",\n        \"vehicle_id\": \"L10\",\n        \"driver_ids\": \"L10\",\n        \"loader_ids\": \"L13\"\n      }\n    }\n  ],\n  \"finish_time\": 720,\n  \"finish_time_source\": \"L6\",\n  \"finish_time_guessed\": false,\n  \"problem_sizes\": {\n    \"volunteer_leaves_early\": 90,\n    \"vehicle_returns_late\": 30,\n    \"supply_delivery_late\": 45,\n    \"place_blocked\": 30\n  },\n  \"questions\": [\n    {\n      \"item_id\": \"ravi\",\n      \"question_text\": \"What time is Ravi available from?\"\n    },\n    {\n      \"item_id\": \"maya\",\n      \"question_text\": \"What time is Maya available from?\"\n    },\n    {\n      \"item_id\": \"sam\",\n      \"question_text\": \"What time is Sam available from?\"\n    },\n    {\n      \"item_id\": \"anita\",\n      \"question_text\": \"What time is Anita available from?\"\n    }\n  ],\n  \"is_distribution_plan\": true,\n  \"not_distribution_reason\": null\n}",
               "thought": null,
-              "thought_signature": "EmkKZwFpFH0TYlytJais30M0wgpuZn5idXIeAhsyxLTj-IEAoqM1mBDKcvV1y4aJ7CHDKtpozTkGjgmx0t21GLqt1rcNn5Wr2uE4MOWvEERu9wAPaR2EGMav6pHCzZQUGqwO-_loLPjI7k4=",
+              "thought_signature": "EmkKZwFpFH0TqWyOlELTa7KwZk0TiWgFiNbMSJ96ckeLf8JXaOSbDG1vv1fKbhfd9p4A_KZzjGZzQuQU36ZMuLI00EIKFjLTaJWV9G53dC8dYutnaZOpNvFNuM_a33z96sPP19thkTw4FNE=",
               "video_metadata": null,
               "tool_call": null,
               "tool_response": null,
@@ -67,23 +67,23 @@
     "create_time": null,
     "model_version": "gemini-3.8-flash",
     "prompt_feedback": null,
-    "response_id": "T6PTauSMEv_Fg8UP0ciL8As",
+    "response_id": "OHDXasbsAfvMjuMPz96nwAI",
     "usage_metadata": {
       "cache_tokens_details": null,
       "cached_content_token_count": null,
-      "candidates_token_count": 1573,
+      "candidates_token_count": 2197,
       "candidates_tokens_details": null,
-      "prompt_token_count": 907,
+      "prompt_token_count": 1019,
       "prompt_tokens_details": [
         {
           "modality": "TEXT",
-          "token_count": 907
+          "token_count": 1019
         }
       ],
       "thoughts_token_count": null,
       "tool_use_prompt_token_count": null,
       "tool_use_prompt_tokens_details": null,
-      "total_token_count": 2480,
+      "total_token_count": 3216,
       "traffic_type": null
     },
     "model_status": null,
@@ -91,7 +91,7 @@
     "parsed": {
       "people": [
         {
-          "id": "person_joel",
+          "id": "joel",
           "name": "Joel",
           "can_drive": true,
           "can_drive_guessed": false,
@@ -99,10 +99,16 @@
           "available_until": 630,
           "holds_key": true,
           "source_line": "L3",
-          "guessed": false
+          "guessed": false,
+          "fact_sources": {
+            "available_from": "L3",
+            "available_until": "L3",
+            "can_drive": "L16",
+            "holds_key": "L3"
+          }
         },
         {
-          "id": "person_ravi",
+          "id": "ravi",
           "name": "Ravi",
           "can_drive": true,
           "can_drive_guessed": false,
@@ -110,10 +116,16 @@
           "available_until": 780,
           "holds_key": false,
           "source_line": "L8",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "available_from": null,
+            "available_until": "L15",
+            "can_drive": "L8",
+            "holds_key": null
+          }
         },
         {
-          "id": "person_maya",
+          "id": "maya",
           "name": "Maya",
           "can_drive": true,
           "can_drive_guessed": false,
@@ -121,10 +133,16 @@
           "available_until": 645,
           "holds_key": false,
           "source_line": "L8",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "available_from": null,
+            "available_until": "L15",
+            "can_drive": "L16",
+            "holds_key": null
+          }
         },
         {
-          "id": "person_sam",
+          "id": "sam",
           "name": "Sam",
           "can_drive": true,
           "can_drive_guessed": false,
@@ -132,10 +150,16 @@
           "available_until": 720,
           "holds_key": false,
           "source_line": "L9",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "available_from": null,
+            "available_until": "L15",
+            "can_drive": "L9",
+            "holds_key": null
+          }
         },
         {
-          "id": "person_anita",
+          "id": "anita",
           "name": "Anita",
           "can_drive": true,
           "can_drive_guessed": false,
@@ -143,53 +167,79 @@
           "available_until": 720,
           "holds_key": false,
           "source_line": "L9",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "available_from": null,
+            "available_until": "L15",
+            "can_drive": "L10",
+            "holds_key": null
+          }
         }
       ],
       "vehicles": [
         {
-          "id": "vehicle_van",
+          "id": "van",
           "name": "Van",
           "available_from": 570,
           "source_line": "L5",
-          "guessed": false
+          "guessed": false,
+          "fact_sources": {
+            "available_from": "L5"
+          }
         },
         {
-          "id": "vehicle_car",
+          "id": "car",
           "name": "Car",
           "available_from": 540,
           "source_line": "L5",
-          "guessed": false
+          "guessed": false,
+          "fact_sources": {
+            "available_from": "L5"
+          }
         }
       ],
       "places": [
         {
-          "id": "place_hall",
+          "id": "hall",
           "name": "Hall",
           "opens_at": 540,
           "one_vehicle_at_a_time": false,
           "needs_key": false,
           "source_line": "L3",
-          "guessed": false
+          "guessed": false,
+          "fact_sources": {
+            "opens_at": "L3",
+            "one_vehicle_at_a_time": null,
+            "needs_key": null
+          }
         },
         {
-          "id": "place_bay",
+          "id": "loading_bay",
           "name": "Loading bay",
           "opens_at": 540,
           "one_vehicle_at_a_time": true,
           "needs_key": true,
           "source_line": "L3",
-          "guessed": false
+          "guessed": false,
+          "fact_sources": {
+            "opens_at": "L3",
+            "one_vehicle_at_a_time": "L12",
+            "needs_key": "L3"
+          }
         }
       ],
       "deliveries": [
         {
-          "id": "delivery_supply_truck",
-          "name": "Supply truck",
+          "id": "supply_truck_drop",
+          "name": "Supply truck drops",
           "arrives_at": 540,
-          "place_id": "place_bay",
+          "place_id": "loading_bay",
           "source_line": "L4",
-          "guessed": false
+          "guessed": false,
+          "fact_sources": {
+            "arrives_at": "L4",
+            "place_id": "L4"
+          }
         }
       ],
       "routes": [
@@ -199,20 +249,28 @@
           "households": 10,
           "load_minutes": 10,
           "drive_minutes": 60,
-          "vehicle_id": "vehicle_car",
+          "vehicle_id": "car",
           "driver_ids": [
-            "person_ravi",
-            "person_maya",
-            "person_joel"
+            "ravi",
+            "maya",
+            "joel"
           ],
           "loader_ids": [
-            "person_joel",
-            "person_anita",
-            "person_maya",
-            "person_ravi"
+            "ravi",
+            "joel",
+            "anita",
+            "maya"
           ],
           "source_line": "L8",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "households": "L8",
+            "load_minutes": "L12",
+            "drive_minutes": "L8",
+            "vehicle_id": "L8",
+            "driver_ids": "L8",
+            "loader_ids": "L13"
+          }
         },
         {
           "id": "route_b",
@@ -220,19 +278,27 @@
           "households": 12,
           "load_minutes": 10,
           "drive_minutes": 35,
-          "vehicle_id": "vehicle_van",
+          "vehicle_id": "van",
           "driver_ids": [
-            "person_sam",
-            "person_anita",
-            "person_ravi"
+            "sam",
+            "anita",
+            "ravi"
           ],
           "loader_ids": [
-            "person_joel",
-            "person_anita",
-            "person_maya"
+            "joel",
+            "anita",
+            "maya"
           ],
           "source_line": "L9",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "households": "L9",
+            "load_minutes": "L12",
+            "drive_minutes": "L9",
+            "vehicle_id": "L9",
+            "driver_ids": "L9",
+            "loader_ids": "L13"
+          }
         },
         {
           "id": "route_c",
@@ -240,19 +306,27 @@
           "households": 8,
           "load_minutes": 10,
           "drive_minutes": 60,
-          "vehicle_id": "vehicle_van",
+          "vehicle_id": "van",
           "driver_ids": [
-            "person_anita",
-            "person_sam",
-            "person_ravi"
+            "anita",
+            "sam",
+            "ravi"
           ],
           "loader_ids": [
-            "person_joel",
-            "person_anita",
-            "person_maya"
+            "joel",
+            "anita",
+            "maya"
           ],
           "source_line": "L10",
-          "guessed": true
+          "guessed": true,
+          "fact_sources": {
+            "households": "L10",
+            "load_minutes": "L12",
+            "drive_minutes": "L10",
+            "vehicle_id": "L10",
+            "driver_ids": "L10",
+            "loader_ids": "L13"
+          }
         }
       ],
       "finish_time": 720,
@@ -266,20 +340,20 @@
       },
       "questions": [
         {
-          "item_id": "person_ravi",
-          "question_text": "What time does Ravi arrive?"
+          "item_id": "ravi",
+          "question_text": "What time is Ravi available from?"
         },
         {
-          "item_id": "person_maya",
-          "question_text": "What time does Maya arrive?"
+          "item_id": "maya",
+          "question_text": "What time is Maya available from?"
         },
         {
-          "item_id": "person_sam",
-          "question_text": "What time does Sam arrive?"
+          "item_id": "sam",
+          "question_text": "What time is Sam available from?"
         },
         {
-          "item_id": "person_anita",
-          "question_text": "What time does Anita arrive?"
+          "item_id": "anita",
+          "question_text": "What time is Anita available from?"
         }
       ],
       "is_distribution_plan": true,

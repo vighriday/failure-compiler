@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 
 from server.ai.adapter import read_plan  # noqa: E402
 from server.ai.groq_provider import cooldown_seconds  # noqa: E402
+from server.ai.prompts import READ_PROMPT_VERSION, READ_SCHEMA_VERSION  # noqa: E402
 from server.ai.types import AIError  # noqa: E402
 from server.evaluation import (  # noqa: E402
     MEASUREMENT_VERSION,
@@ -105,7 +106,14 @@ def main():
     values = dotenv_values(ROOT / ".env")
     keys = {"groq": values.get("GROQ_API_KEY"), "gemini": values.get("GEMINI_API_KEY")}
     text = (ROOT / "fixtures/example-plan.txt").read_text(encoding="utf-8")
-    report = {"date": datetime.now(UTC).isoformat(), "readings": [], "winner": None}
+    report = {
+        "date": datetime.now(UTC).isoformat(),
+        "readings": [],
+        "winner": None,
+        "prompt_version": READ_PROMPT_VERSION,
+        "schema_version": READ_SCHEMA_VERSION,
+        "measurement_version": MEASUREMENT_VERSION,
+    }
     args.output.parent.mkdir(parents=True, exist_ok=True)
 
     def save():

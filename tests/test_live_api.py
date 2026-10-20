@@ -131,7 +131,7 @@ def test_live_http_flow_keys_metadata_gate_score_apply_and_cache(monkeypatch, ca
     assert not bad["eligible"] and bad["gate_status"] == "couldnt_apply"
     assert "person-dave" in bad["gate_reason"]
     assert client.post("/api/suggest-fixes", json=body).json() == payload
-    assert [version for _, version, _ in calls] == ["read-v3", "fix-v1"]
+    assert [version for _, version, _ in calls] == ["read-v4", "fix-v1"]
     accepted = client.post("/api/apply-fix", json={**body, "fix_id": good["id"]})
     assert accepted.status_code == 200, accepted.text
     new_fp = accepted.json()["fingerprint"]
@@ -173,7 +173,7 @@ def test_saved_then_live_identical_map_gets_live_suggestions(monkeypatch):
     assert live["fingerprint"] == fp
     response = client.post("/api/suggest-fixes", json=body)
     assert response.status_code == 200 and response.json()["source"] == "live"
-    assert [version for _, version, _ in calls] == ["read-v3", "fix-v1"]
+    assert [version for _, version, _ in calls] == ["read-v4", "fix-v1"]
 
 
 def test_suggestions_503_falls_back_to_groq(monkeypatch):
@@ -381,7 +381,7 @@ def test_saved_example_retry_never_calls_a_provider(monkeypatch):
     "scenario_id",
     [
         JOEL,
-        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck",
+        "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck-drops",
         "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
         "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
     ],
@@ -389,7 +389,13 @@ def test_saved_example_retry_never_calls_a_provider(monkeypatch):
 def test_recorded_fix_replays_through_live_http(monkeypatch, scenario_id):
     path = os.environ.get("RECORDED_AI_FIXES_PATH", str(ROOT / "fixtures/example-fixes.json"))
     captures = json.loads(Path(path).read_text(encoding="utf-8"))
-    recorded = captures["cases"][scenario_id]["raw"]
+    # The immutable fix capture predates the new reading's delivery label. Only the
+    # archive lookup uses its historical ID; the HTTP request uses the current map ID.
+    captured_case = scenario_id.replace(
+        "supply_delivery_late__delivery-supply-truck-drops",
+        "supply_delivery_late__delivery-supply-truck",
+    )
+    recorded = captures["cases"][captured_case]["raw"]
     fake_providers(monkeypatch)
     monkeypatch.setattr(credentials, "dotenv_values", lambda _: {"GROQ_API_KEY": "offline-groq"})
 

@@ -124,7 +124,7 @@ flowchart TB
 > **The one rule:** AI reads the plan and suggests fixes. The checker decides. AI never has the final word on whether a plan passes or fails.
 
 1. **Paste a plan.** Or load the example. No AI key is needed for the example.
-2. **Check the map.** The AI turns the text into plain statements like *"Maya leaves at 10:45"*, each linked to the line of your plan it came from. Guesses are flagged, and anything unclear becomes a question. You confirm or correct each fact, picking from names and times already in the plan; there's no free typing.
+2. **Check the map.** The AI turns the text into plain statements like *"Maya leaves at 10:45"*. Source tags distinguish the AI's citation for a particular field, such as *"Loaders · L13"*, from an entity mention, such as *"Ravi · mentioned on L8"*. A mention does not support every fact about Ravi. Missing field citations stay missing; check the value against the plan. Guesses are flagged, and anything unclear becomes a question. You confirm or correct each fact, picking from names and times already in the plan; there's no free typing.
 3. **Crash-test it.** The checker tries every single problem and every pair from a fixed list. The grid fills in live.
 4. **Open a cross.** See the two problems, proof that each one alone was fine, the morning drawn on a timeline, and the human cost in households.
 5. **Fix it.** Up to 3 AI cards, each already scored against all 100 tests. The ones that don't work are turned down, with the checker's reason. Or build your own change from up to three fixed-choice operations. Accepting either kind updates the plan and re-tests everything.
@@ -138,7 +138,7 @@ Six real Playwright captures, each **1500 × 1000 (3:2)**, ready for the README 
 <table>
 <tr>
 <td width="50%"><img src="docs/images/01-paste-plan.png" alt="Failure Compiler landing hero"/><br/><b>1. The landing page.</b> Start with a plan or try the saved example.</td>
-<td width="50%"><img src="docs/images/02-plan-map.png" alt="Screen 2: the plan map with source lines"/><br/><b>2. The plan map.</b> Hover a fact and its source line lights up on the left.</td>
+<td width="50%"><img src="docs/images/02-plan-map.png" alt="Screen 2: the plan map with source tags"/><br/><b>2. The plan map.</b> Hover or focus a source tag to highlight its line. Field citations and entity mentions are labelled separately.</td>
 </tr>
 <tr>
 <td><img src="docs/images/03-crash-test-grid.png" alt="Screen 3: the crash-test grid"/><br/><b>3. The crash test.</b> 100 tests, one triangle, filling in live.</td>
@@ -327,7 +327,7 @@ sequenceDiagram
     S->>AI: plan text and a strict schema
     AI-->>S: JSON reading
     S->>S: Gate. Parse, schema, ids, rules
-    S-->>App: Facts with source lines, guesses, questions
+    S-->>App: Facts with field citations or labelled mentions, guesses, questions
     You->>App: Confirm or correct, picks only
     App->>S: validate-map on every change
     You->>App: Confirm plan
@@ -471,7 +471,7 @@ The interface follows the supplied Landing v2 design: Overview, a scroll-linked 
 
 1. Copy `.env.example` to `.env` in the project folder. Add a [Gemini key](https://aistudio.google.com/apikey) as `GEMINI_API_KEY`; add a [Groq key](https://console.groq.com/keys) as `GROQ_API_KEY` to enable fallback. The server reads these keys when handling a live request.
 2. Open **Start** and paste your plan. Or expand **Use your own AI key**, choose its provider and enter a key for this session. A typed key takes precedence for that provider; the selected provider is tried first. With environment keys, Gemini is tried first and Groq is the fallback.
-3. Click **Read plan**, review the source-linked facts and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted.
+3. Click **Read plan**, check the facts and their labelled field citations or entity mentions, and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted.
 
 Typed keys stay only in the local server's session memory. They are never written to files, logged, added to a map or returned in an API response. The server sends an HttpOnly session cookie; that cookie contains no key. Closing a tab does not clear server memory; restarting the server clears session keys, maps and results. `.env` keys remain in your local ignored file.
 

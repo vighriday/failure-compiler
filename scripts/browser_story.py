@@ -6,7 +6,7 @@ from playwright.sync_api import expect
 
 VAN_EARLY = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van"
 VAN_ABSENT = "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van"
-TRUCK_RAVI = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck"
+TRUCK_RAVI = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck-drops"
 JOEL = "volunteer_absent__person-joel"
 
 

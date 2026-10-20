@@ -16,7 +16,7 @@ Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 
 1. **Arrive at the v2 overview.** The landing navigation has Overview, Plan, Read, Crash test, Trust, and Start. The Start tab contains the paste screen: a single text area and a brief prompt. They paste their plan, or load the example in example mode.
 2. **The AI reads the plan.** It produces a structured map (people, vehicles, places, times, deadlines) and surfaces ambiguities as questions. In example mode, a saved AI reading loads instead; a small label reads "Example mode: using a saved AI reading."
-3. **Plan map screen.** The user sees the checklist view at the top (every job with a person and a backup, all ticked; it looks done), followed by the AI's structured reading as short plain statements each sourced to a line of the original. Below the plan statements: the "What we'll test" section listing each failure type with its size. The user confirms or corrects using constrained choices only, then hits confirm.
+3. **Plan map screen.** The user sees the checklist view at the top (every job with a person and a backup, all ticked; it looks done), followed by the AI's structured reading as short plain statements. Source tags distinguish field citations from entity mentions; a mention alone does not support a field's value. Below the plan statements: the "What we'll test" section listing each failure type with its size. The user confirms or corrects using constrained choices only, then hits confirm.
 4. **Crash test screen.** A grid fills in live. Every failure type across the top, every failure type down the side. Each scenario appears once: the diagonal plus the cells below it, so the grid shows one triangle, not two. Cells flip to tick, cross, dimmed mark, or question mark as the checker runs. A count line tracks results in real time.
 5. **Broken case detail panel.** The user clicks a cross. A panel slides in on the right; the grid stays visible on the left. The panel shows the failures, a timeline of the broken morning, the human cost, and up to three fix suggestions, each already scored.
 6. **Fix and re-test.** The user previews a fix on the live grid, accepts it, watches the grid re-test in place. The panel updates: "Now survives." They move to the next broken case. Fixes stack.
@@ -37,9 +37,9 @@ Uses the supplied Landing v2 Start layout: prompt and assurances on the left, a 
 ### Screen 2: Plan Map
 **Top: checklist view.** Every job with a person and a backup. All ticked. It looks complete. This is the "before": the plan as any coordinator would call it done.
 
-**Middle: AI's structured reading.** Short plain statements, each sourced to a line of the original plan. Three visual states for each item:
-- Default: AI's reading with its source line.
-- Corrected: original AI reading struck through, user's correction next to it, marked "corrected by you." The source line stays.
+**Middle: AI's structured reading.** Short plain statements with honest source tags. A field tag such as "Loaders · L13" shows the AI's citation for that field; "Ravi · mentioned on L8" only locates the entity, not evidence for every fact about it. Null or missing field citations stay missing. Hovering or focusing each tag highlights its own line. Three visual states for each item:
+- Default: AI's reading with field citations where supplied, otherwise labelled entity mentions or "No source line".
+- Corrected: original AI reading struck through, user's correction next to it, marked "corrected by you." Retained tags describe the original reading's sources, not proof of the user's new value.
 - Added: no source line, marked "added by you" (created because a rule asked a question).
 
 If an extra place listing has no loading activity or supply arrival, a rule question asks whether it is separate or the same place as another listed loading or supply place. The user chooses from existing places. Keeping it preserves its tests; identifying it as another place uses that place's details and requires those facts to be checked individually again. The original listing and source stay in the question history. Change restores it. Bulk confirmation never answers this question.
@@ -104,7 +104,7 @@ When no AI card is eligible, say "None of these suggestions worked". Live mode o
 Reached from "See report." One page in the app.
 
 **Sections:**
-1. **The plan:** current confirmed facts and source lines, with "AI read N items, N corrected by you, N added by you" and "Read by provider / model". The example starts with 32 AI items; identifying Hall as Loading bay leaves 30 facts and counts as one correction. A fix marks only facts its operations actually changed.
+1. **The plan:** current confirmed facts with field citations, labelled entity mentions or "No source line", with "AI read N items, N corrected by you, N added by you" and "Read by provider / model". Mention tags are not proof of field values; retained citations refer to the original reading when a value was corrected. The example starts with 32 AI items; identifying Hall as Loading bay leaves 30 facts and counts as one correction. A fix marks only facts its operations actually changed.
 2. **What was tested:** the exact problem list with sizes. The example has 14 problems and "100 tests: every single problem and every pair that can happen". Other maps show their actual counts.
 3. **What broke (before fixes):** single weak spots and hidden pairs, each with its human cost. Dimmed results grouped separately: "12 pairs already broken by the hall key alone." If removing a weak spot via a fix caused any formerly-dimmed pairs to resolve or reveal a new hidden pair, the report shows that honestly.
 4. **Fixes:** accepted changes labelled "Fix N (AI)" or "Fix N (yours)", each operation and its fixes / still broken / new crosses scores at that point. Include turned-down and couldn't-apply suggestions requested during the run, their one-line checker or gate reasons, and the provider label. Gate failures say "Not scored". Preserve earlier suggestion rounds; a report never requests new ones.
@@ -166,13 +166,13 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 
 ### AI Reading and Structured Map
 - AI produces a structured map as fixed-schema output: people, vehicles, places, times, deadlines.
-- Every statement sourced to a line of the original plan.
+- Source tags distinguish the AI's field citations from entity mentions. Missing field citations are not replaced with an entity's first mention; older captures without per-field sources do not gain invented evidence.
 - Ambiguities surfaced as questions before the user reaches the confirm button.
 - AI does not re-read after corrections. Corrections go directly into the map.
 - Acceptance criteria:
-  - [ ] Every statement has a source line or is marked "added by you."
+  - [ ] Each available field citation is labelled by its field. Entity-only lines say "mentioned on L…"; a missing source says "No source line". Added items are marked "added by you" without invented sources.
   - [ ] Corrections show the AI's original reading struck through and the user's correction marked "corrected by you."
-  - [ ] The source line remains visible after correction.
+  - [ ] Original source tags remain distinguishable after correction and do not claim to prove the corrected value.
 
 ### Plain Rules Validation
 - App runs plain rules against the confirmed map before the checker runs: every name exists, every route has a vehicle and driver, every time is coherent, nothing the checker needs is missing.
@@ -292,7 +292,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 ## What We're Building
 
 - Screen 1: paste plan or load example; AI key field.
-- Screen 2: plan map with checklist view, sourced AI reading with correction trail, "What we'll test" with preset size pickers, plain rules validation, confirm button.
+- Screen 2: plan map with checklist view, AI reading with labelled field citations or entity mentions and a correction trail, "What we'll test" with preset size pickers, plain rules validation, confirm button.
 - Screen 3: live-filling crash test grid with four cell states, count line, Before/After toggle, preview banner.
 - Screen 4: broken case detail panel (slides in beside grid) with timeline, human cost, scored fix cards, preview and accept flow, re-test in place.
 - Screen 5: report page with all six sections and browser print.

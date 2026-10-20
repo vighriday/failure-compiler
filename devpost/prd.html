@@ -600,7 +600,7 @@
       </div>
 
       <div class="journey-step"
-        data-detail="The AI reads the plan into a structured map: people, vehicles, places, times, deadlines. Every statement is sourced to a line of the original. Ambiguities surface as questions. In example mode, a saved AI reading loads instead; a label reads &ldquo;Example mode: using a saved AI reading.&rdquo;">
+        data-detail="The AI reads the plan into a structured map: people, vehicles, places, times, deadlines. Source tags distinguish field citations from entity mentions; a mention alone does not support a field's value. Missing field citations stay missing. Ambiguities surface as questions. In example mode, a saved AI reading loads instead; a label reads &ldquo;Example mode: using a saved AI reading.&rdquo;">
         <div class="step-num">2</div>
         <div class="step-body">
           <div class="step-title">AI reads the plan</div>
@@ -610,7 +610,7 @@
       </div>
 
       <div class="journey-step"
-        data-detail="Three parts on one screen:<br><br><strong>Checklist view (top):</strong> every job ticked. It looks done. This is the before.<br><br><strong>Structured reading (middle):</strong> short plain statements with source lines. Corrections show the AI reading struck through, yours next to it, marked &ldquo;corrected by you.&rdquo; Rule-added items marked &ldquo;added by you.&rdquo;<br><br><strong>&ldquo;What we&rsquo;ll test&rdquo; (bottom):</strong> each failure type with its size. Preset picks only: 15, 30, 45, 60, or 90 minutes. Confirm locks everything in.">
+        data-detail="Three parts on one screen:<br><br><strong>Checklist view (top):</strong> every job ticked. It looks done. This is the before.<br><br><strong>Structured reading (middle):</strong> short plain statements with labelled field citations or entity mentions. Hover or focus each tag to highlight its own line. Corrections show the AI reading struck through, yours next to it, marked &ldquo;corrected by you.&rdquo; Original source tags are not proof of the corrected value. Rule-added items marked &ldquo;added by you.&rdquo;<br><br><strong>&ldquo;What we&rsquo;ll test&rdquo; (bottom):</strong> each failure type with its size. Preset picks only: 15, 30, 45, 60, or 90 minutes. Confirm locks everything in.">
         <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Confirm the plan map</div>
@@ -701,10 +701,10 @@
         </div>
         <div class="screen-card-body">
           <p><strong>Top: checklist view.</strong> Every job with a person and a backup, all ticked. It looks done. This is the before.</p>
-          <p><strong>Middle: structured reading.</strong> Short plain statements, each sourced to a line of the original. Three provenance states per item:</p>
+          <p><strong>Middle: structured reading.</strong> Short plain statements with honest source tags. A field tag such as "Loaders · L13" shows the AI's citation for that field; "Ravi · mentioned on L8" only locates the entity, not evidence for every fact about it. Null or missing field citations stay missing. Hover or focus each tag to highlight its own line. Three provenance states per item:</p>
           <ul>
-            <li>Default: AI reading plus source line.</li>
-            <li>Corrected: AI reading struck through, correction marked "corrected by you." Source line stays.</li>
+            <li>Default: AI reading with field citations where supplied, otherwise labelled entity mentions or "No source line".</li>
+            <li>Corrected: AI reading struck through, correction marked "corrected by you." Retained tags describe the original reading's sources, not proof of the user's new value.</li>
             <li>Added: marked "added by you," no source line. Created because a rule asked a question.</li>
           </ul>
           <p>Constrained choices only: pick from known people, vehicles, places; time picker; no free text. AI does not re-read after corrections.</p>
@@ -1002,7 +1002,7 @@
     <details class="report-section">
       <summary>1. The plan <span style="font-size:12px;color:var(--text-faint);font-weight:400;margin-left:8px;">Confirmed map and correction trail</span></summary>
       <div class="report-section-body">
-        <p>Confirmed facts with sources, original AI values and corrections, plus <span class="mono">"AI read N items, N corrected by you, N added by you."</span> Counts come from the confirmation evidence, not post-fix status marks. The approved example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Accepted changes are attributed only to the fields they changed.</p>
+        <p>Confirmed facts with field citations, labelled entity mentions or "No source line", original AI values and corrections, plus <span class="mono">"AI read N items, N corrected by you, N added by you."</span> Mention tags are not proof of field values; retained citations refer to the original reading when a value was corrected. Counts come from the confirmation evidence, not post-fix status marks. The approved example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Accepted changes are attributed only to the fields they changed.</p>
         <p><span class="mono">"Read by provider / model"</span> identifies the original reading separately from suggestion providers. Explicit review answers are retained.</p>
       </div>
     </details>
@@ -1164,7 +1164,7 @@
     <h2>What We're Building</h2>
     <ul style="padding-left:20px;font-size:14px;color:var(--text-muted);line-height:2.1;">
       <li>Screen 1: paste plan or load example; AI key field.</li>
-      <li>Screen 2: plan map with checklist view, sourced AI reading with correction trail, "What we'll test" with preset size pickers, plain rules validation, confirm button.</li>
+      <li>Screen 2: plan map with checklist view, AI reading with labelled field citations or entity mentions and a correction trail, "What we'll test" with preset size pickers, plain rules validation, confirm button.</li>
       <li>Screen 3: live-filling crash test grid with four cell states, count line, Before/After toggle, preview banner. Cells fill in order; accepted fix cells animate.</li>
       <li>Screen 4: broken case detail panel beside the grid, with timeline, hard deadline line, human cost, scored fix cards, preview and accept flow, re-test in place.</li>
       <li>Screen 5: report page with six sections plus example-mode notice, and browser print.</li>

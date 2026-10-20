@@ -98,6 +98,15 @@ Build mode: fast
 
 - [ ] Final review complete - feedback resolved and learner confirms ready to ship
 
+### Final completion pass (approved 20 October 2026)
+
+- [x] Part 1: truthful fact citations, nullable-source schema, unedited primary reading and new-schema bake-off evidence.
+- [ ] Part 2: report summary, plain reasons, real answers and sample PDF of five pages or fewer.
+- [ ] Part 3: clean demo reset, timed click runbook and recording thumbnails.
+- [ ] Part 4: final assets/docs, clean-clone and repository audit, complete regression.
+- [ ] Part 5: tested deployment container and host proposal; do not deploy yet.
+- [ ] Part 6: final verification report and pause for hands-on notes and deployment choice.
+
 ## Code Tour and App Map
 
 - [ ] Learning activity complete - focused alternative: follow one AI reading from raw JSON through the gate, normalisation, rules, and confirmation to the checker
@@ -111,6 +120,9 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- User decision, 20 October 2026: run the six-part final completion pass in order, each part committed separately, with the visual design fixed. Source facts must distinguish evidence from mentions; reports need a summary and clearer reasons; prepare recording support, final audits and optional deployment. Stop if demo numbers or story change, and pause after final verification for hands-on notes and a host choice. Final Review and the focused learning wrap-up/app map remain pending until that feedback.
+- Completion pass Part 1: `reading-v2` / `read-v4` adds closed nullable fact-source objects, still requiring every outgoing property for Groq strict mode. The current example is the only successful new-schema Gemini response, reused unchanged from bake-off slot 3 after the initial capture's provider errors. All 39 non-null citations support their facts; ten missing citations stay null and use explicit entity-mention labels. The existing identity answer and confirmation controls reach all aligned inputs and 100/100 verdicts, with the same 32-to-30 review counts and 84/4/12 original grid. Names remain labels. All provider errors and successful raw output are retained; neither provider completed three successful slots, so no new ranking is claimed. See `source-line-review.md` and `bakeoff-read-v4.json`.
 
 - Slice 7 completed, 20 October 2026, in six separate parts. The session-owned report preserves review evidence, original breaks, accepted AI/yours operations and scores, rejected/gate-failed cards, provider labels and explicit limits without solving or calling AI. Before/After reconstructs the original run through frozen AppliedFix ancestors; original four crosses and 12 dimmed pairs remain while the final current plan has all 100 survived. Re-confirmed manual edits are recorded separately. The checker model, locked verdicts and unedited AI captures are unchanged.
 - Slice 7 verification: 201 tests pass and two explicitly opt-in network tests skip; whole-repository Ruff lint and the production build pass. Saved-story and review browser checks pass, and all 11 landing checks pass at 1440/768/390/320 with no unexpected browser errors. The full example is operable using native keyboard controls, including both coordinator changes, preview cancellation, Before/After, printing and return to results. Ten accessibility states pass axe plus rendered-text checks, with no text below 12px and minimum measured contrast 4.55:1; reduced motion passes. The current look remains; new mockup styling is deferred.

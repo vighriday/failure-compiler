@@ -41,7 +41,7 @@ PRD ref: `prd.md > The Core Journey`.
 
 4. Server normalises all entity ids to stable slugs from type and name (`person-ravi`, `vehicle-van`, `route-c`) and updates every reference. Then wraps the reading into a `PlanMap`, setting every item's status to `unconfirmed` and recording the AI's original value for each.
 
-5. Plan map screen renders. The browser displays the checklist view, the structured reading with source lines, and the "What we'll test" list.
+5. Plan map screen renders. The browser displays the checklist view, the structured reading with labelled field citations or entity mentions, and the "What we'll test" list.
 
 6. User confirms or corrects. Each constrained action goes to `POST /api/update-map` with the server-issued reading ID. The server updates its own draft and returns item statuses and rule failures; `POST /api/validate-map` can return the current validation snapshot. Affected items lose their confirmed mark. The Confirm button state is computed from the current map state, never stored.
 
@@ -286,7 +286,7 @@ Three sections stacked vertically:
 
 **Checklist view (top):** computed from the reviewed map - every job with a person and a backup, all ticked. This is the "it looks done" view. Confirmation progress counts current items and open questions. Original AI item counts, corrections, additions and explicit decisions are retained as review evidence; merging an identity does not erase the original AI count.
 
-**Structured reading (middle):** one statement per map item, with its `source_line`. Three visual states: default (status `unconfirmed`), corrected (AI's `original_value` struck through, correction marked "corrected by you"), added (no source line, marked "added by you"). Confirmed items get a small confirmed mark. Corrections use constrained inputs only: `<select>` from known entity ids, time picker for times. No free-text fields. Every correction goes through `POST /api/update-map` against the server-owned draft and returns validation. Affected items that depend on the changed item lose their confirmed mark and show "check this, [name] changed."
+**Structured reading (middle):** one statement per map item, with `source_tags: Array<{label, source_line, kind}>`. A `fact` tag displays the field citation, for example "Loaders · L13"; a `mention` tag displays "Ravi · mentioned on L8" and does not claim support for that field's value. Every tag's hover/focus highlights its own line. A row without a fact tag never treats an entity mention as field proof; missing sources display "No source line". Legacy `source_line` remains for compatibility, not as a fact-proof fallback. Three visual states: default (status `unconfirmed`), corrected (AI's `original_value` struck through, correction marked "corrected by you"), added (no source line, marked "added by you"). Retained source tags describe the original reading, not proof of a corrected value. Confirmed items get a small confirmed mark. Corrections use constrained inputs only: `<select>` from known entity ids, time picker for times. No free-text fields. Every correction goes through `POST /api/update-map` against the server-owned draft and returns validation. Affected items that depend on the changed item lose their confirmed mark and show "check this, [name] changed."
 
 **Place identity question:** an unused place listing alongside a loading or supply place requires an individual choice: keep separate, or select the same existing place. Only a listing with no loading activity and no delivery references can be merged. The server preserves its entity, source rows and question references for undo, retains the selected place's label and details, and requires its facts to be reviewed individually again. The raw reading is unchanged. This review operation does not change the checker model or infer aliases from the truth fixture.
 
@@ -323,6 +323,8 @@ Implements `prd.md > Screen 5`, `prd.md > The Checker's Three Honest Answers`.
 
 Confirmation stores review evidence outside checker inputs: original AI item count, corrected/added counts, item bindings and sources, and explicit answers. The example has 32 AI items, one place-identity correction, zero additions and 30 remaining facts. Current statements come from the accepted map. Fix provenance matches operation fields, so changing a key cannot label unrelated hours as changed.
 
+Report facts use the same explicit `source_tags` distinction as the plan map: field citations, labelled entity mentions, or "No source line". An entity mention is not proof of a field value, and retained citations describe the original reading when the value was corrected.
+
 Successful suggestion rounds and coordinator changes append summaries to the map session: scenario, provider label, gate/verdict reason and scores. Accepting a fix freezes the parent snapshot and its evidence in the child's ancestor store. The report follows `AppliedFix.from_fingerprint` / `to_fingerprint` through these snapshots. Accepted scores compare old/new cross sets; earlier rejected cards survive retries and later fixes. Raw private responses and keys are excluded. Re-confirmed map edits are identified separately rather than invented as fixes.
 
 The response contains original/current metadata and results, confirmed facts and review summary, original breaks and grouped dimmed pairs, accepted operations and scores, rejected/couldn't-apply cards with attribution, final count and explicit limits. Unknown results are named for the original/current run and never counted as survived. The example has its exact 14 problems and 100 scenarios; other maps use actual counts and sizes.
@@ -349,14 +351,14 @@ AIPlanReading
   deliveries:           list[AIDelivery]
   routes:               list[AIRoute]
   finish_time:          int             # Minutes from midnight
-  finish_time_source:   str             # Source line in the original text
+  finish_time_source:   str | None      # Actual deadline citation, or null if unsupported
   finish_time_guessed:  bool
   questions:            list[AIQuestion]   # Ambiguities the AI wants to surface
   is_distribution_plan: bool
   not_distribution_reason: str | None   # Non-null if is_distribution_plan is false
 ```
 
-Each entity in the reading carries `source_line: str` and `guessed: bool`. Example:
+Each entity in the reading carries `source_line: str` for an entity mention, `guessed: bool`, and a closed `fact_sources` object for that entity type. Each defined field source is a nullable line: cite the line for that particular value or assignment, or return null. `reading-v2` / `read-v4` require every `fact_sources` object and all its nullable fields in outgoing structured-output schemas, including Groq's strict schema. Unknown source fields are rejected. Parsing older raw captures that omit `fact_sources` supplies null per-field sources; it never promotes their entity mention into evidence. Examples:
 
 ```
 AIPerson
@@ -368,6 +370,7 @@ AIPerson
   available_until: int
   holds_key:      bool
   source_line:    str
+  fact_sources:   PersonSources  # Fixed fields, each str | None
   guessed:        bool   # True if the AI inferred this person was present
 
 AIRoute
@@ -380,6 +383,7 @@ AIRoute
   driver_ids:     list[str]   # Primary first, then backups. References Person ids.
   loader_ids:     list[str]   # Eligible set, with no priority. References Person ids.
   source_line:    str
+  fact_sources:   RouteSources   # Fixed fields, each str | None
   guessed:        bool
 
 AIQuestion
@@ -387,7 +391,7 @@ AIQuestion
   question_text:  str
 ```
 
-(AIVehicle, AIPlace, AIDelivery follow the same pattern: id, name, timing fields, source_line, guessed. AIPlace also carries `opens_at`.)
+(AIVehicle, AIPlace, AIDelivery follow the same pattern: id, name, timing fields, entity-mention `source_line`, the corresponding closed `fact_sources` object, and guessed. AIPlace also carries `opens_at`.)
 
 ### PlanMap (server-owned)
 

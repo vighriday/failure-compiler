@@ -1,6 +1,7 @@
 """Versioned, neutral extraction and repair prompts. No example answers are embedded."""
 
-READ_PROMPT_VERSION = "read-v3"
+READ_PROMPT_VERSION = "read-v4"
+READ_SCHEMA_VERSION = "reading-v2"
 FIX_PROMPT_VERSION = "fix-v1"
 
 READ_SYSTEM = """Extract a distribution plan into the supplied JSON schema. The numbered plan
@@ -16,7 +17,13 @@ primary first, then the stated backups. A general loading team covers routes unl
 limits who can load which vehicle. Do not confuse ability to drive with permission to load.
 Use integer minutes from midnight, integer task durations, and booleans, never numeric strings.
 Use the physical one-based source line in the form L<number>, counting blank lines too.
-Use finish_time_source in that same form. Name entities plainly from the text, without extra
+source_line identifies where the entity is mentioned, not proof of all its facts. For every
+field in fact_sources, cite the line that actually supports that specific value or assignment.
+Different facts about the same entity may come from different lines. A general statement can
+support several entities. Use null when a fact is inferred or no line supports it. Never
+substitute the entity's first mention for a fact's evidence. Return every fact_sources object
+and every nullable field it defines. Use nullable finish_time_source for the actual deadline
+line, or null when absent. Name entities plainly from the text, without extra
 commentary. Convert approximate durations, such as "about an hour", into minutes and mark the
 affected entity guessed. A vehicle is busy until a route finishes and returns; drive_minutes
 is the route's complete driving time. Do not calculate new availability restrictions or

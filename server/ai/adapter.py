@@ -127,8 +127,21 @@ def read_plan(
                 *reading.routes,
             ]
         ]
+        sources.extend(
+            (source, f"fact_sources.{field}", item.id)
+            for item in [
+                *reading.people,
+                *reading.vehicles,
+                *reading.places,
+                *reading.deliveries,
+                *reading.routes,
+            ]
+            for field, source in item.fact_sources.model_dump().items()
+            if source is not None
+        )
         if reading.finish_time > 0 or reading.finish_time_source:
-            sources.append((reading.finish_time_source, "finish_time_source", "finish_time"))
+            if reading.finish_time_source is not None:
+                sources.append((reading.finish_time_source, "finish_time_source", "finish_time"))
         for source, field, item_id in sources:
             match = re.fullmatch(r"L([1-9][0-9]*)", source)
             if not match or int(match[1]) > len(lines) or not lines[int(match[1]) - 1].strip():

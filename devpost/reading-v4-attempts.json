@@ -1,0 +1,24 @@
+[
+  {
+    "error": "providers_failed",
+    "reason": "Both providers failed. gemini: Gemini request failed (504); try again later.",
+    "attempts": [
+      {
+        "provider": "gemini",
+        "error": "server_error",
+        "reason": "Gemini request failed (504); try again later."
+      }
+    ]
+  },
+  {
+    "error": "providers_failed",
+    "reason": "Both providers failed. gemini: Gemini could not be reached before the timeout.",
+    "attempts": [
+      {
+        "provider": "gemini",
+        "error": "timeout",
+        "reason": "Gemini could not be reached before the timeout."
+      }
+    ]
+  }
+]

@@ -25,3 +25,11 @@ def test_every_source_line_is_a_nonblank_physical_plan_line() -> None:
         line_number = int(match.group(1))
         assert line_number <= len(plan_lines), f"{source_line} is outside the plan"
         assert plan_lines[line_number - 1].strip(), f"{source_line} is blank"
+        for field, fact_source in item.get("fact_sources", {}).items():
+            if fact_source is None:
+                continue
+            match = re.fullmatch(r"L([1-9][0-9]*)", fact_source)
+            assert match, (item["id"], field, fact_source)
+            number = int(match[1])
+            assert number <= len(plan_lines), (item["id"], field, fact_source)
+            assert plan_lines[number - 1].strip(), (item["id"], field, fact_source)

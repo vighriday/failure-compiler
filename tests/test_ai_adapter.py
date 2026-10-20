@@ -122,12 +122,20 @@ def test_success_preserves_exact_raw_response_and_only_normalises_separate_copy(
 
 @pytest.mark.parametrize(
     ("field", "source"),
-    [("finish_time_source", "L9999"), ("finish_time_source", "L2"), ("source_line", "L2")],
+    [
+        ("finish_time_source", "L9999"),
+        ("finish_time_source", "L2"),
+        ("source_line", "L2"),
+        ("fact_sources.can_drive", "L2"),
+        ("fact_sources.can_drive", "L9999"),
+    ],
 )
 def test_sources_reject_missing_or_blank_physical_lines(monkeypatch, field, source):
     response = reading_response()
     payload = json.loads(response.raw_text)
-    if field == "source_line":
+    if field.startswith("fact_sources."):
+        payload["people"][0].setdefault("fact_sources", {})["can_drive"] = source
+    elif field == "source_line":
         payload["people"][0][field] = source
     else:
         payload[field] = source

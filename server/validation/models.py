@@ -4,11 +4,48 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from server.models import AppliedFix, Delivery, Person, Place, PlanMapData, Route, Vehicle
 
 ItemStatus = Literal["unconfirmed", "confirmed", "corrected", "added"]
+
+
+class FactSources(BaseModel):
+    """Nullable physical lines; defaults only support replay of older captures."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+
+class PersonSources(FactSources):
+    available_from: str | None = None
+    available_until: str | None = None
+    can_drive: str | None = None
+    holds_key: str | None = None
+
+
+class VehicleSources(FactSources):
+    available_from: str | None = None
+
+
+class PlaceSources(FactSources):
+    opens_at: str | None = None
+    one_vehicle_at_a_time: str | None = None
+    needs_key: str | None = None
+
+
+class DeliverySources(FactSources):
+    arrives_at: str | None = None
+    place_id: str | None = None
+
+
+class RouteSources(FactSources):
+    households: str | None = None
+    load_minutes: str | None = None
+    drive_minutes: str | None = None
+    vehicle_id: str | None = None
+    driver_ids: str | None = None
+    loader_ids: str | None = None
 
 
 class AIPerson(BaseModel):
@@ -22,6 +59,7 @@ class AIPerson(BaseModel):
     holds_key: bool
     source_line: str
     guessed: bool
+    fact_sources: PersonSources = Field(default_factory=PersonSources)
 
 
 class AIVehicle(BaseModel):
@@ -31,6 +69,7 @@ class AIVehicle(BaseModel):
     available_from: int
     source_line: str
     guessed: bool
+    fact_sources: VehicleSources = Field(default_factory=VehicleSources)
 
 
 class AIPlace(BaseModel):
@@ -42,6 +81,7 @@ class AIPlace(BaseModel):
     needs_key: bool
     source_line: str
     guessed: bool
+    fact_sources: PlaceSources = Field(default_factory=PlaceSources)
 
 
 class AIDelivery(BaseModel):
@@ -52,6 +92,7 @@ class AIDelivery(BaseModel):
     place_id: str
     source_line: str
     guessed: bool
+    fact_sources: DeliverySources = Field(default_factory=DeliverySources)
 
 
 class AIRoute(BaseModel):
@@ -66,6 +107,7 @@ class AIRoute(BaseModel):
     loader_ids: list[str]
     source_line: str
     guessed: bool
+    fact_sources: RouteSources = Field(default_factory=RouteSources)
 
 
 class AIQuestion(BaseModel):
@@ -92,12 +134,36 @@ class AIPlanReading(BaseModel):
     deliveries: list[AIDelivery]
     routes: list[AIRoute]
     finish_time: int
-    finish_time_source: str
+    finish_time_source: str | None
     finish_time_guessed: bool
     problem_sizes: AIProblemSizes
     questions: list[AIQuestion]
     is_distribution_plan: bool
     not_distribution_reason: str | None
+
+    @classmethod
+    def model_json_schema(cls, *args, **kwargs):
+        """Every outgoing property is required, including nullable source fields.
+
+        Old unedited captures omit fact_sources. Parsing them supplies null provenance;
+        this never fabricates a citation. Provider schemas still require every field.
+        """
+        schema = super().model_json_schema(*args, **kwargs)
+
+        def strict(node):
+            if isinstance(node, dict):
+                node.pop("default", None)
+                if node.get("type") == "object":
+                    node["additionalProperties"] = False
+                    node["required"] = list(node.get("properties", {}))
+                for value in node.values():
+                    strict(value)
+            elif isinstance(node, list):
+                for value in node:
+                    strict(value)
+
+        strict(schema)
+        return schema
 
 
 class AIMetadata(BaseModel):
@@ -108,6 +174,7 @@ class AIMetadata(BaseModel):
 
 
 class MapPerson(Person):
+    fact_sources: dict[str, str | None] = {}
     source_line: str = ""
     guessed: bool = False
     can_drive_guessed: bool = False
@@ -117,6 +184,7 @@ class MapPerson(Person):
 
 
 class MapVehicle(Vehicle):
+    fact_sources: dict[str, str | None] = {}
     source_line: str = ""
     guessed: bool = False
     status: ItemStatus = "unconfirmed"
@@ -125,6 +193,7 @@ class MapVehicle(Vehicle):
 
 
 class MapPlace(Place):
+    fact_sources: dict[str, str | None] = {}
     source_line: str = ""
     guessed: bool = False
     status: ItemStatus = "unconfirmed"
@@ -132,6 +201,7 @@ class MapPlace(Place):
 
 
 class MapDelivery(Delivery):
+    fact_sources: dict[str, str | None] = {}
     source_line: str = ""
     guessed: bool = False
     status: ItemStatus = "unconfirmed"
@@ -139,6 +209,7 @@ class MapDelivery(Delivery):
 
 
 class MapRoute(Route):
+    fact_sources: dict[str, str | None] = {}
     source_line: str = ""
     guessed: bool = False
     status: ItemStatus = "unconfirmed"
@@ -164,7 +235,7 @@ class PlanMap(BaseModel):
     deliveries: list[MapDelivery]
     routes: list[MapRoute]
     finish_time: int = 0
-    finish_time_source: str = ""
+    finish_time_source: str | None = ""
     finish_time_guessed: bool = False
     problem_sizes: dict[str, int]
     questions: list[MapQuestion] = []

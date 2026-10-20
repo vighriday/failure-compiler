@@ -1,5 +1,6 @@
 """Sentences and constrained editors derived from the current checker inputs."""
 
+import re
 from typing import Any
 
 from server.labels import route_label
@@ -71,6 +72,36 @@ def names(plan: PlanMap, ids: list[str]) -> str:
 
 def clock(minutes: int) -> str:
     return f"{minutes // 60:02d}:{minutes % 60:02d}"
+
+
+def source_tags(plan: PlanMap, item: dict) -> list[dict]:
+    """Keep fact evidence separate from an entity's mention, including legacy captures."""
+    if item.get("status") == "added":
+        return []
+    if item["entity_type"] == "plan":
+        line = plan.finish_time_source
+        return (
+            [{"label": "Finish time", "source_line": line, "kind": "fact"}]
+            if line and re.fullmatch(r"L[1-9][0-9]*", line)
+            else []
+        )
+    entity = entity_for(plan, item)
+    fields = {
+        "available_until": ["available_from", "available_until"],
+        "place": ["opens_at", "needs_key"],
+        "route": ["households", "vehicle_id", "driver_ids", "loader_ids"],
+        "loading": ["load_minutes", "loader_ids"],
+    }.get(item["field"], [item["field"]])
+    tags, missing = [], False
+    for field in fields:
+        line = entity.fact_sources.get(field)
+        if line:
+            tags.append({"label": LABELS.get(field, field), "source_line": line, "kind": "fact"})
+        else:
+            missing = True
+    if missing and re.fullmatch(r"L[1-9][0-9]*", entity.source_line or ""):
+        tags.append({"label": entity.name, "source_line": entity.source_line, "kind": "mention"})
+    return tags
 
 
 def loading_team(plan: PlanMap) -> list[str]:

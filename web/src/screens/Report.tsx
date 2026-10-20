@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getReport } from "../api/client";
 import { CellMark } from "../components/CrashGrid";
+import SourceTags from "../components/SourceTags";
 import type { ReportData } from "../types";
 import "./report.css";
 
@@ -23,7 +24,7 @@ export function ReportContent({data, onBack}: {data: ReportData; onBack: () => v
       <p className="report-review-summary mono">AI read {data.summary.ai_read} items, {data.summary.corrected} corrected by you, {data.summary.added} added by you</p>
       {[...new Set(data.facts.map((row) => row.group))].map((group) => <div className="report-fact-group" key={group}><h3>{group}</h3><ul>{data.facts.filter((row) => row.group === group).map((row) => <li key={row.id} className="report-fact">
         {row.status === "corrected" && row.original_statement && !row.changed_by_fix && <del>{row.original_statement} </del>}<span>{row.statement}</span>
-        <span className="report-fact-trail mono">{row.source_line ? ` · ${row.source_line}` : " · no source line"}{row.changed_by_fix ? ` · changed by Fix ${row.changed_by_fix}` : row.status === "added" ? " · added by you" : row.status === "corrected" ? " · corrected by you" : " · confirmed"}</span>
+        <span className="report-fact-trail mono"> · <SourceTags tags={row.source_tags} />{row.changed_by_fix ? ` · changed by Fix ${row.changed_by_fix}` : row.status === "added" ? " · added by you" : row.status === "corrected" ? " · corrected by you" : " · confirmed"}</span>
       </li>)}</ul></div>)}
       {data.review_answers.length > 0 && <div className="report-review-answers"><h3>Review decisions</h3><ul>{data.review_answers.map((row, i) => <li key={i}>{row.question} <strong>{row.answer}</strong></li>)}</ul></div>}
     </section>
