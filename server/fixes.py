@@ -257,7 +257,13 @@ def rejection_reason(plan: PlanMap, candidate: PlanMap, suggestion: FixSuggestio
             if all(pid in getattr(route, operation.field) for pid in ids):
                 names = " and ".join(people[pid].name for pid in ids)
                 role = "driver" if operation.op == "add_driver" else "loader"
-                return f"{names} already listed as {role} for {route_label(route.name)}. {short}"
+                return f"{names} is already a {role} for {route_label(route.name)}. {short}"
+            if operation.op == "add_loader" and route.id in reasons:
+                drivers = reasons[route.id].partition("Drivers for ")[2]
+                if drivers:
+                    return (
+                        f"{route_label(route.name)} still is not delivered. Drivers for {drivers}"
+                    )
     return short
 
 
@@ -475,7 +481,7 @@ def describe_change(plan: PlanMap, operations: list[FixOperation]) -> str:
         target, value = operation.target_id, operation.value
         if operation.op in {"add_driver", "add_loader"}:
             ids = [value] if isinstance(value, str) else value
-            role = "drives" if operation.op == "add_driver" else "loads"
+            role = "backs up" if operation.op == "add_driver" else "loads"
             descriptions.append(f"{' and '.join(people[p] for p in ids)} {role} {routes[target]}")
         elif operation.op == "give_spare_key":
             descriptions.append(f"Spare key for {people[target]}")

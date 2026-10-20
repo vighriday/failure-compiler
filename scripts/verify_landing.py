@@ -309,7 +309,7 @@ def main():
         confirm(page)
         no_overflow(page)
         page.locator(f'[data-scenario="{VAN_ANITA}"]').click()
-        expect(page.locator(".fix-card")).to_have_count(2, timeout=30000)
+        expect(page.locator('.fix-card[data-origin="ai"]')).to_have_count(3, timeout=60000)
         screenshot(page, "v2-live-case.png")
         no_overflow(page)
         tab(page, "Start")

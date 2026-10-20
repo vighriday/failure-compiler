@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from server.checker.runner import run_checker
+from server.facts import changed_by, statement
 from server.fixes import SCORED, score_fix
 from server.main import app
 from server.models import PlanMapData, ScenarioResult
@@ -125,7 +126,7 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     assert all(not fix["eligible"] for fix in van["suggestions"])
     assert "11:00" in hours["rejection_reason"] and "12:00" in hours["rejection_reason"]
     assert "shortens" in hours["rejection_reason"]
-    assert "Ravi already listed as driver for Route C" in driver["rejection_reason"]
+    assert "Ravi is already a driver for Route C" in driver["rejection_reason"]
     assert "10:45" in driver["rejection_reason"]
     assert car["fixes_n"] == 3 and car["new_crosses_n"] == 1
     assert "new single weak spot" in car["rejection_reason"]
@@ -153,6 +154,98 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     fp1 = first["fingerprint"]
     assert fp1 != original
 
+    joel = suggestions(fp1, JOEL)
+    assert set(joel["route_reasons"].values()) == {"Nobody can open the loading area."}
+    one = joel["suggestions"][0]
+    assert (one["fixes_n"], one["still_broken_n"], one["new_crosses_n"], one["eligible"]) == (
+        1,
+        1,
+        1,
+        False,
+    )
+    assert one["new_crosses"] == [JOEL_RAVI]
+    assert "Joel absent + Ravi absent" in one["rejection_reason"]
+    assert (
+        next(r for r in one["scenario_results"] if r["scenario_id"] == JOEL_RAVI)["state"]
+        == "cross"
+    )
+    apply(fp1, JOEL, one["id"], expected=409)
+
+    def own_change(fp, scenario, operations):
+        response = client.post(
+            "/api/test-change",
+            json={"fingerprint": fp, "scenario_id": scenario, "operations": operations},
+        )
+        assert response.status_code == 200, response.text
+        fix = response.json()
+        assert fix["origin"] == "yours" and fix["gate_status"] == "passed"
+        assert len(fix["scenario_results"]) == 100
+        return fix
+
+    keys = own_change(
+        fp1,
+        JOEL,
+        [
+            {
+                "op": "give_spare_key",
+                "target_id": f"person-{name}",
+                "field": "holds_key",
+                "value": True,
+            }
+            for name in ("maya", "sam")
+        ],
+    )
+    assert (keys["fixes_n"], keys["still_broken_n"], keys["new_crosses_n"], keys["eligible"]) == (
+        1,
+        1,
+        0,
+        True,
+    )
+    # Reopening a case keeps the coordinator's scored card; it doesn't request AI.
+    assert suggestions(fp1, JOEL)["suggestions"][-1]["id"] == keys["id"]
+    second = apply(fp1, JOEL, keys["id"])
+    fp2 = second["fingerprint"]
+    truck = own_change(
+        fp2,
+        TRUCK_RAVI,
+        [
+            {
+                "op": "add_driver",
+                "target_id": "route-a",
+                "field": "driver_ids",
+                "value": "person-sam",
+            }
+        ],
+    )
+    assert (
+        truck["fixes_n"],
+        truck["still_broken_n"],
+        truck["new_crosses_n"],
+        truck["eligible"],
+    ) == (1, 0, 0, True)
+    assert truck["description"] == "Sam backs up Route A."
+    final = apply(fp2, TRUCK_RAVI, truck["id"])
+    final_fp = final["fingerprint"]
+    assert len(SESSIONS[final_fp].results) == 100
+    assert all(r.state == "tick" for r in SESSIONS[final_fp].results)
+    chain = final["plan_map"]["fix_history"]
+    assert [fix["origin"] for fix in chain] == ["ai", "yours", "yours"]
+    assert [(fix["from_fingerprint"], fix["to_fingerprint"]) for fix in chain] == [
+        (original, fp1),
+        (fp1, fp2),
+        (fp2, final_fp),
+    ]
+    assert next(p for p in final["plan_map"]["people"] if p["name"] == "Joel")["holds_key"]
+    assert next(r for r in final["plan_map"]["routes"] if r["name"] == "C")["changed_by_fix"] == 1
+    # Reading sentences must follow the accepted map rather than stale extraction text.
+    final_plan = SESSIONS[final_fp].plan
+    key_item = {"entity_type": "person", "entity_id": "person-joel", "field": "holds_key"}
+    assert statement(final_plan, key_item) == "Joel, Maya and Sam hold loading-area keys."
+    assert changed_by(final_plan, key_item) == 2
+    for route_id, fix_number in [("route-c", 1), ("route-a", 3)]:
+        route_item = {"entity_type": "route", "entity_id": route_id, "field": "route"}
+        assert "Sam" in statement(final_plan, route_item)
+        assert changed_by(final_plan, route_item) == fix_number
 
 
 def test_bad_fix_is_couldnt_apply_and_names_the_bad_reference() -> None:

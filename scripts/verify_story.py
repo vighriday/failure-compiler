@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 
+from browser_fixes import backup_driver, spare_keys, test_change
 from browser_review import review_example
 from playwright.sync_api import expect, sync_playwright
 
@@ -11,7 +12,8 @@ BASE_URL = os.environ.get("FAILURE_COMPILER_URL", "http://127.0.0.1:5173")
 SCREENS = ROOT / "devpost/screens"
 VAN_ANITA = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van"
 VAN_ANITA_ABSENT = "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van"
-JOEL_MAYA = "volunteer_absent__person-joel+volunteer_absent__person-maya"
+JOEL_RAVI = "volunteer_absent__person-ravi+volunteer_absent__person-joel"
+TRUCK_RAVI = "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck"
 
 
 def main() -> None:
@@ -84,21 +86,26 @@ def main() -> None:
         screenshot("slice5-filled-grid.png")
 
         # Both Anita cases are real, and another cross stays clickable with the panel open.
-        page.locator(f'[data-scenario="{VAN_ANITA_ABSENT}"]').click()
-        expect(card("maya-route-c-driver")).to_be_visible(timeout=30000)
-        expect(page.locator(".human-cost")).to_have_text("Route C: 8 households not delivered")
-        expect(page.locator(".checker-facts")).to_contain_text("Anita absent")
         page.locator(f'[data-scenario="{VAN_ANITA}"]').click()
-        expect(card("maya-route-c-driver")).to_be_visible(timeout=30000)
+        expect(card("fix-2-add-driver-ravi-to-c")).to_be_visible(timeout=60000)
+        expect(page.locator('.fix-card[data-origin="ai"]')).to_have_count(3)
+        expect(page.locator(".fix-card.turned-down-card")).to_have_count(3)
+        expect(page.locator(".ai-sentence")).to_contain_text(
+            "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)"
+        )
+        expect(page.get_by_text("None of these suggestions worked", exact=True)).to_be_visible()
+        expect(
+            page.get_by_role("button", name="Ask for new suggestions", exact=True)
+        ).to_have_count(0)
         expect(page.locator(".checker-facts")).to_contain_text("Van back 10:45. Loading team gone.")
         expect(page.locator(".single-proof")).to_contain_text("Each alone: survives")
         assert page.locator(".axis-column span").last.evaluate(
             "el => el.getBoundingClientRect().right"
             " <= el.closest('.triangle-scroll').getBoundingClientRect().right"
         ), "Last column label is clipped"
-        screenshot("slice5-van-anita-panel.png")
+        screenshot("slice6-van-anita-three-turned-down.png")
 
-        maya = card("maya-route-c-driver")
+        maya = card("fix-2-add-driver-ravi-to-c")
         expect(maya).to_contain_text("Turned down")
         expect(maya).to_contain_text("fixes 0")
         expect(maya.get_by_role("button", name="Accept fix")).to_have_count(0)
@@ -109,44 +116,68 @@ def main() -> None:
         screenshot("slice5-maya-turned-down-preview.png")
         page.get_by_role("button", name="Cancel preview", exact=True).click()
         assert states() == before
-        first = accept("sam-route-c-loader")
+        page.locator(f'[data-scenario="{VAN_ANITA_ABSENT}"]').click()
+        sam = card("fix-2")
+        expect(sam).to_contain_text("Add an extra loader (Sam) to Route C", timeout=60000)
+        expect(sam).to_contain_text("fixes 2 · still broken 2 · new crosses 0")
+        screenshot("slice6-sam-card-eligible.png")
+        first = accept("fix-2")
         expect(page.locator(".crash-count")).to_contain_text("86 survived", timeout=30000)
         expect(page.locator(".case-resolved")).to_contain_text("Now survives.")
         expect(page.locator(".result-cross")).to_have_count(2)
-        screenshot("slice5-after-sam-loads-c.png")
+        assert states()[VAN_ANITA] == states()[VAN_ANITA_ABSENT] == "tick"
+        expect(page.locator(".accepted-changes")).to_contain_text("Fix 1 (AI)")
+        screenshot("slice6-sam-card-accepted.png")
+        expect(page.locator(".accepted-fix-card")).to_contain_text("Add an extra loader (Sam)")
 
-        page.get_by_role("button", name="Next broken case (2 left)", exact=True).click()
-        expect(card("sam-route-a-driver")).to_be_visible(timeout=30000)
-        expect(page.locator(".human-cost")).to_have_text("Route A: 10 households not delivered")
-        second = accept("sam-route-a-driver")
-        expect(page.locator(".crash-count")).to_contain_text("87 survived", timeout=30000)
-        page.get_by_role("button", name="Next broken case (1 left)", exact=True).click()
-        expect(card("maya-spare-key")).to_be_visible(timeout=30000)
+        page.locator('[data-scenario="volunteer_absent__person-joel"]').click()
+        expect(card("fix-1")).to_be_visible(timeout=60000)
         expect(page.locator(".human-cost")).to_have_text(
             "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"
         )
-        one_key = card("maya-spare-key")
+        one_key = card("fix-1")
         expect(one_key).to_contain_text("Turned down")
-        expect(one_key).to_contain_text("Joel absent + Maya absent")
+        expect(one_key).to_contain_text("Joel absent + Ravi absent")
         expect(one_key.get_by_role("button", name="Accept fix")).to_have_count(0)
         before = states()
-        assert before[JOEL_MAYA] == "dim"
+        assert before[JOEL_RAVI] == "dim"
         one_key.get_by_role("button", name="Preview", exact=True).click()
         expect(page.locator(".new-cross-cell")).to_have_count(1)
-        expect(page.locator(f'[data-scenario="{JOEL_MAYA}"]')).to_have_attribute(
+        expect(page.locator(f'[data-scenario="{JOEL_RAVI}"]')).to_have_attribute(
             "data-state", "cross"
         )
-        expect(page.locator(".crash-count")).to_contain_text("99 survived")
+        expect(page.locator(".crash-count")).to_contain_text("98 survived")
         screenshot("slice5-one-key-new-cross-preview.png")
         page.get_by_role("button", name="Cancel preview", exact=True).click()
         assert states() == before
-        final = accept("maya-sam-spare-keys")
+        builder = spare_keys(page)
+        # The three-operation limit and removal are exercised through visible controls.
+        builder.get_by_role("button", name="Add another operation", exact=True).click()
+        expect(
+            builder.get_by_role("button", name="Add another operation", exact=True)
+        ).to_have_count(0)
+        builder.get_by_role("button", name="Remove change 3", exact=True).click()
+        screenshot("slice6-builder-spare-keys-filled.png")
+        own = test_change(page)
+        expect(own).to_contain_text("fixes 1 · still broken 1 · new crosses 0")
+        second = accept(own.get_attribute("data-fix-id"))
+        expect(page.locator(".crash-count")).to_contain_text("99 survived", timeout=30000)
+        expect(page.locator(".accepted-changes")).to_contain_text("Fix 2 (yours)")
+        page.get_by_role("button", name="Next broken case (1 left)", exact=True).click()
+        expect(page.locator(".suggestion-loading")).to_have_count(0, timeout=60000)
+        expect(page.locator(".human-cost")).to_have_text("Route A: 10 households not delivered")
+        backup_driver(page)
+        own = test_change(page)
+        expect(own).to_contain_text("fixes 1 · still broken 0 · new crosses 0")
+        final = accept(own.get_attribute("data-fix-id"))
         expect(page.locator(".case-panel")).to_contain_text(
             "All 100 tested scenarios survive.", timeout=30000
         )
         expect(page.locator(".result-tick")).to_have_count(100)
         expect(page.locator(".result-cross, .result-dim, .result-qmark")).to_have_count(0)
-        screenshot("slice5-all-survived.png")
+        expect(page.locator(".accepted-changes")).to_contain_text("Fix 3 (yours)")
+        expect(page.locator(".accepted-fix-card")).to_contain_text("Sam backs up Route A.")
+        screenshot("slice6-all-survived.png")
         chain = final["plan_map"]["fix_history"]
         assert len(chain) == 3
         assert chain[0]["to_fingerprint"] == first["fingerprint"]
@@ -195,7 +226,8 @@ def main() -> None:
         assert not errors, errors
         print(
             "PASS: full example story; all 100 survived; 3 linked fingerprints;"
-            " 6 screenshots; reduced motion; no page errors."
+            " real AI cards, constrained builder, full-page screenshots;"
+            " reduced motion; no page errors."
         )
         browser.close()
 

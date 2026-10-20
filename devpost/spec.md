@@ -400,6 +400,7 @@ PlanMap
 ```
 AppliedFix
   fix_id:           str
+  origin:           "ai" | "yours"  # Server-owned source of the accepted change
   description:      str
   operations:       list[FixOperation]
   from_fingerprint: str

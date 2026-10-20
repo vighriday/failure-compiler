@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 
+from browser_fixes import backup_driver, spare_keys, test_change
 from browser_review import review_example
 from playwright.sync_api import expect, sync_playwright
 
@@ -12,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "assets/submission/screenshots"
 BASE = os.environ.get("FAILURE_COMPILER_URL", "http://127.0.0.1:5173")
 VAN_ANITA = "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van"
-JOEL_MAYA = "volunteer_absent__person-joel+volunteer_absent__person-maya"
+VAN_ABSENT = "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van"
+JOEL_RAVI = "volunteer_absent__person-ravi+volunteer_absent__person-joel"
 
 
 def main() -> None:
@@ -61,33 +63,36 @@ def main() -> None:
         capture("04-live-grid.png", full_page=True)
 
         page.locator(f'[data-scenario="{VAN_ANITA}"]').click()
-        maya = page.locator('[data-fix-id="maya-route-c-driver"]')
+        maya = page.locator('[data-fix-id="fix-2-add-driver-ravi-to-c"]')
         expect(maya).to_be_visible(timeout=30000)
         expect(page.locator(".human-cost")).to_have_text("Route C: 8 households not delivered")
         capture("05-broken-case.png", full_page=True)
         capture("06-fix-turned-down.png", target=page.locator(".case-panel"))
 
-        page.locator('[data-fix-id="sam-route-c-loader"]').get_by_role(
-            "button", name="Accept fix", exact=True
-        ).click()
-        expect(page.locator(".crash-count")).to_contain_text("86 survived", timeout=30000)
-        page.get_by_role("button", name="Next broken case (2 left)", exact=True).click()
-        sam = page.locator('[data-fix-id="sam-route-a-driver"]')
-        expect(sam).to_be_visible(timeout=30000)
+        page.locator(f'[data-scenario="{VAN_ABSENT}"]').click()
+        sam = page.locator('[data-fix-id="fix-2"]')
+        expect(sam).to_contain_text("Add an extra loader (Sam) to Route C", timeout=60000)
         sam.get_by_role("button", name="Accept fix", exact=True).click()
-        expect(page.locator(".crash-count")).to_contain_text("87 survived", timeout=30000)
-        page.get_by_role("button", name="Next broken case (1 left)", exact=True).click()
-        one_key = page.locator('[data-fix-id="maya-spare-key"]')
+        expect(page.locator(".crash-count")).to_contain_text("86 survived", timeout=30000)
+        page.locator('[data-scenario="volunteer_absent__person-joel"]').click()
+        one_key = page.locator('[data-fix-id="fix-1"]')
         expect(one_key).to_be_visible(timeout=30000)
         one_key.get_by_role("button", name="Preview", exact=True).click()
-        expect(page.locator(f'[data-scenario="{JOEL_MAYA}"]')).to_have_attribute(
+        expect(page.locator(f'[data-scenario="{JOEL_RAVI}"]')).to_have_attribute(
             "data-state", "cross"
         )
         capture("07-one-key-new-pair.png", full_page=True)
         page.get_by_role("button", name="Cancel preview", exact=True).click()
-        page.locator('[data-fix-id="maya-sam-spare-keys"]').get_by_role(
-            "button", name="Accept fix", exact=True
-        ).click()
+        spare_keys(page)
+        capture("07b-your-change-filled.png", full_page=True)
+        own = test_change(page)
+        own.get_by_role("button", name="Accept fix", exact=True).click()
+        expect(page.locator(".crash-count")).to_contain_text("99 survived", timeout=30000)
+        page.get_by_role("button", name="Next broken case (1 left)", exact=True).click()
+        expect(page.get_by_role("region", name="Test your own change")).to_be_visible(timeout=60000)
+        backup_driver(page)
+        own = test_change(page)
+        own.get_by_role("button", name="Accept fix", exact=True).click()
         expect(page.locator(".result-tick")).to_have_count(100, timeout=30000)
         expect(page.locator(".case-panel")).to_contain_text("All 100 tested scenarios survive.")
         capture("08-all-survived.png", full_page=True)

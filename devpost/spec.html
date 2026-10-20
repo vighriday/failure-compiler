@@ -803,6 +803,7 @@ map_fingerprint:       str</code></pre>
 
   <h3>FixSuggestion</h3>
   <pre><code>id, description
+origin:              "ai" | "yours"          <span class="comment"># Assigned by the server</span>
 operations:          list[FixOperation]       <span class="comment"># From the fixed operations list</span>
 scenario_results:    list[ScenarioResult]     <span class="comment"># Full results; browser derives counts</span>
 fixes_n, still_broken_n, new_crosses_n       <span class="comment"># Derived by server before sending</span>

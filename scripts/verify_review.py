@@ -4,6 +4,7 @@ import os
 import re
 from pathlib import Path
 
+from browser_fixes import backup_driver, spare_keys, test_change
 from browser_review import review_example
 from playwright.sync_api import expect, sync_playwright
 
@@ -11,16 +12,16 @@ BASE = os.environ.get("FAILURE_COMPILER_URL", "http://127.0.0.1:8011")
 SCREENS = Path(__file__).resolve().parents[1] / "devpost/screens"
 CASES = [
     (
-        "volunteer_leaves_early__person-anita+vehicle_returns_late__vehicle-van",
-        "sam-route-c-loader",
+        "volunteer_absent__person-anita+vehicle_returns_late__vehicle-van",
+        "fix-2",
         "86 survived",
     ),
     (
         "volunteer_absent__person-ravi+supply_delivery_late__delivery-supply-truck",
-        "sam-route-a-driver",
+        "yours-driver",
         "87 survived",
     ),
-    ("volunteer_absent__person-joel", "maya-sam-spare-keys", "100 survived"),
+    ("volunteer_absent__person-joel", "yours-keys", "100 survived"),
 ]
 
 
@@ -40,7 +41,18 @@ def main():
         expect(page.locator(".result-cell")).to_have_count(100)
         for scenario, fix_id, count in CASES:
             page.locator(f'[data-scenario="{scenario}"]').click()
-            card = page.locator(f'[data-fix-id="{fix_id}"]')
+            expect(page.locator(".suggestion-loading")).to_have_count(0, timeout=60000)
+            expect(page.get_by_role("region", name="Test your own change")).to_be_visible(
+                timeout=60000
+            )
+            if fix_id == "yours-driver":
+                backup_driver(page)
+                card = test_change(page)
+            elif fix_id == "yours-keys":
+                spare_keys(page)
+                card = test_change(page)
+            else:
+                card = page.locator(f'[data-fix-id="{fix_id}"]')
             expect(card).to_be_visible(timeout=60000)
             card.get_by_role("button", name="Accept fix", exact=True).click()
             expect(page.locator(".crash-count")).to_contain_text(count, timeout=60000)
