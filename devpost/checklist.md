@@ -69,7 +69,7 @@ Build mode: fast
   Learner check: Review the hardening evidence and try corrections before the live AI work.
   Commit: `Harden confirmation, corrections, validation and cached results`
 
-- [ ] **6. Live AI**
+- [x] **6. Live AI**
   Becomes usable: Paste your own plan with an AI key, and the AI reads it, the gate checks the output, the map renders. Fix suggestions come from the AI, not a fixture. Both providers work with fallback.
   Why now: Provider quirks are contained in one slice. Slices 3 to 5 already give a recordable demo, so AI integration can't block the Oct 20 deadline.
   PRD ref: `prd.md > States and Boundaries`
@@ -111,6 +111,8 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- Slice 6 completed, 20 October 2026, after the user's approval of the real suggestion fixtures: 192 offline tests pass and two opt-in network tests skip. Whole-repository Ruff and the production build pass. Playwright passes the real-card story, two coordinator-built fixes, all 100 survived, linked history, preview cancellation, current facts, re-confirmation, reduced motion, 1440/768/390/320 layout, scroll and animation recovery. Recorded real and synthetic transport replays verify fallback, attribution, key privacy, errors and the once-only live retry without provider requests. Four full-page 1440x900-viewport captures are saved in ignored `screens/slice6-van-anita-three-turned-down.png`, `slice6-sam-card-accepted.png`, `slice6-builder-spare-keys-filled.png` and `slice6-all-survived.png`; dimensions and counts are recorded in `screens/slice6-approval-verification.json`. README and Markdown/HTML product/spec companions describe the real results and the approved builder. No em dashes were introduced in the edited docs. The checker model and locked verdicts remain unchanged. Slice 7 has not started.
 
 - User decision, 20 October 2026: approve all four unedited Groq / openai/gpt-oss-120b suggestion captures as the example fixtures, retaining Gemini's 503/504 retry history. The app labels them "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)". Ten suggestions are turned down after scoring, one cannot pass the gate, and only the Sam loader card is eligible on the original map. No second round is captured.
 - User decision, 20 October 2026: add "Test your own change" below the AI cards. A coordinator picks up to three fixed operations (driver, loader, spare key, person hours or vehicle); the same gate and all 100 scenarios determine preview and acceptance. Cards say "Your change" and history distinguishes "Fix N (AI)" from "Fix N (yours)". The real demo accepts the Sam loader card, then coordinator-built spare keys for Maya and Sam, then Sam as Route A backup. A live case with no eligible AI card offers "Ask for new suggestions" once; saved examples do not.

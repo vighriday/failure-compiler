@@ -7,7 +7,7 @@
 -->
 
 > [!NOTE]
-> **Submission draft.** The app includes live plan reading, confirmation, the live checker, case details and scored AI suggestions. Gemini is primary, with Groq as fallback. The saved example reading is real, unedited Gemini output with explicit review steps; saved example fixes remain labelled hand-written placeholders pending approval of the captured suggestions. Slice 6 stays open for that approval; reports remain in slice 7. Video, image and PDF links below are placeholders for the final submission.
+> **Submission draft.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions and a fixed-choice change builder. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. Reports remain in slice 7. Video, image and PDF links below are placeholders for the final submission.
 
 <div align="center">
 
@@ -128,7 +128,7 @@ flowchart TB
 2. **Check the map.** The AI turns the text into plain statements like *"Maya leaves at 10:45"*, each linked to the line of your plan it came from. Guesses are flagged, and anything unclear becomes a question. You confirm or correct each fact, picking from names and times already in the plan; there's no free typing.
 3. **Crash-test it.** The checker tries every single problem and every pair from a fixed list. The grid fills in live.
 4. **Open a cross.** See the two problems, proof that each one alone was fine, the morning drawn on a timeline, and the human cost in households.
-5. **Fix it.** Up to 3 suggested fixes, each already scored against all 100 tests. The ones that don't work are turned down, with the checker's reason. Accept one and every test re-runs.
+5. **Fix it.** Up to 3 AI cards, each already scored against all 100 tests. The ones that don't work are turned down, with the checker's reason. Or build your own change from up to three fixed-choice operations. Accepting either kind updates the plan and re-tests everything.
 6. **Report (planned for slice 7).** What was tested, what broke, what fixed it, and what was **not** tested. Print it or save it as a PDF.
 
 ---
@@ -232,20 +232,34 @@ gantt
 
 **Together:** the van is free at the exact moment the last loader walks out.
 
-### Why the obvious fix fails
+### What the real suggestions did
 
-| Suggested fix | Checker's verdict | Why |
+| Case / suggested change (short label) | Checker's verdict on the original map | Why |
 |---|---|---|
-| Add Maya as a backup driver for Route C | **✗ Turned down.** Fixes 0. | Route C was never short of a driver. It's short of a *loader* when the van gets back, and Maya leaves at 10:45 anyway. |
-| Sam loads Route C | **✓ Fixes 2** | Sam is the one bringing the van back at 10:45. Let him load it. |
-| Sam backs up Route A | **✓ Fixes 1** | Someone who stays until noon can drive Route A after the late truck. |
-| Give Maya a spare key | **✗ Turned down.** 1 new cross. | It fixes "Joel absent", but creates a new hidden pair: Joel **and** Maya absent leaves nobody with a key. |
-| Spare keys for Maya and Sam | **✓ Fixes 1.** Breaks nothing. | Any two of the three key holders can be missing and someone still opens the hall. |
+| Van + Anita early: extend Anita | **✗ Turned down.** Fixes 0, 2 new crosses. | Description says extend, but the operation sets her finish to 11:00, earlier than her planned 12:00. |
+| Van + Anita early: add Ravi as driver for C | **✗ Turned down.** Fixes 0, 0 new crosses. | Ravi is already a driver for C. Loading still fails when the van is back at 10:45. |
+| Van + Anita early: C to car, B to van | **✗ Turned down.** Fixes 3, 1 new cross. | Makes "Supply truck 45 min late" a new single weak spot. |
+| Van + Anita absent: replace C's drivers | **✗ Turned down.** Fixes 0, 2 new crosses. | Still no loader; replacing drivers also creates problems elsewhere. |
+| Van + Anita absent: **add Sam as loader for C** | **✓ Eligible. Fixes 2, 0 new crosses.** | Sam can load after the original loading team leaves. Both van crosses flip. |
+| Van + Anita absent: assign van earlier / car to B | **Couldn't apply.** Not scored. | Operation targets are vehicle IDs where route IDs are required. |
+| Joel absent: spare key for Ravi | **✗ Turned down.** Fixes 1, 1 new cross. | Creates the hidden pair "Joel absent + Ravi absent". |
+| Joel absent: replace A's drivers | **✗ Turned down.** Fixes 0, 2 new crosses. | Nobody can open the loading area; replacing drivers creates other breaks. |
+| Joel absent: replace loaders | **✗ Turned down.** Fixes 0, 2 new crosses. | Still no key; changes elsewhere create more broken pairs. |
+| Truck + Ravi: replace A's drivers | **✗ Turned down.** Fixes 1, 9 new crosses. | Fixes this case but removing the planned driver creates new broken pairs. |
+| Truck + Ravi: spare key for Anita | **✗ Turned down.** Fixes 1, 1 new cross. | Fixes Joel's single instead; the selected truck case stays broken. |
+| Truck + Ravi: add Sam as loader for A | **✗ Turned down.** Fixes 0, 0 new crosses. | The gap here is driving, not loading. |
 
-> After the three accepted fixes, in any order: **All 100 tested scenarios survive.**
+**12 real cards: 10 turned down after scoring, 1 rejected by the gate, 1 eligible.** Descriptions, operations, provider metadata and Gemini's 503/504 history are preserved in [`fixtures/example-fixes.json`](fixtures/example-fixes.json). The app shows the full, unedited descriptions with the label **Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)**. Each card is gated and scored live against the current map; reopening uses the cache. No second round was captured.
 
-<!-- UPDATE after slice 6: in example mode these suggestions come from a saved AI run (fixtures/example-fixes.json). If the real AI suggests different fixes, update this table to match. Never present hand-written suggestions as AI output. -->
-<sub>Current example mode uses hand-written PLACEHOLDER suggestions (<code>fixtures/example-fixes.json</code>). Each suggestion is gated and scored by the live checker; reopening the same case uses its cached results.</sub>
+**The demo story:**
+
+1. Open van + Anita leaves early: all three AI cards are turned down. Previewing one never changes the plan.
+2. Open van + Anita absent. Accept **"Add an extra loader (Sam) to Route C so loading can finish after the original loaders leave."** Both van crosses flip. History: **Fix 1 (AI)**.
+3. Open Joel absent. The AI's one-key card reveals Joel + Ravi absent. Under **Test your own change**, pick spare keys for **Maya and Sam**, then **Test this change**. It fixes Joel, creates no new crosses and makes every re-tested Joel pair survive. Accept: **Fix 2 (yours)**.
+4. Open truck + Ravi. Build **Sam as another driver for Route A**, test and accept: **Fix 3 (yours)**.
+5. **All 100 tested scenarios survive.**
+
+The builder uses picks only: add a driver or loader, give a spare key, change someone's hours with a time picker, or move a route to another vehicle. Up to three operations use the same gate, preview and acceptance rules as the AI. When no AI card is eligible, the app says **"None of these suggestions worked"**. Live mode with a key offers **"Ask for new suggestions"** once; saved example mode does not call a provider.
 
 ```mermaid
 gantt
@@ -394,7 +408,7 @@ flowchart LR
 > Any "?" result is listed by name in the report and never counted as a pass. This version supports community distribution plans with up to 24 problems. It is a proof of concept, not a guarantee for real-world operations.
 
 > [!NOTE]
-> **Build status:** example mode uses one unedited saved Gemini reading. The review controls identify Hall as the same place as Loading bay. Loader order needs no correction: eligible loaders are compared as a set. A regression verifies every checker input and all 100 locked verdicts against the independent hand-checked truth map. Fix suggestions remain labelled placeholders until the real suggestions have been reviewed.
+> **Build status:** example mode uses one unedited saved Gemini reading. The review controls identify Hall as the same place as Loading bay. Loader order needs no correction: eligible loaders are compared as a set. A regression verifies every checker input and all 100 locked verdicts against the independent hand-checked truth map. The approved saved suggestions are real Groq fallback responses, scored live; coordinator-built changes use the same gate and scorer.
 
 ---
 
@@ -416,13 +430,14 @@ Every number in this README can be reproduced from the repository.
 | The whole demo story plays end to end in a real browser | [`scripts/verify_story.py`](scripts/verify_story.py), with the dev server running and Playwright installed |
 | V2 navigation, animation recovery, every sample square, editor controls and responsive layouts work | [`scripts/verify_landing.py`](scripts/verify_landing.py), at desktop, tablet and phone sizes |
 | The saved AI reading plus the demo's corrections equals the hand-checked map | [`tests/test_reading_matches_truth.py`](tests/test_reading_matches_truth.py) |
-| Live paste, review, checker, suggestions and apply work offline; keys and caches stay session-scoped | [`tests/test_live_api.py`](tests/test_live_api.py), recorded real reading plus explicitly synthetic fix response |
+| Live paste, review, checker, suggestions and apply work offline; keys and caches stay session-scoped | [`tests/test_live_api.py`](tests/test_live_api.py), recorded real reading and all four approved real suggestion responses |
+| Coordinator picks pass the same gate; real-card story reaches all 100 survived | [`tests/test_change_builder.py`](tests/test_change_builder.py), [`tests/test_fix_pipeline.py`](tests/test_fix_pipeline.py), [`scripts/verify_story.py`](scripts/verify_story.py) |
 | Provider read/connect timeouts become safe retryable errors | [`tests/test_live_transport.py`](tests/test_live_transport.py) |
 | Real provider smoke tests require explicit opt-in and a key | [`tests/test_live_network.py`](tests/test_live_network.py) |
 
 Run the Python tests with `uv run -- python -m pytest -q`. Browser checks run separately with `uv run -- python scripts/verify_landing.py` and `uv run -- python scripts/verify_story.py`.
 
-The ordinary test run makes no provider requests, even when `.env` contains keys. Offline end-to-end coverage replays the real saved reading through the HTTP flow; its always-available fix response is explicitly synthetic. To replay all four actual recorded suggestion responses locally, set `RECORDED_AI_FIXES_PATH` to the ignored recorder output file before running the same test command. Each case needs a successful `raw` record. The replay checks provider attribution and fallback, and applies any eligible change before re-testing. It skips when no capture is supplied; new suggestions remain uncommitted until approved.
+The ordinary test run makes no provider requests, even when `.env` contains keys. Offline end-to-end coverage replays the real saved reading and all four approved Groq suggestion responses through HTTP, including simulated Gemini 503 fallback, scoring and any eligible acceptance. `RECORDED_AI_FIXES_PATH` optionally selects another local recorder file. A separate explicitly synthetic response tests failure handling. Only the two opt-in real-network reading tests skip by default.
 
 Real-network smoke tests run only when you explicitly set `RUN_LIVE_AI_TESTS=1` and a provider key is available. Without both, they skip. These tests send the fictional example plan to the provider.
 
@@ -459,7 +474,7 @@ Typed keys stay only in the local server's session memory. They are never writte
 
 The plan map and results show **Read by provider / model**; live suggestions show who supplied them. A Gemini server error such as HTTP 503, timeout, rate limit or failed output format check triggers one Groq attempt when a Groq key is available. Missing or invalid keys, unsupported plans and both-provider failures have clear errors and retry/example actions. A failed suggestion request leaves the checker's facts available.
 
-Screen 1 shows the Gemini data notice: Google may use content to improve its products. Avoid personal details; the example plan is fictional. Loading the saved example and its placeholder fixes makes no AI calls. Requesting new suggestions uses a configured key and sends the confirmed map and selected case to the provider.
+Screen 1 shows the Gemini data notice: Google may use content to improve its products. Avoid personal details; the example plan is fictional. Loading the saved reading and real saved suggestions makes no AI calls. Requesting new suggestions in live mode uses a configured key and sends the confirmed map and selected case to the provider.
 
 | Task | Command |
 |---|---|
@@ -528,7 +543,7 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 - [x] **Slice 3:** the plan map screen
 - [x] **Slice 4:** the grid fills live
 - [x] **Slice 5:** broken case, fixes, flip
-- [ ] **Slice 6:** live Gemini/Groq flow and real saved reading; final suggestion fixtures await approval
+- [x] **Slice 6:** live Gemini/Groq flow, real saved reading and approved real suggestions, fixed-choice coordinator changes, offline end-to-end verification
 - [ ] **Slice 7:** report, before and after, design pass
 - [ ] Final review, learning wrap-up and app map
 
@@ -571,7 +586,7 @@ failure-compiler/
 │   ├── example-truth.json   The hand-checked correct map
 │   ├── example-reading.json Unedited saved Gemini reading
 │   ├── example-corrections.json Explicit review actions, separate from the AI output
-│   ├── example-fixes.json   Hand-written PLACEHOLDER suggestions
+│   ├── example-fixes.json   Unedited Groq suggestions and Gemini failure history
 │   └── expected-results.json  All 100 locked results
 ├── scripts/                 dev.py, check_map.py, verify_story.py
 ├── tests/                   pytest, plus a Playwright end-to-end test
@@ -591,7 +606,8 @@ failure-compiler/
 | `POST /api/update-map` | Applies constrained corrections and review actions to the server's own reading draft |
 | `POST /api/confirm-map` | Checks the server's confirmations, answers and rules, then returns the fingerprint |
 | `GET /api/run-tests` | Streams each result as it finishes (server-sent events) |
-| `POST /api/suggest-fixes` | Gets live suggestions for a confirmed case, then gates, scores and caches them for that session; `live: true` requests AI instead of saved example placeholders, and `retry: true` uses the one explicit no-eligible retry |
+| `POST /api/suggest-fixes` | Gates, scores and caches saved or live suggestions; `retry: true` uses the one explicit retry for a live case with no eligible AI card |
+| `POST /api/test-change` | Gates and scores up to three coordinator-picked operations against every scenario; returns a server-owned "Your change" card |
 | `POST /api/apply-fix` | Applies an accepted fix, records the before and after fingerprints, re-tests |
 | `GET /api/report` | Planned for slice 7; not implemented yet |
 
@@ -637,7 +653,7 @@ The app looks like a coordinator's run sheet, not a tech dashboard: warm paper, 
 ## Privacy and security
 
 - Runs on your own machine. The server only listens on `127.0.0.1`.
-- Loading the saved example and its placeholder suggestions makes **no AI calls**. Requesting new suggestions does.
+- Loading the saved reading and real saved suggestions makes **no AI calls**. Live requests for new suggestions do.
 - Live reading sends your plan to the selected provider; live suggestions send the confirmed map and checker facts for the selected case. Gemini is the default primary and Groq the fallback. Screen 1 displays the Gemini data notice. The example plan is fictional.
 - `.env` is ignored by Git and loaded only by the server. Typed keys stay only in server session memory and are never logged, saved to a file or returned in an API response. The browser's HttpOnly session cookie contains no key.
 - Maps, review drafts, keys and results stay in server memory until the server restarts. Nothing is written to a database. Closing the tab does not clear server memory. Successful suggestion caches belong to the session, fingerprint and broken case.
