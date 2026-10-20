@@ -15,11 +15,24 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     reports = []
+    proof = json.loads((ROOT / "devpost/screens/report-print-proof.json").read_text())
+
+    def words(value):
+        return re.sub(r"\W+", " ", unicodedata.normalize("NFKC", value)).strip()
+
     for paper, path in [
         ("a4", ROOT / "docs/sample-report.pdf"),
         ("letter", ROOT / "devpost/screens/sample-report-letter.pdf"),
     ]:
         document = pymupdf.open(path)
+        assert len(document) <= 5, (paper, len(document), "report exceeds five pages")
+        page_texts = [words(page.get_text()) for page in document]
+        for card in proof["cards"]:
+            assert any(words(card) in page for page in page_texts), (
+                paper,
+                card[:100],
+                "card split across pages or missing text",
+            )
         output = ROOT / "devpost/screens" / f"report-{paper}"
         output.mkdir(parents=True, exist_ok=True)
         text = unicodedata.normalize("NFKC", "\n".join(page.get_text() for page in document))
@@ -33,6 +46,10 @@ def main():
         ]:
             assert heading in text, heading
         for phrase in [
+            "3 fixes accepted: 1 from the AI, 2 yours.",
+            "The AI suggested 12 fixes. The checker turned down 10 and couldn't apply 1.",
+            "Read by Gemini / gemini-3.8-flash",
+            "Answered: 09:00.",
             "All 100 tested scenarios survive.",
             "Fix 1 (AI)",
             "Fix 2 (yours)",

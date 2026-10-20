@@ -28,11 +28,18 @@ def test_report_available_after_first_run_and_is_session_private(monkeypatch):
     response = client.get("/api/report", params={"map": fp})
     assert response.status_code == 200, response.text
     report = response.json()
-    assert report["source"] == "saved" and report["read_by"].startswith("gemini / ")
+    assert report["source"] == "saved" and report["read_by"].startswith("Gemini / ")
     assert report["summary"]["ai_read"] == 32
     assert report["summary"]["corrected"] == 1
     assert report["summary"]["added"] == 0
     assert len(report["facts"]) == 30
+    assert report["overview"]["accepted"] == report["overview"]["ai_suggested"] == 0
+    assert "30 households not delivered" in report["overview"]["main_human_cost"]
+    arrivals = [answer for answer in report["review_answers"] if "from" in answer["question"]]
+    assert len(arrivals) == 4 and all(answer["answer"] == "09:00" for answer in arrivals)
+    assert all(
+        answer["answer"] != "Use the reviewed details" for answer in report["review_answers"]
+    )
     assert all(row["source_line"] for row in report["facts"])
     assert report["before"] == report["after"]
     assert report["after"]["total"] == 100 and len(report["after"]["problems"]) == 14

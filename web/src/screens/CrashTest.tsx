@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { providerLabel } from "../lib/labels";
 import { APIError, applyFix, getReport, streamTests, suggestFixes, testChange } from "../api/client";
 import CrashGrid from "../components/CrashGrid";
 import CasePanel from "../components/CasePanel";
@@ -110,7 +111,7 @@ export default function CrashTest({ plan, onEdit, onPlanChange, onTryExample, re
   return <div className={`app-shell crash-shell ${selected && !before ? "panel-open" : ""}`}>
     {!embedded && <header className="topbar"><div className="brand brand-compact"><div className="brand-name">Failure Compiler</div><div className="brand-subtitle">Crash-test a plan before Saturday does.</div></div><div className="topbar-meta"><span>{readingSource === "live" ? "YOUR PLAN" : "EXAMPLE MODE"}</span><button type="button" onClick={onEdit}>← Plan map</button></div></header>}
     <section className="crash-main">
-      {embedded && <div className="live-view-bar"><span className="mono">{readingSource === "live" ? "YOUR PLAN" : "EXAMPLE PLAN"} · LIVE CHECKER<br />Read by {plan.ai_meta.provider} / {plan.ai_meta.model}{fallbackUsed && " · fallback provider"}</span><button type="button" className="button button-text" onClick={onEdit}>← Plan map</button></div>}
+      {embedded && <div className="live-view-bar"><span className="mono">{readingSource === "live" ? "YOUR PLAN" : "EXAMPLE PLAN"} · LIVE CHECKER<br />Read by {providerLabel(plan.ai_meta.provider)} / {plan.ai_meta.model}{fallbackUsed && " · fallback provider"}</span><button type="button" className="button button-text" onClick={onEdit}>← Plan map</button></div>}
       <div className="eyebrow">03 / CRASH TEST</div>
       <div className="crash-heading"><h1>What could break this plan?</h1><span className="mono run-progress">{count?.completed ?? 0} / {meta?.total ?? "…"} checked</span></div>
       <p className="crash-count mono" aria-live="polite">{before ? <span className="history-label">BEFORE · </span> : preview && <span className="projected-label">PROJECTED · </span>}{shownCount?.line ?? "The checker is starting with one problem at a time."}</p>

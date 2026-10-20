@@ -216,6 +216,72 @@ def example_case(plan: PlanMap, scenario_id: str, fixture: dict) -> dict:
     return saved
 
 
+def _driver_window_reason(candidate: PlanMap, result: ScenarioResult, route_id: str) -> str | None:
+    """Explain an impossible driver window using a conservative earliest-start bound."""
+    from server.checker.scenarios import _instantiate_problems
+
+    active = {problem["id"]: problem for problem in _instantiate_problems(candidate.checker_data())}
+    failures = [active[problem_id] for problem_id in result.failures]
+    absent = {p["entity_id"] for p in failures if p["type_id"] == "volunteer_absent"}
+    early = {
+        p["entity_id"]: p["size"] for p in failures if p["type_id"] == "volunteer_leaves_early"
+    }
+    late = {
+        p["entity_id"]: p["size"]
+        for p in failures
+        if p["type_id"] in {"vehicle_returns_late", "supply_delivery_late", "place_blocked"}
+    }
+    route = next(route for route in candidate.routes if route.id == route_id)
+    vehicle = next(vehicle for vehicle in candidate.vehicles if vehicle.id == route.vehicle_id)
+    ready = max(
+        [vehicle.available_from + late.get(vehicle.id, 0)]
+        + [place.opens_at + late.get(place.id, 0) for place in candidate.places]
+        + [delivery.arrives_at + late.get(delivery.id, 0) for delivery in candidate.deliveries]
+    )
+    people = {person.id: person for person in candidate.people}
+    remaining = [
+        people[person_id]
+        for person_id in route.driver_ids
+        if person_id not in absent and people[person_id].can_drive
+    ]
+    if not remaining or any(
+        max(ready + route.load_minutes, person.available_from) + route.drive_minutes
+        <= person.available_until - early.get(person.id, 0)
+        for person in remaining
+    ):
+        return None
+    missing = [people[person_id].name for person_id in route.driver_ids if person_id in absent]
+    absence = (
+        f"{' and '.join(missing)} {'is' if len(missing) == 1 else 'are'} absent; "
+        if missing
+        else ""
+    )
+    backup = bool(route.driver_ids and route.driver_ids[0] in absent)
+    drivers = (
+        "the backups leave"
+        if backup and len(remaining) > 1
+        else "the backup driver leaves"
+        if backup
+        else "the remaining drivers leave"
+        if len(remaining) > 1
+        else "the remaining driver leaves"
+    )
+    delivery_ready = max(
+        (delivery.arrives_at + late.get(delivery.id, 0) for delivery in candidate.deliveries),
+        default=None,
+    )
+    start = (
+        f"after the supplies arrive at {clock(ready)}"
+        if delivery_ready == ready
+        else f"even if loading starts at {clock(ready)}"
+    )
+    return (
+        f"{route_label(route.name)} is still not delivered. "
+        f"{absence}{drivers if absence else drivers.capitalize()} before the "
+        f"{route.drive_minutes}-minute drive could finish {start}."
+    )
+
+
 def rejection_reason(plan: PlanMap, candidate: PlanMap, suggestion: FixSuggestion, result) -> str:
     """Explain operations and proven outcomes, independently of the AI's description."""
     from server.checker.scenarios import _instantiate_problems
@@ -229,8 +295,8 @@ def rejection_reason(plan: PlanMap, candidate: PlanMap, suggestion: FixSuggestio
             if operation.value < person.available_until:
                 return (
                     f"This change sets {person.name}'s finish to {clock(operation.value)}, "
-                    f"earlier than their planned {clock(person.available_until)}. "
-                    "The operation shortens their hours; the selected case still fails."
+                    f"earlier than their planned {clock(person.available_until)}, "
+                    "so the case still fails."
                     if result.state != "tick"
                     else f"This change shortens {person.name}'s hours and creates a new cross."
                 )
@@ -247,6 +313,10 @@ def rejection_reason(plan: PlanMap, candidate: PlanMap, suggestion: FixSuggestio
             return f"Fixes {suggestion.fixes_n} crosses but makes '{name}' a new single weak spot."
         return f"Creates a new hidden pair: {name}."
     reasons = route_reasons(candidate.checker_data(), result)
+    for route_id in reasons:
+        driver_reason = _driver_window_reason(candidate, result, route_id)
+        if driver_reason:
+            return driver_reason
     # Keep the decisive checker fact on the card; the full facts remain above the cards.
     reason = next(iter(reasons.values()), result.human_cost or "The selected case still fails.")
     short = ". ".join(reason.split(". ")[:2]).rstrip(".") + "."
@@ -262,9 +332,42 @@ def rejection_reason(plan: PlanMap, candidate: PlanMap, suggestion: FixSuggestio
                 drivers = reasons[route.id].partition("Drivers for ")[2]
                 if drivers:
                     return (
-                        f"{route_label(route.name)} still is not delivered. Drivers for {drivers}"
+                        f"{route_label(route.name)} is still not delivered. Drivers for {drivers}"
                     )
     return short
+
+
+def _plain_gate_reason(plan: PlanMap, raw: dict[str, Any], error: Exception) -> str:
+    """Name a known wrong-kind target plainly, retaining the original error separately."""
+    if not isinstance(error, FixGateError) or not str(error).startswith("Unknown target id "):
+        return str(error)
+    route_operations = {
+        "add_driver",
+        "replace_drivers",
+        "add_loader",
+        "replace_loaders",
+        "move_route",
+    }
+    for operation in raw.get("operations", []):
+        if not isinstance(operation, dict):
+            continue
+        expected_error = (
+            f"Unknown target id '{operation.get('target_id')}' in fix {operation.get('op')}."
+        )
+        if str(error) != expected_error:
+            continue
+        if operation.get("op") in route_operations:
+            vehicle = next(
+                (item for item in plan.vehicles if item.id == operation.get("target_id")), None
+            )
+            if vehicle:
+                return f"it named the {vehicle.name.casefold()} where a route was needed."
+            person = next(
+                (item for item in plan.people if item.id == operation.get("target_id")), None
+            )
+            if person:
+                return f"it named {person.name} where a route was needed."
+    return str(error)
 
 
 def score_fix(
@@ -279,7 +382,8 @@ def score_fix(
             description=str(raw.get("description", "Suggested change")),
             operations=[],
             gate_status="couldnt_apply",
-            gate_reason=str(error),
+            gate_reason=_plain_gate_reason(plan, raw, error),
+            gate_detail=str(error),
         )
         return ScoredFix(suggestion, None)
     fingerprint = fingerprint_plan_map(candidate)

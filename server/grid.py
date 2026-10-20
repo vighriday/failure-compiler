@@ -9,6 +9,7 @@ from fastapi.responses import StreamingResponse
 
 from server.checker.runner import iter_checker
 from server.checker.scenarios import _instantiate_problems, generate_scenarios
+from server.labels import read_by_label
 from server.models import RunCount, ScenarioResult
 from server.session import capture_map, get_map, map_is_current
 
@@ -86,7 +87,7 @@ def run_tests(
     captured = capture_map(session)
     plan = captured.plan.checker_data()
     cached = captured.results
-    read_by = f"{captured.plan.ai_meta.provider} / {captured.plan.ai_meta.model}"
+    read_by = read_by_label(captured.plan)
     problems = problem_labels(_instantiate_problems(plan))
     singles, pairs = generate_scenarios(plan)
     scenarios = singles + pairs

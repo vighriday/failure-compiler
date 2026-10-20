@@ -20,6 +20,13 @@ def main():
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         play_story(page, base)
+        expect(page.locator(".report-overview")).to_contain_text(
+            "3 fixes accepted: 1 from the AI, 2 yours."
+        )
+        expect(page.locator(".report-overview")).to_contain_text(
+            "The AI suggested 12 fixes. The checker turned down 10 and couldn't apply 1."
+        )
+        cards = page.locator(".report-fix").all_inner_texts()
         page.evaluate("document.fonts.ready.then(() => true)")
         page.emulate_media(media="print")
         expect(page.locator(".report-controls")).to_be_hidden()
@@ -51,6 +58,7 @@ def main():
                     "accepted_fixes": 3,
                     "controls_hidden": True,
                     "page_errors": errors,
+                    "cards": cards,
                 },
                 indent=2,
             )

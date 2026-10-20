@@ -152,17 +152,19 @@ def statement(plan: PlanMap, item: dict) -> str:
         if field == "loading":
             return (
                 f"{route_label(entity.name)} takes {entity.load_minutes} minutes to load; "
-                f"loading cover: {names(plan, entity.loader_ids)}."
+                f"Loaders: {names(plan, entity.loader_ids)}."
             )
         vehicle = next(
             (v.name for v in plan.vehicles if v.id == entity.vehicle_id), entity.vehicle_id
         )
+        if vehicle.casefold() in {"car", "van", "truck", "bike", "bicycle"}:
+            vehicle = vehicle.lower()
         drivers = entity.driver_ids
         return (
             f"{route_label(entity.name)} serves {entity.households} households by {vehicle}; "
             f"{names(plan, drivers[:1])} drives"
             + (f", with {names(plan, drivers[1:])} as backups" if len(drivers) > 1 else "")
-            + f". Loading cover: {names(plan, entity.loader_ids)}."
+            + f". Loaders: {names(plan, entity.loader_ids)}."
         )
     if kind == "vehicle":
         return f"{entity.name} is available from {clock(entity.available_from)}."

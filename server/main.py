@@ -25,6 +25,7 @@ from server.credentials import (
 )
 from server.fixes import router as fixes_router
 from server.grid import router as grid_router
+from server.labels import read_by_label
 from server.models import PlanMapData
 from server.reading import items_for_plan, plan_from_record, questions_for_plan
 from server.report import router as report_router
@@ -185,7 +186,7 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
                 raw_record=reading,
             ),
             "placeholder": False,
-            "read_by": f"{reading['provider']} / {reading['model']}",
+            "read_by": read_by_label(plan),
             "problem_types": plan.problem_sizes,
         }
     plan = PlanMap.from_truth_map(truth)

@@ -103,7 +103,7 @@ export type AppliedFix = { fix_id: string; origin: "ai" | "yours"; description: 
 export type FixSuggestion = {
   id: string; origin: "ai" | "yours"; description: string; operations: FixOperation[]; scenario_results: ScenarioResult[];
   fixes_n: number; still_broken_n: number; new_crosses_n: number; new_crosses: string[];
-  eligible: boolean; rejection_reason: string | null; gate_status: string; gate_reason: string | null;
+  eligible: boolean; rejection_reason: string | null; gate_status: string; gate_reason: string | null; gate_detail?: string | null;
 };
 export type CaseDetail = {
   placeholder: boolean; explanation: string | null; result: ScenarioResult;
@@ -114,8 +114,9 @@ export type CaseDetail = {
 export type ReportRun = RunMeta & { results: ScenarioResult[]; count: RunCount };
 export type ReportData = {
   fingerprint: string; source: ReadingSource; read_by: string;
+  overview: {accepted: number; accepted_ai: number; accepted_yours: number; ai_suggested: number; ai_turned_down: number; ai_couldnt_apply: number; main_human_cost: string | null};
   summary: {ai_read: number; corrected: number; added: number};
-  facts: Array<{id: string; group: string; statement: string; source_line: string | null; source_tags: SourceTag[]; status: Status; original_statement?: string; changed_by_fix?: number | null}>;
+  facts: Array<{id: string; entity_id: string; group: string; statement: string; source_line: string | null; source_tags: SourceTag[]; status: Status; original_statement?: string; changed_by_fix?: number | null}>;
   review_answers: Array<{question: string; answer: string}>;
   before: ReportRun; after: ReportRun;
   broken_before: Array<ScenarioResult & {label: string}>;

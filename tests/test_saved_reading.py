@@ -34,7 +34,7 @@ def test_saved_raw_reading_is_rendered_without_overwriting_names_or_inserting_tr
     assert response.status_code == 200
     body = response.json()
     assert not body["placeholder"]
-    assert body["read_by"] == "gemini / test-model"
+    assert body["read_by"] == "Gemini / test-model"
     assert body["plan_map"]["places"][0]["name"] == "Hall"
     assert body["plan_map"]["routes"][0]["name"] == "Route A"
     assert body["plan_map"]["routes"][0]["id"] == "route-a"

@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from server.checker.scenarios import _instantiate_problems, generate_scenarios
 from server.facts import changed_by, source_tags, statement
 from server.grid import count_results, problem_labels
-from server.labels import route_label
+from server.labels import read_by_label, route_label
 from server.reading import items_for_plan
 from server.session import MapSnapshot, capture_map, get_map
 
@@ -144,6 +144,7 @@ def build_report(chain: list[tuple[str, MapSnapshot]]) -> dict:
     facts = [
         {
             "id": row["id"],
+            "entity_id": row["entity_id"],
             "group": row["group"],
             "statement": statement(current.plan, row),
             "source_line": row.get("source_line"),
@@ -159,10 +160,42 @@ def build_report(chain: list[tuple[str, MapSnapshot]]) -> dict:
         for row in snapshot.results:
             if row.state == "qmark":
                 unknown.setdefault(name(row.scenario_id), []).append(phase)
+    ai_cards = [
+        suggestion
+        for batch in batches
+        for suggestion in batch["suggestions"]
+        if suggestion.get("origin", "ai") == "ai"
+    ]
+    worst = max(
+        (row for row in original.results if row.state == "cross"),
+        key=lambda row: (
+            sum(
+                route.households
+                for route in original.plan.routes
+                if any(
+                    event.route_id == route.id and event.event == "not_delivered"
+                    for event in row.timeline
+                )
+            ),
+            row.lateness_minutes or 0,
+        ),
+        default=None,
+    )
     return {
         "fingerprint": fingerprint,
         "source": current.source,
-        "read_by": f"{current.plan.ai_meta.provider} / {current.plan.ai_meta.model}",
+        "read_by": read_by_label(current.plan),
+        "overview": {
+            "accepted": len(accepted),
+            "accepted_ai": sum(fix["origin"] == "ai" for fix in accepted),
+            "accepted_yours": sum(fix["origin"] == "yours" for fix in accepted),
+            "ai_suggested": len(ai_cards),
+            "ai_turned_down": sum(
+                not card["eligible"] and card["gate_status"] == "passed" for card in ai_cards
+            ),
+            "ai_couldnt_apply": sum(card["gate_status"] != "passed" for card in ai_cards),
+            "main_human_cost": worst.human_cost if worst else None,
+        },
         "summary": {
             key: evidence.get(key, default)
             for key, default in [("ai_read", len(rows)), ("corrected", 0), ("added", 0)]

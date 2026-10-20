@@ -115,7 +115,7 @@ def test_live_http_flow_keys_metadata_gate_score_apply_and_cache(monkeypatch, ca
     assert "HttpOnly" in cookie_header and "SameSite=lax" in cookie_header
     reading, confirmed = read_and_confirm(client)
     assert reading["source"] == "live" and not reading["placeholder"]
-    assert reading["read_by"].startswith("gemini / ")
+    assert reading["read_by"].startswith("Gemini / ")
     cookie = client.cookies[credentials.COOKIE_NAME]
     assert credentials.CLIENTS[cookie].keys == {"gemini": "typed-private-gemini"}
     fp = confirmed["fingerprint"]
@@ -203,7 +203,7 @@ def test_env_keys_and_503_fallback_are_reported(monkeypatch):
     response = TestClient(app).post("/api/read-plan", json={"text": PLAN, "example": False})
     assert response.status_code == 200
     result = response.json()
-    assert result["fallback_used"] and result["read_by"].startswith("groq / ")
+    assert result["fallback_used"] and result["read_by"].startswith("Groq / ")
     assert result["attempts"] == [
         {"provider": "gemini", "error": "server_error"},
         {"provider": "groq", "status": "passed"},
@@ -216,7 +216,7 @@ def test_typed_groq_is_first_and_success_does_not_call_gemini(monkeypatch):
     calls = fake_providers(monkeypatch)
     client = TestClient(app)
     reading, _ = read_and_confirm(client, api_key="typed-groq", key_provider="groq")
-    assert reading["read_by"].startswith("groq / ")
+    assert reading["read_by"].startswith("Groq / ")
     assert [name for name, _, _ in calls] == ["groq"]
     assert client.get("/api/ai-status").json()["selected_provider"] == "groq"
 

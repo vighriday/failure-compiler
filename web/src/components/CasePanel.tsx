@@ -46,7 +46,7 @@ export default function CasePanel({ plan, meta, result, detail, loading, running
         {fix.gate_status === "passed" ? <><p className="fix-score mono">fixes {fix.fixes_n} · still broken {fix.still_broken_n} · new crosses {fix.new_crosses_n}</p>{fix.rejection_reason && <p className="fix-reason">{fix.rejection_reason}</p>}
           {fix.new_crosses.map((id) => <p className="new-cross-callout" key={id}><CellMark state="cross" /><span>New {id.includes("+") ? "hidden pair" : "single weak spot"}: {id.split("+").map(label).join(" + ")}</span></p>)}
           <div className="fix-card-actions"><button className="button button-secondary" disabled={running || loading} type="button" onClick={() => onPreview(fix)}>{previewId === fix.id ? "Previewing" : "Preview"}</button>{fix.eligible && <button className="button button-primary" disabled={running || loading} type="button" onClick={() => onAccept(fix)}>Accept fix</button>}</div>
-        </> : <p className="fix-reason">{fix.gate_reason}</p>}
+        </> : <><p className="fix-reason">Couldn't apply: {fix.gate_reason ? fix.gate_reason[0].toLowerCase() + fix.gate_reason.slice(1) : "the change did not pass the gate."}</p>{fix.gate_detail && <p className="fix-score mono fix-gate-detail">{fix.gate_detail}</p>}</>}
       </article>;
   }
 }

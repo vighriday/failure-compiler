@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from pydantic import TypeAdapter
 
 from server.facts import changed_by, controls, entity_for, loading_team, source_tags, statement
+from server.labels import read_by_label
 from server.place_review import answer_place_question, reopen_place_question
 from server.rule_questions import answer_rule_question, sync_rule_questions
 from server.session import capture_map, get_map, remember_map
@@ -110,7 +111,7 @@ def snapshot(reading_id: str) -> dict:
         "open_questions": sum(q["id"] not in review.answers for q in review.questions),
         "confirmed": review.confirmed,
         "out_of_date": review.out_of_date,
-        "read_by": f"{review.plan.ai_meta.provider} / {review.plan.ai_meta.model}",
+        "read_by": read_by_label(review.plan),
         "source": review.source,
         "placeholder": review.source == "placeholder",
         "fallback_used": len(review.attempts) > 1,
@@ -300,6 +301,29 @@ def update_review(request: dict) -> dict:
     return snapshot(reading_id)
 
 
+def resolved_answer(review: Review, question: dict) -> str:
+    answer = review.answers[question["id"]]
+    if answer != "Use the reviewed details":
+        return str(answer)
+    item = next((row for row in review.items if row["id"] == question["item_id"]), None)
+    if not item:
+        return str(answer)
+    entity = entity_for(review.plan, item)
+    words = question["question_text"].lower()
+    from server.facts import clock
+
+    if item["entity_type"] == "person":
+        if any(word in words for word in ("arriv", "from", "start")):
+            return clock(entity.available_from)
+        if any(word in words for word in ("leave", "until", "finish")):
+            return clock(entity.available_until)
+        if "drive" in words:
+            return "Can drive" if entity.can_drive else "Cannot drive"
+        if "key" in words:
+            return "Holds a key" if entity.holds_key else "Does not hold a key"
+    return statement(review.plan, item)
+
+
 def confirm_review(request: dict) -> dict:
     reading_id = request.get("reading_id")
     review = get_review(reading_id)
@@ -318,7 +342,7 @@ def confirm_review(request: dict) -> dict:
         "added": sum(item["status"] == "added" for item in review.items),
         "items": deepcopy(review.items),
         "answers": [
-            {"question": q["question_text"], "answer": review.answers[q["id"]]}
+            {"question": q["question_text"], "answer": resolved_answer(review, q)}
             for q in review.questions
             if q["id"] in review.answers
         ],

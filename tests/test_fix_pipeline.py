@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from server.checker.runner import run_checker
 from server.facts import changed_by, statement
-from server.fixes import SCORED, score_fix
+from server.fixes import SCORED, _driver_window_reason, score_fix
 from server.main import app
 from server.models import PlanMapData, ScenarioResult
 from server.session import SESSIONS, remember_map
@@ -56,6 +56,40 @@ def test_new_single_is_not_described_as_a_hidden_pair(monkeypatch):
         },
     ).suggestion
     assert "new single weak spot" in result.rejection_reason
+
+
+def test_driver_window_reason_explains_the_actual_block_and_uses_a_lower_bound():
+    plan = truth()
+    result = ScenarioResult(scenario_id=TRUCK_RAVI, failures=TRUCK_RAVI.split("+"), state="cross")
+    assert _driver_window_reason(plan, result, "route-a") == (
+        "Route A is still not delivered. Ravi is absent; the backups leave before the "
+        "60-minute drive could finish after the supplies arrive at 9:45."
+    )
+    # A backup with enough time must never receive the too-short-window explanation,
+    # even if some other loading or shared-resource constraint still blocks the route.
+    next(person for person in plan.people if person.id == "person-maya").available_until = 690
+    assert _driver_window_reason(plan, result, "route-a") is None
+
+
+def test_wrong_kind_gate_reason_keeps_technical_detail_and_names_the_actual_error():
+    move = {
+        "op": "move_route",
+        "target_id": "vehicle-van",
+        "field": "vehicle_id",
+        "value": "vehicle-car",
+    }
+    raw = {"id": "wrong-kind", "description": "Move the van", "operations": [move]}
+    result = score_fix(truth(), [], VAN_ABSENT, raw).suggestion
+    assert result.gate_reason == "it named the van where a route was needed."
+    assert result.gate_detail == "Unknown target id 'vehicle-van' in fix move_route."
+    assert not result.eligible and result.scenario_results == []
+    raw["operations"] = [
+        {"op": "give_spare_key", "target_id": "person-dave", "field": "holds_key", "value": True},
+        move,
+    ]
+    result = score_fix(truth(), [], VAN_ABSENT, raw).suggestion
+    assert result.gate_reason == "Unknown target id 'person-dave' in fix give_spare_key."
+    assert result.gate_detail == result.gate_reason
 
 
 def test_approved_capture_is_unedited_and_retains_primary_failure_history():
@@ -125,7 +159,10 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     hours, driver, car = van["suggestions"]
     assert all(not fix["eligible"] for fix in van["suggestions"])
     assert "11:00" in hours["rejection_reason"] and "12:00" in hours["rejection_reason"]
-    assert "shortens" in hours["rejection_reason"]
+    assert hours["rejection_reason"] == (
+        "This change sets Anita's finish to 11:00, earlier than their planned 12:00, "
+        "so the case still fails."
+    )
     assert "Ravi is already a driver for Route C" in driver["rejection_reason"]
     assert "10:45" in driver["rejection_reason"]
     assert car["fixes_n"] == 3 and car["new_crosses_n"] == 1
@@ -150,6 +187,10 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     sam = absent["suggestions"][1]
     assert (sam["fixes_n"], sam["new_crosses_n"], sam["eligible"]) == (2, 0, True)
     assert absent["suggestions"][2]["gate_status"] == "couldnt_apply"
+    assert absent["suggestions"][2]["gate_reason"] == ("it named the van where a route was needed.")
+    assert absent["suggestions"][2]["gate_detail"] == (
+        "Unknown target id 'vehicle-van' in fix move_route."
+    )
     first = apply(original, VAN_ABSENT, sam["id"])
     fp1 = first["fingerprint"]
     assert fp1 != original

@@ -103,6 +103,8 @@ When no AI card is eligible, say "None of these suggestions worked". Live mode o
 ### Screen 5: Report
 Reached from "See report." One page in the app.
 
+Open with a summary of the before and after count lines, accepted fixes split between AI and yours, AI suggestions turned down or not applicable, and the main original human cost. These are actual history counts, including when the coordinator stops early. Review questions show their actual confirmed answer, not "Use the reviewed details". The full example report fits five pages on A4 and Letter, without splitting fix cards or changing the visual design.
+
 **Sections:**
 1. **The plan:** current confirmed facts with field citations, labelled entity mentions or "No source line", with "AI read N items, N corrected by you, N added by you" and "Read by provider / model". Mention tags are not proof of field values; retained citations refer to the original reading when a value was corrected. The example starts with 32 AI items; identifying Hall as Loading bay leaves 30 facts and counts as one correction. A fix marks only facts its operations actually changed.
 2. **What was tested:** the exact problem list with sizes. The example has 14 problems and "100 tests: every single problem and every pair that can happen". Other maps show their actual counts.

@@ -167,3 +167,4 @@ class FixSuggestion(BaseModel):
     rejection_reason: str | None = None
     gate_status: str = "passed"  # "passed" | "format_error" | "rules_error" | "couldnt_apply"
     gate_reason: str | None = None
+    gate_detail: str | None = None
