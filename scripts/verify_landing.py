@@ -121,7 +121,7 @@ def main():
         before = primary.get_attribute("style")
         buttons_before = primary.locator("button").count()
         for _ in range(3):
-            page.get_by_role("button", name="Break the page", exact=True).click()
+            page.get_by_role("button", name="Break the page: breaks. ← click", exact=True).click()
             expect(page.locator("[data-shard]")).to_have_count(9)
             assert page.locator('[data-shard]:not([data-shard="0"])').evaluate_all(
                 "nodes => nodes.every(n => n.inert && n.getAttribute('aria-hidden') === 'true')"
@@ -130,7 +130,7 @@ def main():
             assert primary.get_attribute("style") == before
             assert primary.locator("button").count() == buttons_before
         # Navigation during an animation must also restore the original surface.
-        page.get_by_role("button", name="Break the page", exact=True).click()
+        page.get_by_role("button", name="Break the page: breaks. ← click", exact=True).click()
         tab(page, "Plan")
         tab(page, "Overview")
         expect(page.locator("[data-shard]")).to_have_count(1)
@@ -229,7 +229,7 @@ def main():
         cells.nth(2).focus()
         page.keyboard.press("Space")
         expect(page.locator("[data-case]")).to_contain_text("Problem 2 on its own")
-        page.get_by_role("button", name="Run the crash test again", exact=True).click()
+        page.get_by_role("button", name="Rerun the crash test", exact=True).click()
         for _ in range(3):
             page.get_by_role("button", name="Show this example fix", exact=True).click()
             page.wait_for_timeout(900)
@@ -377,7 +377,7 @@ def main():
         checked.append("All three driver rule pickers recover a valid, confirmable map")
 
         reduced = new_page(reduced=True)
-        reduced.get_by_role("button", name="Break the page", exact=True).click()
+        reduced.get_by_role("button", name="Break the page: breaks. ← click", exact=True).click()
         expect(reduced.locator("[data-shard]")).to_have_count(1)
         tab(reduced, "Trust")
         reduced.get_by_role("button", name="Replay", exact=True).click()

@@ -70,5 +70,5 @@ function useSampleGrid(props: GridProps) {
 export type SampleGridValues = ReturnType<typeof useSampleGrid>;
 export default function SampleGrid(props: GridProps) {
   const values = useSampleGrid(props);
-  return <div className="sample-grid" aria-label="Illustration of the locked example results"><SampleGridView v={values} /></div>;
+  return <div className="sample-grid" role="group" aria-label="Illustration of the locked example results"><SampleGridView v={values} /></div>;
 }

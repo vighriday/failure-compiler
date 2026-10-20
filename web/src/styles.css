@@ -22,6 +22,10 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 button, textarea, input, select { font: inherit; }
 button { color: inherit; }
 button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #446c54; outline-offset: 2px; }
+.landing-root :is(h1, h2, .case-resolved, .preview-banner, .fix-card):focus-visible { outline: 2px solid #1a1916; outline-offset: 3px; }
+.landing-root [tabindex]:focus-visible { outline: 2px solid #1a1916; outline-offset: 3px; }
+.landing-root .question-icon { color: #8a6410; }
+.landing-root .case-plus, .landing-root .footer-dot { color: #57544c; }
 .app-shell { min-height: 100vh; background: #f6f4ee; }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .history-controls { margin: 20px 0; }

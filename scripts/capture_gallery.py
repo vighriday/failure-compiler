@@ -47,7 +47,7 @@ def main():
                 expect(page.locator("#plan-L10")).to_have_class("paper-line line-active")
                 capture("02-plan-map.png")
             elif stage == "grid":
-                page.evaluate("window.scrollTo(0, 0)")
+                scroll_to(".crash-count")
                 capture("03-crash-test-grid.png")
             elif stage == "broken":
                 scroll_to(".ai-sentence")

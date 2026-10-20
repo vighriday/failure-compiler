@@ -1,4 +1,5 @@
 import type { CaseDetail, FixOperation, FixSuggestion, PlanMap, RunMeta, ScenarioResult } from "../types";
+import { useEffect, useRef } from "react";
 import { CellMark } from "./CrashGrid";
 import CaseTimeline from "./CaseTimeline";
 import ChangeBuilder from "./ChangeBuilder";
@@ -14,11 +15,14 @@ export default function CasePanel({ plan, meta, result, detail, loading, running
 }) {
   const label = (id: string) => meta.problems.find((problem) => problem.id === id)?.label ?? id;
   const survives = result.state === "tick" && !running;
+  const heading = useRef<HTMLHeadingElement>(null);
+  const resolved = useRef<HTMLDivElement>(null);
+  useEffect(() => { (survives ? resolved.current : heading.current)?.focus({preventScroll: true}); }, [result.scenario_id, survives]);
   return <aside className="case-panel" aria-label="Case details" data-state={survives ? "survives" : "broken"}>
     <header className="case-panel-heading"><span className="eyebrow">04 / {survives ? "AFTER THE FIX" : "BROKEN CASE"}</span><button className="quiet-link" type="button" onClick={onClose}>Close</button></header>
-    <h2>{result.failures.map(label).map((text, index) => <span key={text}>{index > 0 && <span className="case-plus"> + </span>}{text}</span>)}</h2>
+    <h2 ref={heading} tabIndex={-1}>{result.failures.map(label).map((text, index) => <span key={text}>{index > 0 && <span className="case-plus"> + </span>}{text}</span>)}</h2>
     {result.failures.length === 2 && detail && <div className="single-proof"><strong>Each alone: survives</strong>{detail.alone_results.map((single) => <span key={single.scenario_id}><CellMark state={single.state} />{label(single.scenario_id)}</span>)}</div>}
-    {running ? <p className="case-retesting mono">Re-testing the changed plan…</p> : survives ? <div className="case-resolved"><CellMark state="tick" /><strong>Now survives.</strong></div> : <p className="human-cost">{result.human_cost}</p>}
+    {running ? <p className="case-retesting mono">Re-testing the changed plan…</p> : survives ? <div className="case-resolved" ref={resolved} tabIndex={-1}><CellMark state="tick" /><strong>Now survives.</strong></div> : <p className="human-cost">{result.human_cost}</p>}
     {!survives && detail && !running && <div className="checker-facts"><h3>Why the checker says so</h3>{[...new Set(Object.values(detail.route_reasons))].map((reason) => <p key={reason}>{reason}</p>)}</div>}
     <CaseTimeline plan={plan} result={result} reasons={survives ? {} : detail?.route_reasons ?? {}} />
     {survives && plan.fix_history.length > 0 && <article className="fix-card accepted-fix-card"><div className="section-kicker">ACCEPTED · {plan.fix_history.at(-1)!.origin === "yours" ? "YOUR CHANGE" : "AI"}</div><h4>{plan.fix_history.at(-1)!.description}</h4><p className="fix-score mono">Checked against all {meta.total} scenarios. No new crosses.</p></article>}
@@ -36,7 +40,7 @@ export default function CasePanel({ plan, meta, result, detail, loading, running
   </aside>;
 
   function renderCard(fix: FixSuggestion) {
-    return <article className={`fix-card ${!fix.eligible ? "turned-down-card" : ""}`} key={fix.id} data-fix-id={fix.id} data-origin={fix.origin}>
+    return <article className={`fix-card ${!fix.eligible ? "turned-down-card" : ""}`} key={fix.id} data-fix-id={fix.id} data-origin={fix.origin} tabIndex={-1}>
         <div className="fix-card-title"><h4>{fix.origin === "yours" ? "Your change" : fix.description}</h4>{fix.gate_status !== "passed" ? <span className="fix-verdict">Couldn't apply</span> : !fix.eligible && <span className="fix-verdict">Turned down</span>}</div>
         {fix.origin === "yours" && <p>{fix.description}</p>}
         {fix.gate_status === "passed" ? <><p className="fix-score mono">fixes {fix.fixes_n} · still broken {fix.still_broken_n} · new crosses {fix.new_crosses_n}</p>{fix.rejection_reason && <p className="fix-reason">{fix.rejection_reason}</p>}

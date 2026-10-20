@@ -10,7 +10,7 @@ export default function SampleGridView({ v }: { v: SampleGridValues }) {
 <div style={{"display": "flex", "flexDirection": "column", "gap": "6px", "borderTop": "1px solid #1A1916", "borderBottom": "1px solid #DAD6CB", "padding": "10px 0 12px"} as CSSProperties}>
 <div style={{"display": "flex", "justifyContent": "space-between", "alignItems": "center", "gap": "12px", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#57544C"} as CSSProperties}>
 <span style={{"letterSpacing": "0.12em"} as CSSProperties}>{`SAMPLE PLAN · ${v.checked} OF 100 TESTS`}</span>
-<button onClick={v.replay} aria-label={"Run the crash test again"} style={{"all": "unset", "cursor": "pointer", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#1A1916", "border": "1px solid #DAD6CB", "borderRadius": "2px", "padding": "3px 8px"} as CSSProperties} type="button" className="landing-effect-17">{"Rerun"}</button>
+<button onClick={v.replay} aria-label={"Rerun the crash test"} style={{"all": "unset", "cursor": "pointer", "font": "400 12px 'IBM Plex Mono',monospace", "color": "#1A1916", "border": "1px solid #DAD6CB", "borderRadius": "2px", "padding": "3px 8px"} as CSSProperties} type="button" className="landing-effect-17">{"Rerun"}</button>
 </div>
 <div style={{"display": "block", "font": "400 15px/1.4 'IBM Plex Sans',sans-serif", "color": "#1A1916", "opacity": v.sentOp, "transition": "opacity 400ms ease"} as CSSProperties}><b style={{"fontWeight": "500", "color": "#B23A2E"} as CSSProperties}>{`${v.cnt.w} ${v.cnt.wl}`}</b>{", "}<b style={{"fontWeight": "500", "color": "#B23A2E"} as CSSProperties}>{`${v.cnt.p} ${v.cnt.pl}`}</b>{", "}<b style={{"fontWeight": "500", "color": "#1E6B47"} as CSSProperties}>{`${v.cnt.o} pass`}</b>{"."}</div>
 </div>
@@ -26,7 +26,7 @@ export default function SampleGridView({ v }: { v: SampleGridValues }) {
 </Fragment>)}
 <div style={{"position": "absolute", "left": `${v.L}px`, "top": `${v.T}px`, "width": "1px", "height": `${v.gridH}px`, "background": "#DAD6CB"} as CSSProperties}></div>
 {v.names && <>
-<div style={{"position": "absolute", "left": "0", "top": `${v.diagLabelY}px`, "font": "400 12px/1.5 'IBM Plex Mono',monospace", "letterSpacing": "0.12em", "color": "#57544C"} as CSSProperties}>{"ONE PROBLEM"}<div style={{"font": "400 12px 'IBM Plex Sans',sans-serif", "letterSpacing": "0", "color": "#77736A"} as CSSProperties}>{"on the diagonal"}</div></div>
+<div style={{"position": "absolute", "left": "0", "top": `${v.diagLabelY}px`, "font": "400 12px/1.5 'IBM Plex Mono',monospace", "letterSpacing": "0.12em", "color": "#57544C"} as CSSProperties}>{"ONE PROBLEM"}<div style={{"font": "400 12px 'IBM Plex Sans',sans-serif", "letterSpacing": "0", "color": "#57544C"} as CSSProperties}>{"on the diagonal"}</div></div>
 </>}
 {v.rows.map((r, index) => <Fragment key={index}>
 <div style={{"position": "absolute", "left": "0", "top": `${r.y}px`, "width": `${r.w}px`, "height": `${v.s}px`, "display": "flex", "alignItems": "center", "justifyContent": r.j, "font": r.font, "color": r.color, "whiteSpace": "nowrap", "transition": "color 120ms"} as CSSProperties}>{r.label}</div>

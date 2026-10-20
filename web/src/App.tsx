@@ -36,7 +36,7 @@ function LineNumbers({ text, activeLine, onLineClick }: { text: string; activeLi
     if (target.bottom > viewport.bottom) paper.scrollTop += target.bottom - viewport.bottom;
   }, [activeLine]);
   return (
-    <div ref={lines} className="line-paper" aria-label="Original plan with line numbers">
+    <div ref={lines} className="line-paper" role="region" aria-label="Original plan with line numbers">
       {text.trimEnd().split("\n").map((line, index) => {
         const number = String(index + 1);
         const source = `L${number}`;

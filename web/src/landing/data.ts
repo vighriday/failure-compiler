@@ -29,5 +29,5 @@ export function sampleCellType(r: number, c: number, stage: number): SampleCellT
   return "ok";
 }
 export const SAMPLE_STATUS = {
-  ok: ["Survives. The checker found a schedule.", "#1E6B47"], cross: ["Weak spot. This alone breaks the plan.", "#B23A2E"], ring: ["Hidden pair. Each is fine alone, together they break the plan.", "#B23A2E"], fixed: ["Now survives.", "#1E6B47"], dash: ["Already broken, because Joel absent breaks it alone.", "#77736A"], hatch: ["Can't happen. The same person can't be absent and leave early.", "#77736A"],
+  ok: ["Survives. The checker found a schedule.", "#1E6B47"], cross: ["Weak spot. This alone breaks the plan.", "#B23A2E"], ring: ["Hidden pair. Each is fine alone, together they break the plan.", "#B23A2E"], fixed: ["Now survives.", "#1E6B47"], dash: ["Already broken, because Joel absent breaks it alone.", "#57544C"], hatch: ["Can't happen. The same person can't be absent and leave early.", "#57544C"],
 };
