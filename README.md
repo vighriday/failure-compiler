@@ -7,7 +7,7 @@
 -->
 
 > [!NOTE]
-> **Submission draft.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions and a fixed-choice change builder. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. Reports remain in slice 7. Video, image and PDF links below are placeholders for the final submission.
+> **Submission draft.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The demo video is still pending.
 
 <div align="center">
 
@@ -24,16 +24,15 @@ Fixes get tested before you trust them.
 [![Built with the Devpost Learn Skill Pack](https://img.shields.io/badge/built%20with-Devpost%20Learn%20Skill%20Pack-8a5a14)](devpost/)
 [![Runs locally](https://img.shields.io/badge/runs-locally%2C%20no%20key%20needed-1f1f1f)](#run-it-in-60-seconds)
 
-**[Watch the demo](https://youtu.be/VIDEO_ID)** &nbsp;·&nbsp; **[Run it in 60 seconds](#run-it-in-60-seconds)** &nbsp;·&nbsp; **[Read the planning docs](#built-plan-first)**
+**[Demo video status](#demo-video)** &nbsp;·&nbsp; **[Run it in 60 seconds](#run-it-in-60-seconds)** &nbsp;·&nbsp; **[Read the planning docs](#built-plan-first)**
 
-<!-- REPLACE: video-thumbnail.png = a frame of the grid mid-flip, with the title burned in. Replace every VIDEO_ID (4 places). -->
-[![Demo video: the crash-test grid flipping from crosses to ticks](docs/images/video-thumbnail.png)](https://youtu.be/VIDEO_ID)
+[![Failure Compiler: the actual landing hero](docs/images/video-thumbnail.png)](#demo-video)
 
 </div>
 
 > [!TIP]
 > **Judging in a hurry? Two minutes, five links.**
-> 1. [The demo video](https://youtu.be/VIDEO_ID) (under 3 minutes)
+> 1. [Demo video status](#demo-video) (recording pending)
 > 2. [The moment that matters](#the-moment) (a GIF: the obvious fix gets turned down, the real one flips the grid)
 > 3. [A real report the app produced](docs/sample-report.pdf) (PDF)
 > 4. [Spot the hidden pair yourself](#can-you-spot-it) (a 60-second puzzle)
@@ -129,32 +128,36 @@ flowchart TB
 3. **Crash-test it.** The checker tries every single problem and every pair from a fixed list. The grid fills in live.
 4. **Open a cross.** See the two problems, proof that each one alone was fine, the morning drawn on a timeline, and the human cost in households.
 5. **Fix it.** Up to 3 AI cards, each already scored against all 100 tests. The ones that don't work are turned down, with the checker's reason. Or build your own change from up to three fixed-choice operations. Accepting either kind updates the plan and re-tests everything.
-6. **Report (planned for slice 7).** What was tested, what broke, what fixed it, and what was **not** tested. Print it or save it as a PDF.
+6. **Compare and report.** Before/After restores the original and current results from the accepted-fix chain. Open the report any time after the first run, even with crosses remaining. It includes confirmed facts, the exact tests, original breaks, accepted and turned-down changes, final results and what was **not** tested. Print it or save it as a PDF.
 
 ---
 
 ## What you see
 
-<!-- REPLACE all six images with full-page screenshots at 1440x900 from the final build. -->
+Six real Playwright captures, each **1500 × 1000 (3:2)**, ready for the README and Devpost gallery. [Capture details and commands](docs/images/README.md).
 <table>
 <tr>
-<td width="50%"><img src="docs/images/01-paste-plan.png" alt="Screen 1: paste the plan"/><br/><b>1. Paste the plan.</b> A sheet of paper, not a form.</td>
+<td width="50%"><img src="docs/images/01-paste-plan.png" alt="Failure Compiler landing hero"/><br/><b>1. The landing page.</b> Start with a plan or try the saved example.</td>
 <td width="50%"><img src="docs/images/02-plan-map.png" alt="Screen 2: the plan map with source lines"/><br/><b>2. The plan map.</b> Hover a fact and its source line lights up on the left.</td>
 </tr>
 <tr>
 <td><img src="docs/images/03-crash-test-grid.png" alt="Screen 3: the crash-test grid"/><br/><b>3. The crash test.</b> 100 tests, one triangle, filling in live.</td>
-<td><img src="docs/images/04-broken-case.png" alt="Screen 4: the broken case with its timeline"/><br/><b>4. The broken morning.</b> Each problem alone survives; together, Route C never leaves.</td>
+<td><img src="docs/images/04-broken-case.png" alt="Van and Anita early case with three real turned-down cards"/><br/><b>4. Three real suggestions, turned down.</b> The checker shows why each fails.</td>
 </tr>
 <tr>
-<td><img src="docs/images/05-fix-turned-down.png" alt="A fix card marked Turned down"/><br/><b>5. Turned down.</b> The obvious fix, rejected by the checker, with its reason.</td>
+<td><img src="docs/images/05-fix-turned-down.png" alt="The fixed-choice builder with a scored Your change card"/><br/><b>5. Your change.</b> Two spare keys, tested against every scenario before acceptance.</td>
 <td><img src="docs/images/06-report.png" alt="Screen 5: the report"/><br/><b>6. The report.</b> Including an honest "What was NOT tested" section.</td>
 </tr>
 </table>
 
 ### The moment
 
-<!-- REPLACE: a 6 to 10 second GIF. Preview the turned-down fix, cancel, accept "Sam loads Route C", crosses flip to ticks. Under 10 MB. ScreenToGif works on Windows. -->
-<p align="center"><img src="docs/images/flip.gif" alt="The obvious fix is turned down; the real fix is accepted and the crosses flip to ticks" width="85%"/></p>
+Two actual Playwright frames, before and after accepting the real Sam loader card. Both van crosses flip; the remaining breaks stay visible.
+<p align="center"><img src="docs/images/flip.gif" alt="Actual before and after screens for the accepted Sam loader card" width="85%"/></p>
+
+### Demo video
+
+The video has not been recorded or linked yet. The gallery, before/after frames and [sample report](docs/sample-report.pdf) are available now.
 
 ---
 
@@ -362,7 +365,7 @@ stateDiagram-v2
 
 If you correct Ravi to "can't drive", every route that lists him as a driver loses its confirmed mark and shows *Check this: Ravi changed*. The AI never re-reads your plan after you start correcting it, because a re-read could quietly change facts you already confirmed.
 
-**The fingerprint.** A confirmed map gets a SHA-256 fingerprint of exactly what the checker uses: people, vehicles, places, deliveries, routes, finish time and problem sizes. The same plan always gets the same fingerprint. Status marks and AI details don't change it. Every result carries it; the planned report will include it too.
+**The fingerprint.** A confirmed map gets a SHA-256 fingerprint of exactly what the checker uses: people, vehicles, places, deliveries, routes, finish time and problem sizes. The same plan always gets the same fingerprint. Status marks and AI details don't change it. Every result carries it, and the report prints it in the footer.
 
 ---
 
@@ -609,7 +612,7 @@ failure-compiler/
 | `POST /api/suggest-fixes` | Gates, scores and caches saved or live suggestions; `retry: true` uses the one explicit retry for a live case with no eligible AI card |
 | `POST /api/test-change` | Gates and scores up to three coordinator-picked operations against every scenario; returns a server-owned "Your change" card |
 | `POST /api/apply-fix` | Applies an accepted fix, records the before and after fingerprints, re-tests |
-| `GET /api/report` | Planned for slice 7; not implemented yet |
+| `GET /api/report?map=<fingerprint>` | Session-owned report after the first completed run; original/current results, confirmed facts, scored change history and explicit limits; no AI calls or re-solving |
 
 </details>
 
