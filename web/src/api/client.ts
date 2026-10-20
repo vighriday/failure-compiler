@@ -23,6 +23,7 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export const aiStatus = () => request<AIStatus>("/api/ai-status");
+export const resetDemo = () => request<{ok: boolean}>("/api/demo/reset", {});
 
 export const readPlan = (text: string, apiKey?: string, keyProvider?: AIProvider) =>
   request<ExampleReading>("/api/read-plan", { text, example: false, ...(apiKey ? {api_key: apiKey, key_provider: keyProvider} : {}) });

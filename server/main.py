@@ -23,6 +23,8 @@ from server.credentials import (
     remember_key,
     safe_message,
 )
+from server.demo import RESET_MESSAGE, STATE_LOCK, clear_browser, require_active_owner
+from server.demo import router as demo_router
 from server.fixes import router as fixes_router
 from server.grid import router as grid_router
 from server.labels import read_by_label
@@ -39,22 +41,47 @@ app = FastAPI(title="Failure Compiler")
 app.include_router(grid_router)
 app.include_router(fixes_router)
 app.include_router(report_router)
+app.include_router(demo_router)
 
 
 @app.middleware("http")
 async def session_cookie(request: Request, call_next):
     owner = browser_session(request.cookies.get(COOKIE_NAME))
     request.state.owner = owner
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
+    except Exception:
+        if request.state.owner in CLIENTS:
+            raise
+        return expired_response(request.state.owner)
+    owner = request.state.owner
+    if owner not in CLIENTS:
+        # An old fix request may have allocated its per-case lock immediately
+        # after reset. Its stale check rejects the write; discard that lock too.
+        return expired_response(owner)
     if request.cookies.get(COOKIE_NAME) != owner:
         response.set_cookie(COOKIE_NAME, owner, httponly=True, samesite="lax")
     return response
 
 
+def expired_response(owner: str) -> JSONResponse:
+    clear_browser(owner)
+    return JSONResponse(
+        status_code=409,
+        content={"detail": RESET_MESSAGE},
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+def session_message(owner: str, message: str) -> str:
+    with STATE_LOCK:
+        return safe_message(owner, message) if owner in CLIENTS else RESET_MESSAGE
+
+
 @app.exception_handler(AIError)
 def ai_error(request: Request, error: AIError) -> JSONResponse:
     content = {
-        "detail": safe_message(request.state.owner, str(error)),
+        "detail": session_message(request.state.owner, str(error)),
         "error_code": error.code,
     }
     if getattr(error, "case_detail", None) is not None:
@@ -68,7 +95,7 @@ def ai_error(request: Request, error: AIError) -> JSONResponse:
 @app.exception_handler(GateError)
 def gate_error(request: Request, error: GateError) -> JSONResponse:
     return JSONResponse(
-        status_code=422, content={"detail": safe_message(request.state.owner, str(error))}
+        status_code=422, content={"detail": session_message(request.state.owner, str(error))}
     )
 
 
@@ -79,7 +106,7 @@ def request_error(request: Request, error: RequestValidationError) -> JSONRespon
     return JSONResponse(
         status_code=422,
         content={
-            "detail": safe_message(request.state.owner, f"Invalid request field {field}."),
+            "detail": session_message(request.state.owner, f"Invalid request field {field}."),
             "error_code": "invalid_request",
         },
     )
@@ -89,7 +116,7 @@ def request_error(request: Request, error: RequestValidationError) -> JSONRespon
 def http_error(request: Request, error: HTTPException) -> JSONResponse:
     return JSONResponse(
         status_code=error.status_code,
-        content={"detail": safe_message(request.state.owner, str(error.detail))},
+        content={"detail": session_message(request.state.owner, str(error.detail))},
         headers=error.headers,
     )
 
@@ -101,7 +128,7 @@ def shape_error(request: Request, error: ValidationError) -> JSONResponse:
     return JSONResponse(
         status_code=422,
         content={
-            "detail": safe_message(
+            "detail": session_message(
                 request.state.owner,
                 f"Invalid {field}: {issue.get('input')!r}. {issue['msg']}",
             )
@@ -120,15 +147,25 @@ def health() -> dict[str, str]:
 
 @app.get("/api/ai-status")
 def ai_status(request: Request) -> dict[str, Any]:
-    keys = available_keys(request.state.owner)
-    return {
-        "primary_provider": PRIMARY_PROVIDER,
-        "primary_model": PRIMARY_MODEL,
-        "fallback_provider": FALLBACK_PROVIDER,
-        "fallback_model": FALLBACK_MODEL,
-        "selected_provider": CLIENTS[request.state.owner].selected_provider,
-        "key_available": {name: bool(key) for name, key in keys.items()},
-    }
+    with STATE_LOCK:
+        require_active_owner(request.state.owner)
+        keys = available_keys(request.state.owner)
+        return {
+            "primary_provider": PRIMARY_PROVIDER,
+            "primary_model": PRIMARY_MODEL,
+            "fallback_provider": FALLBACK_PROVIDER,
+            "fallback_model": FALLBACK_MODEL,
+            "selected_provider": CLIENTS[request.state.owner].selected_provider,
+            "key_available": {name: bool(key) for name, key in keys.items()},
+        }
+
+
+def create_current_review(*args, owner: str, **kwargs) -> dict[str, Any]:
+    # Provider requests run outside this lock. Only persistence is serialized
+    # with reset, so an old request cannot reintroduce an expired browser.
+    with STATE_LOCK:
+        require_active_owner(owner)
+        return create_review(*args, owner=owner, **kwargs)
 
 
 @app.post("/api/read-plan")
@@ -141,15 +178,17 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
     provider = request.get("key_provider", PRIMARY_PROVIDER)
     if not isinstance(provider, str) or provider not in {"gemini", "groq"}:
         raise AIError("invalid_request", "Choose Gemini or Groq for the AI key.", status=422)
-    if "api_key" in request:
-        remember_key(owner, request.get("key_provider", PRIMARY_PROVIDER), request["api_key"])
+    with STATE_LOCK:
+        require_active_owner(owner)
+        if "api_key" in request:
+            remember_key(owner, request.get("key_provider", PRIMARY_PROVIDER), request["api_key"])
+        keys = available_keys(owner)
+        preferred_provider = CLIENTS[owner].selected_provider
     if not request.get("example"):
         text = request.get("text", "")
         if not isinstance(text, str):
             raise AIError("invalid_plan", "Enter a plan of 1 to 4,000 characters.", status=422)
-        result = adapter.read_plan(
-            text, available_keys(owner), preferred_provider=CLIENTS[owner].selected_provider
-        )
+        result = adapter.read_plan(text, keys, preferred_provider=preferred_provider)
         plan = plan_map_from_reading(
             result.reading,
             provider=result.raw.provider,
@@ -159,7 +198,7 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
         items = items_for_plan(plan)
         return {
             "plan_text": text,
-            **create_review(
+            **create_current_review(
                 plan,
                 items,
                 questions_for_plan(plan, items),
@@ -177,7 +216,7 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
         items = items_for_plan(plan)
         return {
             "plan_text": (ROOT / "fixtures/example-plan.txt").read_text(encoding="utf-8"),
-            **create_review(
+            **create_current_review(
                 plan,
                 items,
                 questions_for_plan(plan, items),
@@ -196,7 +235,7 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
     # The one deliberately guessed value is already equal to the truth map.
     return {
         "plan_text": (ROOT / "fixtures/example-plan.txt").read_text(encoding="utf-8"),
-        **create_review(
+        **create_current_review(
             plan, reading["items"], reading["questions"], owner=owner, source="placeholder"
         ),
         "placeholder": reading["placeholder"],
@@ -208,8 +247,10 @@ def read_plan(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
 @app.post("/api/validate-map")
 def validate_map(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
     if request.get("reading_id"):
-        check_owner(request["reading_id"], http_request.state.owner)
-        return snapshot(request["reading_id"])
+        with STATE_LOCK:
+            require_active_owner(http_request.state.owner)
+            check_owner(request["reading_id"], http_request.state.owner)
+            return snapshot(request["reading_id"])
     try:
         plan = PlanMap.model_validate(request["plan_map"])
     except (KeyError, ValidationError) as error:
@@ -231,14 +272,18 @@ def validate_map(request: dict[str, Any], http_request: Request) -> dict[str, An
 
 @app.post("/api/confirm-map")
 def confirm_map(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
-    check_owner(request.get("reading_id"), http_request.state.owner)
-    return confirm_review(request)
+    with STATE_LOCK:
+        require_active_owner(http_request.state.owner)
+        check_owner(request.get("reading_id"), http_request.state.owner)
+        return confirm_review(request)
 
 
 @app.post("/api/update-map")
 def update_map(request: dict[str, Any], http_request: Request) -> dict[str, Any]:
-    check_owner(request.get("reading_id"), http_request.state.owner)
-    return update_review(request)
+    with STATE_LOCK:
+        require_active_owner(http_request.state.owner)
+        check_owner(request.get("reading_id"), http_request.state.owner)
+        return update_review(request)
 
 
 if (ROOT / "web/dist").is_dir():

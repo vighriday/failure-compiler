@@ -102,7 +102,7 @@ Build mode: fast
 
 - [x] Part 1: truthful fact citations, nullable-source schema, unedited primary reading and new-schema bake-off evidence.
 - [x] Part 2: report summary, plain reasons, real answers and sample PDF of five pages or fewer.
-- [ ] Part 3: clean demo reset, timed click runbook and recording thumbnails.
+- [x] Part 3: clean demo reset, timed click runbook and recording thumbnails.
 - [ ] Part 4: final assets/docs, clean-clone and repository audit, complete regression.
 - [ ] Part 5: tested deployment container and host proposal; do not deploy yet.
 - [ ] Part 6: final verification report and pause for hands-on notes and deployment choice.
@@ -120,6 +120,8 @@ Reflection: [offered/answered/declined/already covered - personal answer belongs
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- Completion pass Part 3: `/demo` clears only the requesting browser's keys, readings, results and fix history, rotates its cookie and returns to the landing page with browser storage cleared. Retired requests cannot restore that state; a second browser and unowned test helpers remain intact. Seven reset cases and the live/session regression set pass (31 tests). The full saved recording path reaches all 100 survived with no page or console errors, and two consecutive clean resets pass. `demo-runbook.md` records the 2:30 click path at 1440x900 and 100% zoom. Actual Overview thumbnail candidates are saved at 1280x720 and 1500x1000; both crops were inspected. No visual styling changed.
 
 - Completion pass Part 2: the report opens with original/current counts, the 1-AI/2-yours accepted split, 12 AI suggestions with ten turned down and one gate failure, and the 30-household worst human cost. Counts are derived from the actual requested rounds and history, not hard-coded. Review answers record the actual confirmed values. Read-by labels use Gemini/Groq capitalization, route sentences use generic vehicle words in lower case and "Loaders:". Turned-down cards identify the remaining blocker; wrong-kind targets have a plain reason and separate technical detail. Confirmed facts are grouped by entity, source labels are concise and repeated metadata is removed; fonts, colours, spacing rules and stylesheets are unchanged. The full example prints to five A4 pages and five Letter pages. All 14 cards fit on individual pages, all ten pages were inspected, and bounds/minimum text/black-and-white checks pass. The report/reading HTTP tests pass (25 tests), fix-pipeline regressions pass (7 tests), Ruff and the production build pass. Locked verdicts, solver and unedited suggestion records are unchanged.
 
