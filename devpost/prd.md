@@ -82,9 +82,13 @@ Opens on the right when a cross is clicked. The grid stays visible on the left. 
 - Up to three fix suggestions, each a card showing:
   - What the fix changes.
   - Fixes N / still broken N / new crosses N, scored by the checker before the user touches it.
-  - Turn down “Add Maya as backup driver for Route C”: the gap is loading, not driving; show the checker-derived reason “Van back 10:45. Loading team gone.”
-  - The working fixes are “Sam loads Route C” and “Sam backs up Route A.” Turn down “one spare key” because it reveals “Joel absent + Maya absent.” “Spare keys for Maya and Sam” makes all 100 scenarios survive. Turned-down fixes can be previewed but not accepted.
+  - The saved example uses unedited real cards labelled "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)". All three van + Anita leaves early cards are turned down. Their reasons name the actual operation or checker result: shortening Anita's finish from 12:00 to 11:00, adding Ravi who already drives Route C while loading still fails at 10:45, or fixing three crosses while creating the single weak spot "Supply truck 45 min late".
+  - On van + Anita absent, accept "Add an extra loader (Sam) to Route C so loading can finish after the original loaders leave." Both van crosses flip. Joel's one-spare-key AI card is turned down because it reveals "Joel absent + Ravi absent". The coordinator then builds spare keys for Maya and Sam and Sam as Route A backup; all 100 scenarios survive. Turned-down scored fixes can be previewed but not accepted; a card that fails the gate cannot be previewed.
 - Accept button (enabled only for accepted-eligible fixes).
+
+**Test your own change:** below the AI cards, build up to three operations with picks only: add a driver or loader to a route, give a spare key, change someone's hours using a time picker, or move a route to another known vehicle. No free text. "Test this change" runs the same gate and all 100 tests. The result is a "Your change" card with the same preview, turned-down and accept rules. Invalid choices name the problem and cannot be accepted.
+
+When no AI card is eligible, say "None of these suggestions worked". Live mode offers "Ask for new suggestions" once with a configured or session key. Saved example mode never requests or captures another round automatically.
 
 **After accepting a fix:**
 - Grid re-tests in place. Cells flip. Takes a few seconds.
@@ -92,6 +96,7 @@ Opens on the right when a cross is clicked. The grid stays visible on the left. 
 - Button: "Next broken case (N left)."
 - When nothing is left: "All 100 tested scenarios survive." Button: "See report."
 - Accepted changes appear on the plan map, marked "changed by Fix 1" (or Fix 2, etc.).
+- Accepted history labels each change "Fix N (AI)" or "Fix N (yours)".
 
 ### Screen 5: Report
 Reached from "See report." One page in the app.
@@ -213,7 +218,9 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - A fix that does not solve the presenting case, or that creates any new cross, is labelled "Turned down" with a one-line reason.
 - Turned-down fixes: previewable, not acceptable.
 - Acceptance criteria:
-  - [ ] “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; Sam loads Route C and backs up Route A.
+  - [ ] All three real van + Anita leaves early cards are turned down with checker-derived reasons; the real Sam loader card on van + Anita absent fixes both van pairs.
+  - [ ] Coordinator-built spare keys for Maya and Sam and a Sam backup on Route A pass the same gate and score as expected across all 100 scenarios.
+  - [ ] The builder accepts at most three fixed-choice operations and labels its results "Your change"; accepted history records AI or yours.
   - [ ] A turned-down fix cannot be accepted regardless of user action.
   - [ ] Scores are present on the card before the user interacts with it.
 
@@ -258,7 +265,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - **AI key invalid or AI call fails:** a clear error message, a retry button, and a suggestion to try the example plan instead.
 - **AI reading fails the format check:** "The AI's reading did not pass the format check." Retry button offered. Nothing reaches the plan map unchecked; the format check is part of the validation pipeline.
 - **Pasted text is not a distribution plan:** "This version only supports community distribution plans." Offer to load the example plan.
-- **None of the suggested fixes pass:** "None of these fixes worked." Option to ask for a new set of suggestions, once.
+- **None of the suggested fixes pass:** "None of these suggestions worked". Live mode only offers "Ask for new suggestions" once, using a key. The coordinator can build a change in either mode.
 - **Persistence:** none. No accounts, no saved sessions. Closing the tab loses the run.
 
 ---
@@ -268,7 +275,7 @@ Tick and cross throughout (not colour alone), so the grid is readable by everyon
 - **Finish time is strict, not adjustable.** One minute late is broken. The human cost display makes the exact delay visible; the coordinator decides what that means. Keeps the checker honest and the results comparable.
 - **Problem sizes use preset choices only.** 15, 30, 45, 60, 90 minutes. No free typing. Keeps results reproducible and the example story reliable.
 - **Corrections do not trigger AI re-reads.** The user's correction goes directly into the map. Preserves the validation pipeline: AI reads once, human confirms, checker acts on the confirmed map.
-- **Turned-down fixes are visible with checker-derived reasons.** “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; “one spare key” reveals Joel + Maya absent. The emotional beat of the obvious fix being turned down is a feature, not a footnote.
+- **Turned-down fixes are visible with checker-derived reasons.** All three real van + Anita leaves early cards fail. The AI's one spare key reveals Joel + Ravi absent. Real cards are unedited; the checker explains the failures. The coordinator can build and test their own changes through the same gate and scorer.
 - **Dimmed pairs re-test after a weak spot is removed.** A fix can unmask a hidden pair the weak spot was covering. The report shows this honestly. Keeps the checker's results accurate across fix iterations.
 - **Report is a page in the app with browser print.** No custom export for the PoC. Nicer download is explicitly in Later.
 - **Desktop-first.** The side-by-side grid + panel layout requires screen width. Mobile layout is post-PoC.

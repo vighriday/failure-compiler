@@ -286,6 +286,19 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-
 .flipped-cell { animation: cell-flip .42s ease-out; }
 .accepted-changes { margin-top: 18px; padding-top: 15px; border-top: 1px solid #dedbd4; }
 .accepted-changes h3 { margin: 0 0 8px; font-size: 13px; font-weight: 500; }
+.change-builder { margin-top: 24px; padding-top: 20px; border-top: 1px solid #dad6cb; }
+.change-builder h3 { margin: 5px 0 8px; font-size: 20px; font-weight: 500; }
+.change-builder p { font-size: 14px; line-height: 1.5; color: #55564f; }
+.change-builder fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+.change-operation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 14px 0; border-top: 1px solid #e4e0d7; }
+.change-operation label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+.change-operation label:first-child { grid-column: 1 / -1; }
+.change-operation select, .change-operation input { width: 100%; min-width: 0; min-height: 40px; padding: 7px; border: 1px solid #cbc8bf; border-radius: 2px; background: #fbfaf6; color: #1a1916; font: inherit; font-size: 14px; }
+.change-operation input { font-family: 'IBM Plex Mono', monospace; }
+.change-builder .choice-row { justify-content: space-between; margin: 8px 0 16px; font-size: 12px; }
+.change-builder .remove-operation { justify-self: start; }
+.change-builder fieldset:disabled { opacity: .65; }
+.change-operation :focus-visible { outline: 2px solid #1e6b47; outline-offset: 2px; }
 .accepted-changes p { display: flex; gap: 12px; margin: 5px 0 0; color: #55564f; font-size: 12px; }
 .status-fix { color: #39573b; border-color: #c1cfb9; background: #edf3e6; }
 .fix-map-note { margin-top: 4px; color: #39573b; font-size: 12px; }

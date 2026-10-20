@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { APIError, applyFix, streamTests, suggestFixes } from "../api/client";
+import { APIError, applyFix, streamTests, suggestFixes, testChange } from "../api/client";
 import CrashGrid from "../components/CrashGrid";
 import CasePanel from "../components/CasePanel";
 import { countResults } from "../lib/results";
-import type { CaseDetail, FixSuggestion, PlanMap, ReadingSource, RunCount, RunMeta, ScenarioResult } from "../types";
+import type { CaseDetail, FixOperation, FixSuggestion, PlanMap, ReadingSource, RunCount, RunMeta, ScenarioResult } from "../types";
 
 export default function CrashTest({ plan, onEdit, onPlanChange, onTryExample, readingSource = "saved", fallbackUsed = false, embedded = false }: { plan: PlanMap; onEdit: () => void; onPlanChange: (plan: PlanMap) => void; onTryExample: () => void; readingSource?: ReadingSource; fallbackUsed?: boolean; embedded?: boolean }) {
   const [meta, setMeta] = useState<RunMeta | null>(null);
@@ -22,6 +22,8 @@ export default function CrashTest({ plan, onEdit, onPlanChange, onTryExample, re
   const [applying, setApplying] = useState(false);
   const [flippedIds, setFlippedIds] = useState<string[]>([]);
   const resultsRef = useRef<ScenarioResult[]>([]);
+  const currentCase = useRef("");
+  currentCase.current = `${plan.fingerprint}:${selectedId}`;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -66,6 +68,18 @@ export default function CrashTest({ plan, onEdit, onPlanChange, onTryExample, re
     finally { setApplying(false); }
   }
 
+  async function testOwnChange(operations: FixOperation[]) {
+    if (!selectedId || !done) return;
+    const capturedCase = currentCase.current;
+    const fix = await testChange(plan.fingerprint!, selectedId, operations);
+    if (currentCase.current !== capturedCase) return;
+    setPreview(null);
+    setDetail((current) => current ? {...current, suggestions: [...current.suggestions, fix]} : {
+      placeholder: false, source: readingSource, explanation: null, result: selected!,
+      route_reasons: {}, alone_results: [], suggestions: [fix], can_retry: false,
+    });
+  }
+
   const shown = preview?.scenario_results ?? results;
   const shownCount = preview ? countResults(shown) : count;
   const changedIds = preview ? shown.filter((result) => results.find((r) => r.scenario_id === result.scenario_id)?.state !== result.state).map((r) => r.scenario_id) : [];
@@ -87,9 +101,9 @@ export default function CrashTest({ plan, onEdit, onPlanChange, onTryExample, re
         {preview && <div className="preview-banner" role="status"><div><span className="section-kicker">PREVIEW {preview.eligible ? "" : "· TURNED DOWN"}</span><strong>Previewing: {preview.description}</strong><span>Changed cases are outlined.{preview.new_crosses_n > 0 ? " A starred cross is newly revealed." : ""}</span></div><button className="button button-secondary" type="button" onClick={() => setPreview(null)}>Cancel preview</button></div>}
         {meta && <CrashGrid meta={meta} results={shown} changedIds={changedIds} newCrossIds={preview?.new_crosses} flippedIds={flippedIds} rechecking={!done} selectedId={selectedId ?? undefined} onSelect={(result) => { if (!preview && done && result.state === "cross" && result.scenario_id !== selectedId) { detailOptions.current = {}; setSelectedId(result.scenario_id); setDetail(null); setDetailError(""); } }} />}
         {done && !preview && <div className="run-outcome"><div>{count?.survived === meta?.total ? <><h2>Your plan survived all {meta?.total} tested scenarios.</h2><p>It survived the listed problems at the sizes you confirmed.</p></> : <><h2>{count?.weak_spots} single weak spot{count?.weak_spots === 1 ? "" : "s"}. {count?.hidden_pairs} hidden pair{count?.hidden_pairs === 1 ? "" : "s"}.</h2><p>Open a cross to see the households affected and test a change.</p></>}</div><button type="button" className="button button-secondary" disabled title="Report preview is not available yet.">See report</button></div>}
-        {plan.fix_history?.length > 0 && <section className="accepted-changes"><h3>Changes accepted</h3>{plan.fix_history.map((fix, index) => <p key={fix.to_fingerprint}><span className="mono">Fix {index + 1}</span><span>{fix.description}</span></p>)}</section>}
+        {plan.fix_history?.length > 0 && <section className="accepted-changes"><h3>Changes accepted</h3>{plan.fix_history.map((fix, index) => <p key={fix.to_fingerprint}><span className="mono">Fix {index + 1} ({fix.origin === "yours" ? "yours" : "AI"})</span><span>{fix.description}</span></p>)}</section>}
       </div>
-      {selected && meta && <CasePanel plan={plan} meta={meta} result={selected} detail={detail} loading={detailLoading} running={!done || applying} error={detailError} previewId={preview?.id} remaining={broken.length} onRetry={() => setDetailAttempt((value) => value + 1)} onExtraSuggestions={(live) => { detailOptions.current = live ? {live: true} : {retry: true}; setDetailAttempt((value) => value + 1); }} onTryExample={onTryExample} onClose={() => { setSelectedId(null); setPreview(null); }} onPreview={setPreview} onAccept={accept} onNext={nextCase} />}
+      {selected && meta && <CasePanel plan={plan} meta={meta} result={selected} detail={detail} loading={detailLoading} running={!done || applying} error={detailError} previewId={preview?.id} remaining={broken.length} onRetry={() => setDetailAttempt((value) => value + 1)} onExtraSuggestions={(live) => { detailOptions.current = live ? {live: true} : {retry: true}; setDetailAttempt((value) => value + 1); }} onTryExample={onTryExample} onTestChange={testOwnChange} onClose={() => { setSelectedId(null); setPreview(null); }} onPreview={setPreview} onAccept={accept} onNext={nextCase} />}
       </div>
     </section>
   </div>;

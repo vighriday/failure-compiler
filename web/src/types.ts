@@ -96,9 +96,9 @@ export type RunCount = {
 };
 
 export type FixOperation = { op: string; target_id: string; field: string; value: string | number | boolean | string[] };
-export type AppliedFix = { fix_id: string; description: string; operations: FixOperation[]; from_fingerprint: string; to_fingerprint: string };
+export type AppliedFix = { fix_id: string; origin: "ai" | "yours"; description: string; operations: FixOperation[]; from_fingerprint: string; to_fingerprint: string };
 export type FixSuggestion = {
-  id: string; description: string; operations: FixOperation[]; scenario_results: ScenarioResult[];
+  id: string; origin: "ai" | "yours"; description: string; operations: FixOperation[]; scenario_results: ScenarioResult[];
   fixes_n: number; still_broken_n: number; new_crosses_n: number; new_crosses: string[];
   eligible: boolean; rejection_reason: string | null; gate_status: string; gate_reason: string | null;
 };

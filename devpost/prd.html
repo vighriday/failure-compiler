@@ -913,8 +913,8 @@
       <div class="fix-card turned-down">
         <div class="fix-card-body">
           <div class="turned-down-label">Turned down</div>
-          <div class="fix-card-title">Fix 1: Add Maya as backup driver for Route C</div>
-          <div class="reason">"The gap is loading, not driving. Van back 10:45. Loading team gone."</div>
+          <div class="fix-card-title">Add Ravi as an additional driver for Route C</div>
+          <div class="reason">Ravi is already a driver for Route C. Van back 10:45. Loading team gone.</div>
           <div class="fix-scores" style="margin-top:10px;">
             <span class="score-fix">Fixes 0</span>
             <span class="score-broken">Still broken 4</span>
@@ -928,11 +928,11 @@
 
       <div class="fix-card">
         <div class="fix-card-body">
-          <div class="fix-card-title">Fix 2: Sam loads Route C + Sam backs up Route A</div>
-          <div class="fix-card-desc">Sam loads Route C and backs up Route A. These fixes clear all three hidden pairs with no new crosses.</div>
+          <div class="fix-card-title">Add an extra loader (Sam) to Route C</div>
+          <div class="fix-card-desc">On van late + Anita absent, this real card fixes both van crosses with no new crosses.</div>
           <div class="fix-scores">
-            <span class="score-fix">Fixes 3</span>
-            <span class="score-broken">Still broken 1</span>
+            <span class="score-fix">Fixes 2</span>
+            <span class="score-broken">Still broken 2</span>
             <span class="score-new">New crosses 0</span>
           </div>
         </div>
@@ -942,7 +942,12 @@
       </div>
     </div>
 
-    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;font-family:var(--mono);">Turned down: one spare key, because it reveals Joel absent + Maya absent. Spare keys for Maya and Sam make all 100 scenarios survive.</p>
+    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;font-family:var(--mono);">Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable). Original responses and Gemini 503/504 history are retained in the fixture.</p>
+    <p>All three van + Anita leaves early cards are turned down. Anita's operation shortens her finish from 12:00 to 11:00; Ravi already drives Route C while loading still fails at 10:45; moving vehicles fixes three crosses but makes &ldquo;Supply truck 45 min late&rdquo; a new single weak spot. The spare-key AI card reveals Joel absent + Ravi absent.</p>
+    <h3>Test your own change</h3>
+    <p>Below the AI cards, pick up to three operations: add a driver or loader to a route, give a spare key, change someone's hours with a time picker, or move a route to another vehicle. No free text. &ldquo;Test this change&rdquo; runs the same gate and all 100 scenarios. A &ldquo;Your change&rdquo; card has the same preview, turned-down and accept rules. History labels &ldquo;Fix N (AI)&rdquo; or &ldquo;Fix N (yours)&rdquo;.</p>
+    <p>The real demo accepts the Sam loader card, then coordinator-built spare keys for Maya and Sam, then Sam as Route A backup. All 100 tested scenarios survive.</p>
+    <p>When no AI card is eligible, say &ldquo;None of these suggestions worked&rdquo;. Live mode with a key offers &ldquo;Ask for new suggestions&rdquo; once. Saved example mode never captures another round.</p>
 
     <div class="callout" style="margin-top:16px;">
       <strong>Preview:</strong> Selecting a fix previews it on the main grid in place. No navigation, no second grid. A banner reads "Previewing: Fix N." Changed cells outlined, new crosses distinctly marked. "Cancel preview" restores exactly. One preview at a time.
@@ -1096,7 +1101,7 @@
       </div>
       <div class="decision">
         <div class="decision-choice">None of the fixes pass</div>
-        <div class="decision-reason">"None of these fixes worked." Option to ask for a new set of suggestions, once.</div>
+        <div class="decision-reason">"None of these suggestions worked". Live mode with a key offers "Ask for new suggestions" once. The coordinator can build a change in either mode.</div>
       </div>
       <div class="decision">
         <div class="decision-choice">See report</div>
@@ -1127,7 +1132,7 @@
       </div>
       <div class="decision">
         <div class="decision-choice">Turned-down fixes are visible</div>
-        <div class="decision-reason">“Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving. “One spare key” reveals Joel absent + Maya absent.</div>
+        <div class="decision-reason">All three real van + Anita leaves early cards fail. The AI's one spare key reveals Joel absent + Ravi absent. Cards stay unedited; the checker explains the failure. Coordinator-built changes use the same gate and scorer.</div>
       </div>
       <div class="decision">
         <div class="decision-choice">Dimmed pairs re-test after a fix</div>

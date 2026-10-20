@@ -20,8 +20,12 @@ def test_html_keys_are_additive_and_fix_card_counts_match_four_crosses():
     assert "false</code> on the current holder" not in spec
     prd = (ROOT / "devpost/prd.html").read_text(encoding="utf-8")
     assert '<span class="score-broken">Still broken 4</span>' in prd
-    assert '<span class="score-fix">Fixes 3</span>' in prd
-    assert '<span class="score-broken">Still broken 1</span>' in prd
+    assert '<span class="score-fix">Fixes 2</span>' in prd
+    assert '<span class="score-broken">Still broken 2</span>' in prd
+    for document in (prd, spec):
+        assert "Test your own change" in document or "ChangeBuilder.tsx" in document
+        assert "Joel absent + Ravi absent" in document or "Joel + Ravi absent" in document
+        assert "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)" in document
 
 
 def test_readme_describes_server_memory_and_review_actions():

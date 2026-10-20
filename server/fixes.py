@@ -5,9 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
 from typing import Any
+from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from server.ai import adapter
 from server.ai.types import AIError, AIFixResponse
@@ -44,6 +45,13 @@ class SuggestRequest(BaseModel):
 
 class ApplyRequest(SuggestRequest):
     fix_id: str
+
+
+class TestChangeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    fingerprint: str
+    scenario_id: str
+    operations: list[FixOperation] = Field(min_length=1, max_length=3)
 
 
 class FixGateError(ValueError):
@@ -456,3 +464,72 @@ def apply_fix(request: ApplyRequest, http_request: Request) -> dict[str, Any]:
             "plan_map": plan.model_dump(mode="json"),
             "applied_fix": applied.model_dump(mode="json"),
         }
+
+
+def describe_change(plan: PlanMap, operations: list[FixOperation]) -> str:
+    people = {p.id: p.name for p in plan.people}
+    routes = {r.id: route_label(r.name) for r in plan.routes}
+    vehicles = {v.id: v.name for v in plan.vehicles}
+    descriptions = []
+    for operation in operations:
+        target, value = operation.target_id, operation.value
+        if operation.op in {"add_driver", "add_loader"}:
+            ids = [value] if isinstance(value, str) else value
+            role = "drives" if operation.op == "add_driver" else "loads"
+            descriptions.append(f"{' and '.join(people[p] for p in ids)} {role} {routes[target]}")
+        elif operation.op == "give_spare_key":
+            descriptions.append(f"Spare key for {people[target]}")
+        elif operation.op == "move_route":
+            descriptions.append(f"{routes[target]} uses {vehicles[value]}")
+        else:
+            when = "starts" if operation.field == "available_from" else "finishes"
+            descriptions.append(f"{people[target]} {when} at {clock(value)}")
+    return "; ".join(descriptions) + "."
+
+
+@router.post("/api/test-change")
+def test_change(request: TestChangeRequest, http_request: Request) -> dict:
+    session = get_map(request.fingerprint, http_request.state.owner)
+    captured = capture_map(session) if session else None
+    if captured is None or captured.results is None:
+        raise HTTPException(409, "Run this confirmed map before testing a change.")
+    result = next((r for r in captured.results if r.scenario_id == request.scenario_id), None)
+    if result is None or result.state != "cross":
+        raise HTTPException(404, "That broken case is not on the current grid.")
+    allowed = {
+        "add_driver",
+        "add_loader",
+        "give_spare_key",
+        "set_person_availability",
+        "move_route",
+    }
+    if any(
+        op.op not in allowed or (isinstance(op.value, list) and len(op.value) != 1)
+        for op in request.operations
+    ):
+        raise HTTPException(
+            422, "Choose up to three individual changes from the builder's operations."
+        )
+    try:
+        # Gate before deriving labels, and again inside the shared scoring path.
+        apply_operations(captured.plan, request.operations)
+    except (FixGateError, GateError) as error:
+        raise HTTPException(422, str(error)) from error
+    entry = score_fix(
+        captured.plan,
+        captured.results,
+        request.scenario_id,
+        {
+            "id": f"your-change-{uuid4().hex}",
+            "origin": "yours",
+            "description": describe_change(captured.plan, request.operations),
+            "operations": [op.model_dump(mode="json") for op in request.operations],
+        },
+    )
+    key = cache_key(session, request.fingerprint, request.scenario_id, captured.revision)
+    with FIX_LOCKS.setdefault(key, Lock()), session.lock:
+        require_current(session, captured, request.fingerprint)
+        SCORED.setdefault(key, []).append(entry)
+        if key in DETAILS:
+            DETAILS[key]["suggestions"].append(entry.suggestion.model_dump(mode="json"))
+        return entry.suggestion.model_dump(mode="json")

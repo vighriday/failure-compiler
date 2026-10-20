@@ -216,7 +216,7 @@ Implements `prd.md > Features and Behavior`, `prd.md > The Checker's Three Hones
 - **Routes:** households, `load_minutes` (needs a loader present), `drive_minutes` (needs a driver and a vehicle). Jobs are filled only from `driver_ids` and `loader_ids` in the route - drivers primary first, then listed backups; loader lists are eligible sets with no priority. No one else may fill those jobs. Start times can move freely within people's and vehicles' availability windows.
 - **Finish time:** soft deadline. The solver minimises total households-times-minutes-late.
 
-The checker evaluates “Add Maya as backup driver for Route C” and turns it down because the gap is loading, not driving. Its reason is “Van back 10:45. Loading team gone.”
+The checker evaluates the real Ravi driver card and turns it down: Ravi already drives Route C and loading still fails. Its reason includes “Van back 10:45. Loading team gone.”
 
 ### How the checker decides
 
@@ -243,11 +243,11 @@ Implements `prd.md > Broken Case Detail Panel`, `prd.md > Fix Cards and Scoring`
 
 One AI request per uncached broken case: `POST /api/suggest-fixes` uses the session-owned confirmed map plus the checker's facts for that case (the failing problem ids, the timeline, the late routes, lateness in minutes, or "not delivered" if applicable). Gemini is primary by default, with one Groq fallback attempt on a transient provider or output-format failure. The AI returns one plain explanation sentence and up to three fix suggestions. The server gates each operation and scores every allowed fix against the complete scenario grid. Successful responses are cached by session owner, fingerprint and scenario ID, so reopening a cross reuses its scored results. Provider failures do not become successful cache entries.
 
-Request fields are `fingerprint`, `scenario_id`, optional `live: true` to ask AI instead of saved example placeholders, and optional `retry: true` for the single explicit retry after a successful response has no eligible fixes. Live-pasted maps use live suggestions by default. Responses expose `can_retry`; provider errors include checker-only `case_detail` so the timeline and costs remain visible even when the AI is unavailable.
+Request fields are `fingerprint`, `scenario_id`, optional `live: true` to ask AI instead of saved responses, and optional `retry: true` for the single explicit retry after a live response has no eligible AI card. Live-pasted maps use live suggestions by default. Responses expose `can_retry`; provider errors include checker-only `case_detail` so the timeline and costs remain visible even when the AI is unavailable.
 
 The checker's facts are always shown in the panel. The AI's sentence sits next to them, labelled "AI's explanation."
 
-Turned-down reasons come from the checker, not the AI. “Add Maya as backup driver for Route C” is turned down because the gap is loading, not driving; the checker gives “Van back 10:45. Loading team gone.” The fixes are “Sam loads Route C” and “Sam backs up Route A.” One spare key is turned down because it reveals Joel absent + Maya absent; spare keys for Maya and Sam make all 100 scenarios survive.
+Turned-down reasons come from operations and checker outcomes, not the AI. All three van + Anita leaves early cards are turned down: shortening Anita's finish to 11:00 versus planned 12:00, adding Ravi who already drives C while loading still fails at 10:45, and moving vehicles which fixes three crosses but creates a supply-late single. The Sam loader card on van + Anita absent fixes both van crosses. Joel's one-spare-key AI card reveals Joel + Ravi absent. Coordinator-built spare keys for Maya and Sam, then Sam as Route A backup, finish the real-card story with all 100 survived.
 
 ### Fix operations (fixed list, always gateable)
 
@@ -268,7 +268,7 @@ Fixes are composed of one or more of these operations. No new people or vehicles
 
 ### Example mode saved fixes
 
-`fixtures/example-fixes.json` currently stores explicitly labelled hand-written placeholder explanations and suggestions for the example. They still pass through the gate and are scored live; they are not presented as provider output. New captures remain unedited and uncommitted until the user approves them. Slice 6 stays unchecked until that review passes. If a case has no saved suggestion, or the user requests new suggestions, the live path requires a configured session/environment key and displays which provider answered.
+`fixtures/example-fixes.json` stores the four user-approved unedited Groq fallback records, with Gemini's 503/504 history intact. The app labels the provider/model and fallback reason. Each suggestion passes the gate and is scored live against the current map. A separate runtime copy aligns references without editing the capture. Saved mode never requests or captures a second round; live suggestions require a session/environment key.
 
 ## Components
 
@@ -306,7 +306,13 @@ Implements `prd.md > Broken Case Detail Panel`, `prd.md > Fix Cards and Scoring`
 
 Right-side panel; grid stays fully interactive. Contents: checker's facts (failures, timeline, human cost), AI's explanation sentence (labelled), fix cards. Fix cards pre-scored from stored per-scenario results. "Turned down" with checker-derived reason when a fix does not solve the case or creates a new cross. Accept enabled only for eligible fixes. Preview draws from stored results.
 
-Connects to: `POST /api/suggest-fixes`, `POST /api/apply-fix`, new SSE stream.
+Below the AI cards, `ChangeBuilder.tsx` offers only selects for existing people/routes/vehicles and time pickers for person hours. A change contains one to three operations: `add_driver`, `add_loader`, `give_spare_key`, `set_person_availability`, or `move_route`. Each driver/loader operation picks one person. No free-text description: the server derives a label from the gated operations.
+
+`POST /api/test-change` accepts `{fingerprint, scenario_id, operations}` only. It resolves the session-owned confirmed snapshot, enforces the operation limit and vocabulary, runs the same `apply_operations` gate and `score_fix` scorer against all 100 scenarios, and stores the scored candidate under an unpredictable server-issued ID. It rechecks the snapshot after solving. The browser cannot submit eligibility, origin or counts. Results appear as "Your change" with the same preview and acceptance rules as AI cards. AI retry preserves coordinator cards and considers only AI eligibility. `AppliedFix.origin` records `ai` or `yours`, shown as "Fix N (AI)" or "Fix N (yours)".
+
+When all AI cards are ineligible, show "None of these suggestions worked". Only live cases with a key offer "Ask for new suggestions", once per session, fingerprint and case. Saved fixtures never trigger a second capture.
+
+Connects to: `POST /api/suggest-fixes`, `POST /api/test-change`, `POST /api/apply-fix`, new SSE stream.
 
 ### Screen 5: Report
 Implements `prd.md > Screen 5`, `prd.md > The Checker's Three Honest Answers`.
@@ -473,6 +479,7 @@ ScenarioResult
 ```
 FixSuggestion
   id:                    str
+  origin:                "ai" | "yours"      # Assigned by the server
   description:           str
   operations:            list[FixOperation]   # From the fixed operations list
   scenario_results:      list[ScenarioResult] # Full results; browser derives counts
@@ -495,7 +502,7 @@ No database. Review drafts, confirmed maps, test results, fix suggestions and ty
 
 `fixtures/example-reading.json`: the chosen provider's real output for the example plan, saved as-is. It may have small mistakes; the demo corrects them, which shows the correction trail working.
 
-`fixtures/example-fixes.json`: the saved explanation and per-scenario fix results for each broken case in the example plan.
+`fixtures/example-fixes.json`: four unedited real Groq / openai/gpt-oss-120b responses with raw provider metadata, raw-text digests, contexts and the previous Gemini 503/504 attempts. Approved on 20 October 2026. Label: "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)". Runtime parsing and ID alignment happen on a separate copy; original responses stay untouched. The gate and checker score these suggestions live against the current map. No second round is captured. Ten cards are turned down, one fails the gate, and only the Sam loader card is initially eligible.
 
 `fixtures/expected-results.json`: the hand-checked expected verdict and human cost for every cell of the example plan.
 
@@ -513,7 +520,7 @@ No database. Review drafts, confirmed maps, test results, fix suggestions and ty
 
 `test_determinism.py`: runs the example truth map twice and compares every result.
 
-`test_live_api.py` replays the saved real provider reading through Read plan, the gate, review, confirmation, all scenarios, a cross, scored suggestions and application. Its always-available offline test uses `tests/fixtures/synthetic-fix-response.json`, explicitly synthetic, to verify transport/gating without presenting it as AI output. `test_optional_recorded_fix_replays_through_live_http` replays an actual recorded Joel-absent response from the recorder JSON specified by `RECORDED_AI_FIXES_PATH` (`cases["volunteer_absent__person-joel"].raw`); it skips without a supplied local capture. Captured responses remain unedited and outside the commit until approved.
+`test_live_api.py` replays the saved real provider reading through Read plan, the gate, review, confirmation, all scenarios, a cross, scored suggestions and application. Four offline cases replay the approved actual Groq responses from `fixtures/example-fixes.json` with simulated Gemini 503 fallback. `RECORDED_AI_FIXES_PATH` can override that path for local capture review. A separate explicitly synthetic response exercises transport failures. `test_fix_pipeline.py` plays the real-card story and the two coordinator-built changes to all 100 survived; `test_change_builder.py` checks all five operation types, bounds, invalid picks, score forgery and concurrent edits.
 
 `test_live_network.py` requires both explicit `RUN_LIVE_AI_TESTS=1` and the matching provider key from `.env` or the process environment. Its two provider reading smoke tests skip in the ordinary `uv run -- python -m pytest -q` run, even if `.env` contains keys. Deterministic offline tests cover primary HTTP 503 to fallback success, both-provider failures, missing/invalid keys, malformed output, unsupported plans, attribution, successful-response caching and key privacy. `test_live_transport.py` covers read timeouts and connection failures as safe retryable errors.
 
@@ -637,7 +644,7 @@ Implements `prd.md > States and Boundaries`.
 - **Plan exceeds 24 problems** - rule message on Screen 2 before Confirm: "This version supports up to 24 problems. This plan has N."
 - **Plan text exceeds ~4,000 characters** - counter turns amber at 3,500, red at 4,000, submit disabled above 4,000.
 - **AI key invalid or call fails** - clear error message, retry button, suggest example plan.
-- **No eligible fixes** - keep checker facts visible, show "None of these fixes worked" and allow one explicit retry for that session, fingerprint and case. Failed provider requests can be retried; successful cached responses are not silently regenerated when a cross is reopened.
+- **No eligible AI fixes** - keep checker facts visible, show "None of these suggestions worked" and offer "Ask for new suggestions" once for a live case with a key. Saved cases never retry AI automatically. Coordinator-built changes remain available in either mode. Failed provider requests can be retried; successful cached responses are not silently regenerated when a cross is reopened.
 
 ## What Was Simplified and Why
 
