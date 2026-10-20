@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { APIError, aiStatus, confirmMap, readExample, readPlan as readLivePlan, updateMap } from "./api/client";
 import type { AIProvider, ExampleReading, PlanMap, ReadingItem, RuleQuestion, ReviewState, Status } from "./types";
 import FactEditor from "./components/FactEditor";
-import SourceTags from "./components/SourceTags";
+import SourceTags, { focusedSourceLine } from "./components/SourceTags";
 import CrashTest from "./screens/CrashTest";
 import LandingPage from "./landing/LandingPage";
 import { TABS, type LandingTab } from "./landing/data";
@@ -197,7 +197,7 @@ function App() {
           <section className="questions-section">
             <div className="section-heading"><div><div className="section-kicker">NEEDS YOUR ANSWER</div><h2>One question before we test</h2></div><span className={`question-count ${openQuestions.length + issues.length === 0 ? "count-neutral" : ""}`}>{openQuestions.length + issues.length} open</span></div>
             {questions.map((question) => (
-              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} data-question-id={question.id} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(undefined)}>
+              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} data-question-id={question.id} data-source-line={question.source_line} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(focusedSourceLine())}>
                 <div className="question-icon">?</div>
                 <div className="question-body"><p>{question.question_text}</p>
                   {answers[question.id]
@@ -221,9 +221,9 @@ function App() {
                 {items.filter((item) => item.group === group).map((item) => {
                   const changedBy = item.changed_by_fix;
                   const acceptedChange = changedBy ? planMap.fix_history?.[changedBy - 1] : undefined;
-                  const factLine = item.source_tags?.find((tag) => tag.kind === "fact")?.source_line;
+                  const factLine = item.source_tags?.find((tag) => tag.kind === "fact")?.source_line ?? item.source_tags?.[0]?.source_line;
                   return (
-                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} key={item.id} tabIndex={0} onFocus={(event) => { if (event.target === event.currentTarget) setActiveLine(factLine); }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActiveLine(undefined); }} onMouseEnter={() => setActiveLine(factLine)} onMouseLeave={() => setActiveLine(undefined)}>
+                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} data-source-line={factLine} key={item.id} tabIndex={0} onFocus={(event) => { if (event.target === event.currentTarget) setActiveLine(factLine); }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActiveLine(undefined); }} onMouseEnter={() => setActiveLine(factLine)} onMouseLeave={() => setActiveLine(focusedSourceLine())}>
                       <div className="reading-copy">
                         <div className="statement-line">
                           {item.status === "corrected" ? <><del>{item.original_statement}</del><span>{item.statement}</span></> : <span>{item.statement}</span>}

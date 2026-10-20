@@ -69,9 +69,11 @@ def main():
             expect(page.get_by_role("button", name="Confirm plan", exact=True)).to_be_disabled()
             review_example(page)
             ravi = page.locator('[data-item-id="ravi-driver"]')
-            ravi.focus()
-            source = ravi.locator(".source-tag").inner_text()
-            expect(page.locator(f"#plan-{source}")).to_have_class(re.compile("line-active"))
+            for row in (ravi, page.locator('[data-item-id="route-c"]')):
+                for tag in row.locator("button.source-tag").all():
+                    source = re.search(r"\bL\d+\b", tag.inner_text()).group()
+                    tag.focus()
+                    expect(page.locator(f"#plan-{source}")).to_have_class(re.compile("line-active"))
             ravi.get_by_role("button", name="Correct", exact=True).click()
             page.get_by_role(
                 "combobox", name="Correction for Ravi can drive.", exact=True
