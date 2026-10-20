@@ -139,6 +139,16 @@ def main() -> None:
         expect(page.locator(".accepted-changes")).to_contain_text("Fix 1 (AI)")
         screenshot("slice6-sam-card-accepted.png")
         expect(page.locator(".accepted-fix-card")).to_contain_text("Add an extra loader (Sam)")
+        before_button = page.get_by_role("button", name="Before", exact=True)
+        expect(before_button).to_be_enabled(timeout=30000)
+        before_button.click()
+        expect(page.locator(".crash-count")).to_contain_text("84 survived")
+        expect(page.locator(".result-cross")).to_have_count(4)
+        expect(page.locator(".case-panel")).to_have_count(0)
+        assert states()[VAN_ANITA] == states()[VAN_ANITA_ABSENT] == "cross"
+        page.get_by_role("button", name="After", exact=True).click()
+        expect(page.locator(".crash-count")).to_contain_text("86 survived")
+        assert states()[VAN_ANITA] == states()[VAN_ANITA_ABSENT] == "tick"
 
         page.locator('[data-scenario="volunteer_absent__person-joel"]').click()
         expect(card("fix-1")).to_be_visible(timeout=60000)
@@ -188,6 +198,11 @@ def main() -> None:
         expect(page.locator(".accepted-changes")).to_contain_text("Fix 3 (yours)")
         expect(page.locator(".accepted-fix-card")).to_contain_text("Sam backs up Route A.")
         screenshot("slice6-all-survived.png")
+        page.get_by_role("button", name="Before", exact=True).click()
+        expect(page.locator(".result-cross")).to_have_count(4)
+        expect(page.locator(".result-dim")).to_have_count(12)
+        page.get_by_role("button", name="After", exact=True).click()
+        expect(page.locator(".result-tick")).to_have_count(100)
         chain = final["plan_map"]["fix_history"]
         assert len(chain) == 3
         assert chain[0]["to_fingerprint"] == first["fingerprint"]
@@ -204,9 +219,9 @@ def main() -> None:
         expect(page.locator(".report-after")).to_contain_text("All 100 tested scenarios survive.")
         expect(page.locator(".report-footer")).to_contain_text(final["fingerprint"])
         expect(page.locator(".report-fixes")).to_contain_text("Couldn't apply")
-        page.evaluate("window.printCalls = 0; window.print = () => window.printCalls++")
+        page.evaluate("() => { window.printCalls = 0; window.print = () => window.printCalls++; }")
         page.get_by_role("button", name="Print or save as PDF", exact=True).click()
-        assert page.evaluate("window.printCalls") == 1
+        page.wait_for_function("window.printCalls === 1", timeout=5000)
         page.get_by_role("button", name="Back to results", exact=True).click()
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         too_small = page.evaluate("""() => [...document.querySelectorAll('body *')].filter(el =>

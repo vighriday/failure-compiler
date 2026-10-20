@@ -263,6 +263,24 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
     assert "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)" in [
         fix["provider_label"] for fix in report["accepted_fixes"]
     ]
+    # The original confirmed snapshot survives later edits to its registry entry.
+    original_name = SESSIONS[original].plan.people[0].name
+    SESSIONS[original].plan.people[0].name = "Changed later"
+    try:
+        assert (
+            client.get("/api/report", params={"map": final_fp}).json()["before"] == report["before"]
+        )
+    finally:
+        SESSIONS[original].plan.people[0].name = original_name
+    # A later confirmed edit is reported separately; it is never invented as Fix 4.
+    edited = final_plan.model_copy(deep=True)
+    edited.finish_time += 5
+    edited_fp = remember_map(edited, run_checker(edited.checker_data()))
+    after_edit = client.get("/api/report", params={"map": edited_fp}).json()
+    assert after_edit["confirmed_edits_after_fixes"]
+    assert after_edit["before"] == report["before"]
+    assert after_edit["after"]["fingerprint"] == edited_fp
+    assert len(after_edit["accepted_fixes"]) == 3
 
 
 def test_bad_fix_is_couldnt_apply_and_names_the_bad_reference() -> None:

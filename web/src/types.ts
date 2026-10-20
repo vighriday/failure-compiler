@@ -120,4 +120,5 @@ export type ReportData = {
   accepted_fixes: Array<AppliedFix & {number: number; provider_label: string; changes: string[]; fixes_n: number; still_broken_n: number; new_crosses_n: number}>;
   suggestion_batches: Array<{fingerprint: string; scenario_id: string; scenario_label: string; provider_label: string; source: string; suggestions: FixSuggestion[]}>;
   not_tested: string[]; unknown_results: Array<{label: string; phases: string[]}>;
+  confirmed_edits_after_fixes: boolean;
 };

@@ -11,7 +11,7 @@ from pydantic import TypeAdapter
 from server.facts import changed_by, controls, entity_for, loading_team, statement
 from server.place_review import answer_place_question, reopen_place_question
 from server.rule_questions import answer_rule_question, sync_rule_questions
-from server.session import get_map, remember_map
+from server.session import capture_map, get_map, remember_map
 from server.validation.gate import normalise_plan_map_ids
 from server.validation.models import PlanMap
 from server.validation.rules import validate_plan_rules
@@ -322,8 +322,19 @@ def confirm_review(request: dict) -> dict:
             if q["id"] in review.answers
         ],
     }
+    ancestors = None
+    if review.plan.fix_history:
+        last = review.plan.fix_history[-1].to_fingerprint
+        previous = get_map(last, review.owner)
+        if previous:
+            with previous.lock:
+                ancestors = {**previous.ancestors, last: capture_map(previous)}
     review.plan.fingerprint = remember_map(
-        review.plan, owner=review.owner, source=review.source, review_evidence=evidence
+        review.plan,
+        owner=review.owner,
+        source=review.source,
+        review_evidence=evidence,
+        ancestors=ancestors,
     )
     review.confirmed, review.out_of_date = True, False
     return {**snapshot(reading_id), "fingerprint": review.plan.fingerprint}

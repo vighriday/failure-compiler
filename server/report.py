@@ -57,7 +57,14 @@ def history_for(fingerprint: str, owner: str) -> list[tuple[str, MapSnapshot]]:
         chain.append((expected, previous))
         expected = fix.to_fingerprint
     if expected != fingerprint:
-        raise HTTPException(409, "The grid and accepted fix history do not match.")
+        # Re-confirmed map edits are part of the current plan, not a fabricated fix.
+        previous = ancestors.get(expected)
+        if previous is None:
+            stored = get_map(expected, owner)
+            previous = capture_map(stored) if stored else None
+        if previous is None or previous.results is None:
+            raise HTTPException(409, "The last accepted fix run is unavailable.")
+        chain.append((expected, previous))
     return [*chain, (fingerprint, current)]
 
 
@@ -103,7 +110,7 @@ def build_report(chain: list[tuple[str, MapSnapshot]]) -> dict:
             batches.append(
                 {**deepcopy(batch), "fingerprint": fp, "scenario_label": name(batch["scenario_id"])}
             )
-        if index == 0:
+        if index == 0 or index > len(current.plan.fix_history):
             continue
         fix = current.plan.fix_history[index - 1]
         previous = chain[index - 1][1]
@@ -173,6 +180,9 @@ def build_report(chain: list[tuple[str, MapSnapshot]]) -> dict:
             for root, pairs in dimmed.items()
         ],
         "accepted_fixes": accepted,
+        "confirmed_edits_after_fixes": bool(
+            current.plan.fix_history and current.plan.fix_history[-1].to_fingerprint != fingerprint
+        ),
         "suggestion_batches": batches,
         "not_tested": [
             "Three or more problems at once.",

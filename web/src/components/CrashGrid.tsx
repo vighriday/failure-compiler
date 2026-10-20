@@ -12,10 +12,11 @@ export function CellMark({ state }: { state: CellState }) {
 
 const stateWords: Record<CellState, string> = { tick: "Survives", cross: "Breaks", dim: "Already broken", qmark: "Unknown" };
 
-export default function CrashGrid({ meta, results, onSelect, changedIds = [], newCrossIds = [], flippedIds = [], selectedId, rechecking = false }: {
+export default function CrashGrid({ meta, results, onSelect, changedIds = [], newCrossIds = [], flippedIds = [], selectedId, rechecking = false, readOnly = false }: {
   meta: RunMeta; results: ScenarioResult[]; onSelect?: (result: ScenarioResult) => void;
   changedIds?: string[]; newCrossIds?: string[]; flippedIds?: string[]; selectedId?: string;
   rechecking?: boolean;
+  readOnly?: boolean;
 }) {
   const [active, setActive] = useState<{ row: number; col: number; id: string } | null>(null);
   const byId = new Map(results.map((result) => [result.scenario_id, result]));
@@ -45,7 +46,7 @@ export default function CrashGrid({ meta, results, onSelect, changedIds = [], ne
           if (!result) return <div key={id} className={`${classes} pending-cell`} style={{ gridColumn: col + 2, gridRow: row + 2 }} aria-label="Waiting for checker" />;
           return <button key={id} type="button" data-scenario={id} data-state={result.state} style={{ gridColumn: col + 2, gridRow: row + 2 }} className={`${classes} result-cell result-${result.state} ${row === col ? "single-cell" : ""} ${result.state === "cross" && row !== col ? "hidden-pair-cell" : ""} ${changedIds.includes(id) ? "changed-cell" : ""} ${newCrossIds.includes(id) ? "new-cross-cell" : ""} ${flippedIds.includes(id) ? "flipped-cell" : ""} ${rechecking && result.map_fingerprint !== meta.fingerprint ? "previous-run-cell" : ""} ${id === selectedId ? "selected-cell" : ""}`}
             onMouseEnter={() => setActive({ row, col, id })} onMouseLeave={() => setActive(null)} onFocus={() => setActive({ row, col, id })} onBlur={() => setActive(null)}
-            onClick={() => onSelect?.(result)} aria-label={`${result.failures.map(label).join(" + ")}: ${stateWords[result.state]}${newCrossIds.includes(id) ? ", new cross in preview" : ""}`} aria-describedby={active?.id === id ? "case-tooltip" : undefined}>
+            onClick={() => { if (!readOnly) onSelect?.(result); }} aria-disabled={readOnly || undefined} aria-label={`${result.failures.map(label).join(" + ")}: ${stateWords[result.state]}${readOnly ? ", original result, read only" : ""}${newCrossIds.includes(id) ? ", new cross in preview" : ""}`} aria-describedby={active?.id === id ? "case-tooltip" : undefined}>
             <CellMark state={result.state} />{newCrossIds.includes(id) && <span className="new-cross-star" aria-hidden="true">*</span>}
           </button>;
         }))}
@@ -53,7 +54,7 @@ export default function CrashGrid({ meta, results, onSelect, changedIds = [], ne
     </div>
     <div className="grid-caption"><span>Two problems together sit below the diagonal.</span><span className="mono">{meta.total} feasible scenarios</span></div>
     <div className="case-tooltip" id="case-tooltip" role="tooltip">
-      {activeResult ? <><strong>{activeResult.failures.map(label).join(" + ")}</strong><span className={`tooltip-state mark-${activeResult.state}`}>{stateWords[activeResult.state]}</span><span>{detail(activeResult)}</span></> : <span>Hover or focus a mark to trace a case. Open a cross to see what breaks.</span>}
+      {activeResult ? <><strong>{activeResult.failures.map(label).join(" + ")}</strong><span className={`tooltip-state mark-${activeResult.state}`}>{stateWords[activeResult.state]}</span><span>{detail(activeResult)}</span></> : <span>{readOnly ? "Original confirmed results. Hover or focus a mark to trace its case." : "Hover or focus a mark to trace a case. Open a cross to see what breaks."}</span>}
     </div>
     <div className="grid-legend">{(["tick", "cross", "dim", "qmark"] as CellState[]).map((state) => <span key={state}><CellMark state={state} />{stateWords[state].toLowerCase()}</span>)}<span className="ring-key">ring = hidden pair</span></div>
   </section>;
