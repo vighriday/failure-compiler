@@ -3,13 +3,14 @@ import { CellMark } from "./CrashGrid";
 import CaseTimeline from "./CaseTimeline";
 import ChangeBuilder from "./ChangeBuilder";
 
-export default function CasePanel({ plan, meta, result, detail, loading, running, error, previewId, remaining, onClose, onPreview, onAccept, onNext, onRetry, onTryExample, onExtraSuggestions, onTestChange }: {
+export default function CasePanel({ plan, meta, result, detail, loading, running, error, previewId, remaining, onClose, onPreview, onAccept, onNext, onRetry, onTryExample, onExtraSuggestions, onTestChange, onReport }: {
   plan: PlanMap; meta: RunMeta; result: ScenarioResult; detail: CaseDetail | null;
   loading: boolean; running: boolean; error: string; previewId?: string; remaining: number;
   onClose: () => void; onPreview: (fix: FixSuggestion) => void; onAccept: (fix: FixSuggestion) => void; onNext: () => void;
   onRetry: () => void; onTryExample: () => void;
   onExtraSuggestions: (live: boolean) => void;
   onTestChange: (operations: FixOperation[]) => Promise<void>;
+  onReport: () => void;
 }) {
   const label = (id: string) => meta.problems.find((problem) => problem.id === id)?.label ?? id;
   const survives = result.state === "tick" && !running;
@@ -31,7 +32,7 @@ export default function CasePanel({ plan, meta, result, detail, loading, running
       {detail.source !== "live" && detail.suggestions.length === 0 && <button type="button" className="button button-secondary" disabled={loading || running} onClick={() => onExtraSuggestions(true)}>Ask AI for suggestions</button>}
     </>}
     {!survives && !running && !loading && <><ChangeBuilder key={`${plan.fingerprint}:${result.scenario_id}`} plan={plan} disabled={running || loading} onTest={onTestChange} />{detail?.suggestions.filter((fix) => fix.origin === "yours").map((fix) => renderCard(fix))}</>}
-    {survives && <div className="next-case-action">{remaining ? <button className="button button-primary" type="button" onClick={onNext}>Next broken case ({remaining} left)</button> : <><h3>All {meta.total} tested scenarios survive.</h3><button className="button button-secondary" type="button" disabled title="Report preview is not available yet.">See report</button></>}</div>}
+    {survives && <div className="next-case-action">{remaining ? <button className="button button-primary" type="button" onClick={onNext}>Next broken case ({remaining} left)</button> : <><h3>All {meta.total} tested scenarios survive.</h3><button className="button button-secondary" type="button" onClick={onReport}>See report</button></>}</div>}
   </aside>;
 
   function renderCard(fix: FixSuggestion) {

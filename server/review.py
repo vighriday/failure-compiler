@@ -31,6 +31,7 @@ class Review:
     source: str = "saved"
     attempts: list[dict] = field(default_factory=list)
     raw_record: dict | None = field(default=None, repr=False)
+    ai_read_n: int = 0
 
 
 REVIEWS: dict[str, Review] = {}
@@ -55,6 +56,7 @@ def create_review(
         source=source,
         attempts=attempts or [],
         raw_record=raw_record,
+        ai_read_n=len(items),
     )
     for item in review.items:
         item["original_statement"] = statement(review.plan, item)
@@ -308,6 +310,20 @@ def confirm_review(request: dict) -> dict:
     if missing or messages:
         raise HTTPException(422, "Review required: " + "; ".join([*missing, *messages]))
     _sync_entity_statuses(review)
-    review.plan.fingerprint = remember_map(review.plan, owner=review.owner, source=review.source)
+    evidence = {
+        "ai_read": review.ai_read_n,
+        "corrected": sum(item["status"] == "corrected" for item in review.items)
+        + sum(bool(q.get("merge")) for q in review.questions),
+        "added": sum(item["status"] == "added" for item in review.items),
+        "items": deepcopy(review.items),
+        "answers": [
+            {"question": q["question_text"], "answer": review.answers[q["id"]]}
+            for q in review.questions
+            if q["id"] in review.answers
+        ],
+    }
+    review.plan.fingerprint = remember_map(
+        review.plan, owner=review.owner, source=review.source, review_evidence=evidence
+    )
     review.confirmed, review.out_of_date = True, False
     return {**snapshot(reading_id), "fingerprint": review.plan.fingerprint}

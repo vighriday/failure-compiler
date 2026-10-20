@@ -107,3 +107,17 @@ export type CaseDetail = {
   route_reasons: Record<string, string>; alone_results: ScenarioResult[]; suggestions: FixSuggestion[];
   source?: ReadingSource; suggested_by?: string | null; fallback_used?: boolean; can_retry?: boolean;
 };
+
+export type ReportRun = RunMeta & { results: ScenarioResult[]; count: RunCount };
+export type ReportData = {
+  fingerprint: string; source: ReadingSource; read_by: string;
+  summary: {ai_read: number; corrected: number; added: number};
+  facts: Array<{id: string; group: string; statement: string; source_line: string | null; status: Status; original_statement?: string; changed_by_fix?: number | null}>;
+  review_answers: Array<{question: string; answer: string}>;
+  before: ReportRun; after: ReportRun;
+  broken_before: Array<ScenarioResult & {label: string}>;
+  dimmed_groups: Array<{weak_spot: string; count: number; pairs: string[]}>;
+  accepted_fixes: Array<AppliedFix & {number: number; provider_label: string; changes: string[]; fixes_n: number; still_broken_n: number; new_crosses_n: number}>;
+  suggestion_batches: Array<{fingerprint: string; scenario_id: string; scenario_label: string; provider_label: string; source: string; suggestions: FixSuggestion[]}>;
+  not_tested: string[]; unknown_results: Array<{label: string; phases: string[]}>;
+};

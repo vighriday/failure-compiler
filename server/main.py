@@ -27,6 +27,7 @@ from server.fixes import router as fixes_router
 from server.grid import router as grid_router
 from server.models import PlanMapData
 from server.reading import items_for_plan, plan_from_record, questions_for_plan
+from server.report import router as report_router
 from server.review import check_owner, confirm_review, create_review, snapshot, update_review
 from server.validation.gate import GateError, normalise_plan_map_ids, plan_map_from_reading
 from server.validation.models import PlanMap
@@ -36,6 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 app = FastAPI(title="Failure Compiler")
 app.include_router(grid_router)
 app.include_router(fixes_router)
+app.include_router(report_router)
 
 
 @app.middleware("http")

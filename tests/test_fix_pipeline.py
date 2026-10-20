@@ -246,6 +246,23 @@ def test_fix_story_and_fingerprint_chain(monkeypatch) -> None:
         route_item = {"entity_type": "route", "entity_id": route_id, "field": "route"}
         assert "Sam" in statement(final_plan, route_item)
         assert changed_by(final_plan, route_item) == fix_number
+    report = client.get("/api/report", params={"map": final_fp}).json()
+    assert report["before"]["fingerprint"] == original
+    assert len(report["broken_before"]) == 4
+    assert report["after"]["count"]["survived"] == 100
+    assert [fix["fixes_n"] for fix in report["accepted_fixes"]] == [2, 1, 1]
+    assert [fix["origin"] for fix in report["accepted_fixes"]] == ["ai", "yours", "yours"]
+    rejected = [
+        s
+        for batch in report["suggestion_batches"]
+        for s in batch["suggestions"]
+        if not s["eligible"]
+    ]
+    assert any(s["gate_status"] == "couldnt_apply" for s in rejected)
+    assert any("Joel absent + Ravi absent" in (s["rejection_reason"] or "") for s in rejected)
+    assert "Suggested by Groq / openai/gpt-oss-120b (fallback: Gemini unavailable)" in [
+        fix["provider_label"] for fix in report["accepted_fixes"]
+    ]
 
 
 def test_bad_fix_is_couldnt_apply_and_names_the_bad_reference() -> None:

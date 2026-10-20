@@ -424,6 +424,18 @@ def suggest_fixes(request: SuggestRequest, http_request: Request) -> dict[str, A
                 RETRIED.add(key)
             SCORED[key] = scored
             DETAILS[key] = details
+            session.suggestion_batches.append(
+                {
+                    "scenario_id": request.scenario_id,
+                    "provider_label": f"Suggested by {suggested_by}",
+                    "source": source,
+                    "suggestions": [
+                        entry.suggestion.model_dump(mode="json", exclude={"scenario_results"})
+                        for entry in scored
+                        if entry.suggestion.origin == "ai"
+                    ],
+                }
+            )
             return details
 
 
@@ -463,7 +475,12 @@ def apply_fix(request: ApplyRequest, http_request: Request) -> dict[str, Any]:
     with session.lock:
         require_current(session, captured, request.fingerprint)
         remember_map(
-            plan, entry.suggestion.scenario_results, owner=session.owner, source=captured.source
+            plan,
+            entry.suggestion.scenario_results,
+            owner=session.owner,
+            source=captured.source,
+            review_evidence=captured.review_evidence,
+            ancestors={**session.ancestors, request.fingerprint: capture_map(session)},
         )
         return {
             "fingerprint": fingerprint,
@@ -538,4 +555,14 @@ def test_change(request: TestChangeRequest, http_request: Request) -> dict:
         SCORED.setdefault(key, []).append(entry)
         if key in DETAILS:
             DETAILS[key]["suggestions"].append(entry.suggestion.model_dump(mode="json"))
+        session.suggestion_batches.append(
+            {
+                "scenario_id": request.scenario_id,
+                "provider_label": "Your change",
+                "source": "coordinator",
+                "suggestions": [
+                    entry.suggestion.model_dump(mode="json", exclude={"scenario_results"})
+                ],
+            }
+        )
         return entry.suggestion.model_dump(mode="json")

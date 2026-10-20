@@ -1,4 +1,5 @@
 import type { AIProvider, AIStatus, AppliedFix, CaseDetail, ExampleReading, FixOperation, FixSuggestion, PlanMap, ReviewState, RunCount, RunMeta, ScenarioResult } from "../types";
+import type { ReportData } from "../types";
 
 export class APIError extends Error {
   constructor(message: string, public code: string, public status: number, public caseDetail?: CaseDetail) { super(message); this.name = "APIError"; }
@@ -67,3 +68,5 @@ export const applyFix = (fingerprint: string, scenario_id: string, fix_id: strin
 
 export const testChange = (fingerprint: string, scenario_id: string, operations: FixOperation[]) =>
   request<FixSuggestion>("/api/test-change", { fingerprint, scenario_id, operations });
+
+export const getReport = (fingerprint: string) => request<ReportData>(`/api/report?map=${encodeURIComponent(fingerprint)}`);

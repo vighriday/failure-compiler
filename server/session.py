@@ -1,5 +1,6 @@
 """In-memory maps and results, addressed by the confirmed checker fingerprint."""
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 from threading import RLock
 
@@ -16,6 +17,9 @@ class MapSession:
     owner: str | None = None
     source: str = "saved"
     revision: int = 0
+    review_evidence: dict = field(default_factory=dict)
+    suggestion_batches: list[dict] = field(default_factory=list)
+    ancestors: dict = field(default_factory=dict, repr=False)
     lock: RLock = field(default_factory=RLock, repr=False, compare=False)
 
 
@@ -25,6 +29,8 @@ class MapSnapshot:
     results: list[ScenarioResult] | None
     source: str
     revision: int
+    review_evidence: dict = field(default_factory=dict)
+    suggestion_batches: list[dict] = field(default_factory=list)
 
 
 def capture_map(session: MapSession) -> MapSnapshot:
@@ -36,6 +42,8 @@ def capture_map(session: MapSession) -> MapSnapshot:
             else None,
             session.source,
             session.revision,
+            deepcopy(session.review_evidence),
+            deepcopy(session.suggestion_batches),
         )
 
 
@@ -66,6 +74,8 @@ def remember_map(
     *,
     owner: str | None = None,
     source: str = "saved",
+    review_evidence: dict | None = None,
+    ancestors: dict | None = None,
 ) -> str:
     fingerprint = fingerprint_plan_map(plan)
     plan.fingerprint = fingerprint
@@ -81,10 +91,17 @@ def remember_map(
         with session.lock:
             if session.plan != plan or session.source != source:
                 session.revision += 1
+                session.suggestion_batches = []
+                session.ancestors = {}
             if session.plan.checker_data() != plan.checker_data():
                 session.results = None
             session.plan = plan.model_copy(deep=True)
             session.source = source
             if results is not None:
                 session.results = results
+    with store[key].lock:
+        if review_evidence is not None:
+            store[key].review_evidence = deepcopy(review_evidence)
+        if ancestors is not None:
+            store[key].ancestors = dict(ancestors)
     return fingerprint

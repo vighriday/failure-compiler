@@ -83,6 +83,16 @@ def main() -> None:
         )
         expect(page.locator(".result-cell")).to_have_count(100)
         expect(page.locator(".result-cross")).to_have_count(4)
+        page.get_by_role("button", name="See report", exact=True).click()
+        expect(page.get_by_role("heading", name="The plan, tested.", exact=True)).to_be_focused()
+        expect(page.locator(".report-section")).to_have_count(6)
+        expect(page.locator(".report-before")).to_contain_text("3 hidden pairs")
+        expect(page.locator(".report-read-by")).to_contain_text("gemini / ")
+        expect(page.locator(".report-review-summary")).to_contain_text(
+            "AI read 32 items, 1 corrected by you, 0 added by you"
+        )
+        page.get_by_role("button", name="Back to results", exact=True).click()
+        expect(page.locator(".result-cross")).to_have_count(4)
         screenshot("slice5-filled-grid.png")
 
         # Both Anita cases are real, and another cross stays clickable with the panel open.
@@ -185,7 +195,19 @@ def main() -> None:
         assert chain[1]["to_fingerprint"] == second["fingerprint"]
         assert chain[2]["from_fingerprint"] == second["fingerprint"]
         for button in page.get_by_role("button", name="See report", exact=True).all():
-            expect(button).to_be_disabled()
+            expect(button).to_be_enabled()
+        page.get_by_role("button", name="See report", exact=True).first.click()
+        expect(page.locator(".report-accepted-fix")).to_have_count(3)
+        expect(page.locator(".report-before")).to_contain_text(
+            "Route C: 8 households not delivered"
+        )
+        expect(page.locator(".report-after")).to_contain_text("All 100 tested scenarios survive.")
+        expect(page.locator(".report-footer")).to_contain_text(final["fingerprint"])
+        expect(page.locator(".report-fixes")).to_contain_text("Couldn't apply")
+        page.evaluate("window.printCalls = 0; window.print = () => window.printCalls++")
+        page.get_by_role("button", name="Print or save as PDF", exact=True).click()
+        assert page.evaluate("window.printCalls") == 1
+        page.get_by_role("button", name="Back to results", exact=True).click()
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         too_small = page.evaluate("""() => [...document.querySelectorAll('body *')].filter(el =>
             [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) &&
