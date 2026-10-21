@@ -21,10 +21,10 @@ function render(node, locals = new Set()) {
   if (node.type === "text") {
     const text = node.data
       .replace("Suggested by AI, tested by the checker.", "Hand-written example suggestion. This preview does not run the checker.")
-      .replace("This is a sample reading we wrote for the example. With your own key, AI writes it.", "Hand-written design preview. Start the example to review all 24 details and run the live checker.")
+      .replace("This is a sample reading we wrote for the example. With your own key, AI writes it.", "Hand-written design preview. Start the example to review its facts and run the live checker.")
       .replace("Free to try. No sign-up, no AI key, and we never store your plan.", "No sign-up. The example needs no AI key. No plan is saved to disk.")
       .replace("We never store your plan. Close the tab and it’s gone.", "Plans stay in memory for this local session. Nothing is saved to disk.")
-      .replace("Your plan goes to the AI company only to be read.", "Live AI reading is planned. The example works without a key.")
+      .replace("Your plan goes to the AI company only to be read.", "Live reading sends your plan to the selected AI provider. The example works without a key.")
       .replace("12:00 noon", "Noon: families waiting.");
     return text.trim() ? `{${value(text, locals)}}` : "\n";
   }

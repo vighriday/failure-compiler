@@ -19,7 +19,7 @@ export default function SourceTags({tags, onHighlight}: {
   return <span className="source-tags">{tags.map((tag, index) => <Fragment key={`${tag.kind}:${tag.label}:${tag.source_line}:${index}`}>
     {index > 0 && " · "}
     {onHighlight
-      ? <button type="button" className="source-tag" data-source-line={tag.source_line} onMouseEnter={() => onHighlight(tag.source_line)} onMouseLeave={() => onHighlight(focusedSourceLine())} onFocus={() => onHighlight(tag.source_line)} onBlur={() => onHighlight(undefined)} onClick={() => onHighlight(tag.source_line)}>{sourceTagLabel(tag)}</button>
+      ? <button type="button" className="source-tag" data-source-line={tag.source_line} onMouseMove={(event) => { event.stopPropagation(); onHighlight(tag.source_line); }} onMouseLeave={() => onHighlight(focusedSourceLine())} onFocus={() => onHighlight(tag.source_line)} onBlur={() => onHighlight(undefined)} onClick={() => onHighlight(tag.source_line)}>{sourceTagLabel(tag)}</button>
       : <span>{sourceTagLabel(tag)}</span>}
   </Fragment>)}</span>;
 }

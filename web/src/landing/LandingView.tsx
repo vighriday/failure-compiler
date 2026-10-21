@@ -112,7 +112,7 @@ export default function LandingView({ v, readContent, testContent }: { v: Landin
 <span style={{"font": "400 12px 'IBM Plex Mono',monospace", "letterSpacing": "0.14em", "color": "#57544C"} as CSSProperties}>{"02 · READ"}</span>
 <h2 style={{"margin": "0", "font": "500 clamp(36px,4.4vw,64px)/1.02 'IBM Plex Sans',sans-serif", "letterSpacing": "-0.04em"} as CSSProperties}>{"Here’s what we understood."}</h2>
 </div>
-<span style={{"font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "maxWidth": "340px"} as CSSProperties}>{"Hand-written design preview. Start the example to review all 24 details and run the live checker."}</span>
+<span style={{"font": "400 13px 'IBM Plex Sans',sans-serif", "color": "#57544C", "maxWidth": "340px"} as CSSProperties}>{"Hand-written design preview. Start the example to review its facts and run the live checker."}</span>
 </div>
 <div style={{"display": "grid", "gridTemplateColumns": "repeat(auto-fit,minmax(min(100%,340px),1fr))", "gap": "clamp(28px,4vw,48px)", "marginTop": "clamp(32px,4vw,56px)", "alignItems": "start"} as CSSProperties}>
 <div style={{"maxWidth": "560px", "position": "sticky", "top": "96px", "background": "#FBFAF6", "border": "1px solid #DAD6CB"} as CSSProperties}>

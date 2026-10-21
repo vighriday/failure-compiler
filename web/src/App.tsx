@@ -1,5 +1,6 @@
 import MissingFactQuestion from "./components/MissingFactQuestion";
 import { routeLabel } from "./lib/labels";
+import { routeCoverage } from "./lib/coverage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { APIError, aiStatus, confirmMap, readExample, readPlan as readLivePlan, updateMap } from "./api/client";
 import type { AIProvider, ExampleReading, PlanMap, ReadingItem, RuleQuestion, ReviewState, Status } from "./types";
@@ -105,6 +106,8 @@ function App() {
   const ready = Boolean(planMap && planText === reading?.plan_text && unresolvedItems.length === 0 && openQuestions.length === 0 && issues.length === 0 && pending === 0);
   const allProblems = problemTypes.map((problem) => ({...problem, count: !planMap ? problem.count : problem.id.startsWith("volunteer_") ? planMap.people.length : problem.id === "vehicle_returns_late" ? planMap.vehicles.length : problem.id === "place_blocked" ? planMap.places.length : planMap.deliveries.length}));
   const totalProblems = allProblems.reduce((total, problem) => total + problem.count, 0);
+  const coverage = planMap ? routeCoverage(planMap) : [];
+  const allJobsCovered = coverage.length > 0 && coverage.every((route) => route.complete);
   const totalScenarios = totalProblems + totalProblems * (totalProblems - 1) / 2 - (planMap?.people.length ?? 5);
 
   function syncReview(result: ReviewState) {
@@ -189,15 +192,15 @@ function App() {
 
           <section className="checklist-card">
             <div className="section-kicker">THE PLAN AT A GLANCE</div>
-            <h2>Every job has a person and a backup</h2>
+            <h2>{allJobsCovered ? "Every job has a person and a backup" : "Some jobs still need cover"}</h2>
             <p>This is how the plan looks today.</p>
-            <div className="job-checks">{planMap.routes.map((route) => { const vehicle = planMap.vehicles.find((candidate) => candidate.id === route.vehicle_id)?.name; const drivers = route.driver_ids.map((id: string) => planMap.people.find((person: Record<string, any>) => person.id === id)?.name).filter(Boolean); return <div className="job-check" key={route.id}><Tick /><span>{routeLabel(route.name)} · {vehicle} · {drivers[0] ?? "No driver"}, backups {drivers.slice(1).join(" and ")}</span></div>; })}</div>
+            <div className="job-checks">{coverage.map((route) => <div className="job-check" key={route.id}>{route.complete ? <Tick /> : <span className="rule-symbol" aria-label="Needs attention">!</span>}<span>{routeLabel(route.name)} · {route.vehicle ?? "No vehicle"} · {route.drivers[0] ?? "No driver"}, {route.drivers.length > 1 ? `backups ${route.drivers.slice(1).join(" and ")}` : "no backup"}{!route.hasLoader && " · no loader"}</span></div>)}</div>
           </section>
 
           <section className="questions-section">
-            <div className="section-heading"><div><div className="section-kicker">NEEDS YOUR ANSWER</div><h2>One question before we test</h2></div><span className={`question-count ${openQuestions.length + issues.length === 0 ? "count-neutral" : ""}`}>{openQuestions.length + issues.length} open</span></div>
+            <div className="section-heading"><div><div className="section-kicker">NEEDS YOUR ANSWER</div><h2>Questions before we test</h2></div><span className={`question-count ${openQuestions.length + issues.length === 0 ? "count-neutral" : ""}`}>{openQuestions.length + issues.length} open</span></div>
             {questions.map((question) => (
-              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} data-question-id={question.id} data-source-line={question.source_line} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseEnter={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(focusedSourceLine())}>
+              <div className={`question-card ${answers[question.id] ? "question-resolved" : ""}`} data-question-id={question.id} data-source-line={question.source_line} key={question.id} onFocus={() => question.source_line && setActiveLine(question.source_line)} onBlur={() => setActiveLine(undefined)} onMouseMove={() => question.source_line && setActiveLine(question.source_line)} onMouseLeave={() => setActiveLine(focusedSourceLine())}>
                 <div className="question-icon">?</div>
                 <div className="question-body"><p>{question.question_text}</p>
                   {answers[question.id]
@@ -223,7 +226,7 @@ function App() {
                   const acceptedChange = changedBy ? planMap.fix_history?.[changedBy - 1] : undefined;
                   const factLine = item.source_tags?.find((tag) => tag.kind === "fact")?.source_line ?? item.source_tags?.[0]?.source_line;
                   return (
-                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} data-source-line={factLine} key={item.id} tabIndex={0} onFocus={(event) => { if (event.target === event.currentTarget) setActiveLine(factLine); }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActiveLine(undefined); }} onMouseEnter={() => setActiveLine(factLine)} onMouseLeave={() => setActiveLine(focusedSourceLine())}>
+                    <article className={`reading-row ${item.status === "unconfirmed" || item.status === "guessed" || item.status === "stale" ? "needs-confirm" : ""}`} data-item-id={item.id} data-source-line={factLine} key={item.id} tabIndex={0} onFocus={(event) => { if (event.target === event.currentTarget) setActiveLine(factLine); }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setActiveLine(undefined); }} onMouseMove={() => setActiveLine(factLine)} onMouseLeave={() => setActiveLine(focusedSourceLine())}>
                       <div className="reading-copy">
                         <div className="statement-line">
                           {item.status === "corrected" ? <><del>{item.original_statement}</del><span>{item.statement}</span></> : <span>{item.statement}</span>}
