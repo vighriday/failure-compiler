@@ -19,7 +19,7 @@
   <main>
     <h1>Failure Compiler</h1>
     <p>This app turns a messy distribution plan into confirmed facts, tests every
-      single and pair problem, and lets the checker decide whether a change is safe.</p>
+      single and pair problem, and lets the checker decide whether a change fixes the selected case without new failures among the tested scenarios.</p>
 
     <h2>One real action</h2>
     <p>Load the example, confirm the map, open a broken case, and read the concrete
@@ -36,7 +36,7 @@
       <section class="stop">
         <h3>2. Test the map</h3>
         <p><code>server/checker/runner.py</code><br><code>run_checker</code> streams
-          the 100 fixed scenarios through the solver.</p>
+          the generated scenarios through the solver (100 in the saved example).</p>
       </section>
       <div class="arrow" aria-hidden="true">→</div>
       <section class="stop">
@@ -58,7 +58,7 @@
     </ul>
 
     <h2>A practice to reuse</h2>
-    <p>When the provider produced different but equally good schedules, the build
+    <p>When the solver produced different but equally good schedules, the build
       separated observable verdict fields from explanatory metadata. The evidence
       is recorded in <code>devpost/ai-reading-review.md</code> and enforced by
       <code>tests/test_evaluation.py</code>. On another project, define the

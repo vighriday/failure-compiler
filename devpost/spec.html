@@ -400,8 +400,8 @@
   <p>When you paste a plan, the server sends it to an AI (Gemini first, Groq as a fallback). The AI reads messy text and returns a structured description of the plan: who is doing what, in what vehicle, at what place, between what times. The AI returns an <code>AIPlanReading</code>. The server wraps it into a <code>PlanMap</code>, adding its own metadata. The two schemas are separate so Groq strict mode never forces the AI to invent a fingerprint or a fix history.</p>
   <p>That description comes back as JSON and the server runs it through a strict format check before it touches anything else. This is the core learning goal made concrete: <strong>the AI produces output, the gate decides whether it is usable, and nothing downstream ever sees an unchecked map.</strong></p>
   <p>The browser calls <code>POST /api/update-map</code> on every correction against the server-owned draft, using the same Python rules that run at Confirm. Rules are implemented once. No TypeScript reimplementation.</p>
-  <p>The checker is a constraint solver (CP-SAT). Singles run first. Any pair that contains a broken single is marked dimmed without solving. For remaining pairs, the solver finds the best possible schedule using only the people and vehicles the plan names. Zero lateness proved = tick. Minimum above zero proved = cross, with that minimum as the human cost. Some scenarios leave a route with no driver or the loading area with no key holder; rather than failing with no number, every route may be "not delivered," carrying a penalty larger than any possible lateness (households times the full horizon). The solver always returns a number. Deterministic time limit hit = question mark, never a pass.</p>
-  <p>After the format gate, the server normalises all entity ids to stable slugs from type and name (<code>person-ravi</code>, <code>vehicle-van</code>, <code>route-c</code>) and updates every reference. Two runs of the same plan always produce the same ids and the same fingerprint.</p>
+  <p>The checker is a constraint solver (CP-SAT). Singles run first. Any pair that contains a broken single is marked dimmed without solving. For remaining pairs, the solver finds the best possible schedule using only the people and vehicles the plan names. Zero lateness proved = tick. Minimum above zero proved = cross, with that minimum as the human cost. Some scenarios leave a route with no driver or the loading area with no key holder; rather than failing with no number, every route may be "not delivered," carrying a penalty larger than any possible lateness (households times the full horizon). Unproved or ambiguous outcomes return a question mark; proved outcomes state their human cost. Deterministic time limit hit = question mark, never a pass.</p>
+  <p>After the format gate, the server normalises all entity ids to stable slugs from type and name (<code>person-ravi</code>, <code>vehicle-van</code>, <code>route-c</code>) and updates every reference. Unchanged extracted labels and checker inputs normalize consistently when only AI-assigned IDs change. Different names can produce different person/vehicle IDs; reading equivalence is scored separately after role alignment.</p>
   <p>Clicking a cross triggers one AI call that returns both a plain explanation sentence and up to three fix suggestions. The server caches the result per fingerprint and scenario, so reopening a cross never calls the AI again. The checker's facts are always shown; the AI sentence sits next to them, labelled. Turned-down reasons come from the checker. Preview draws from stored fix results without re-solving.</p>
 </section>
 
@@ -649,7 +649,7 @@
   <div class="card" style="font-size:13.5px;">
     <p><strong>Rules re-run on every change, not only at Confirm.</strong> Entities are referenced by internal <code>id</code>. If a correction changes something other items depend on (e.g. Ravi corrected to "can't drive"), those items lose their confirmed mark and show "check this, Ravi changed." The whole map is re-validated from scratch each time.</p>
     <p style="margin-top:8px;"><strong>Fixes go through the same gate.</strong> A fix that fails shows as "Couldn't apply" with the specific reason. Never scored, never acceptable.</p>
-    <p style="margin-top:8px;"><strong>Fingerprint:</strong> SHA-256 of canonical sorted checker inputs (people, vehicles, places, deliveries, routes, finish time, problem sizes). Timestamps and status marks excluded. Two identical plans get the same fingerprint; changing a problem size changes it.</p>
+    <p style="margin-top:8px;"><strong>Fingerprint:</strong> SHA-256 of canonical sorted checker inputs (people, vehicles, places, deliveries, routes, finish time, problem sizes). Timestamps and status marks excluded. Identical normalized checker inputs, including entity IDs, get the same fingerprint; changing a problem size changes it.</p>
   </div>
 </section>
 
@@ -661,7 +661,7 @@
   <ul>
     <li><strong>People:</strong> available from / until. Can drive or not. Holds the key or not. Cannot be in two places at once.</li>
     <li><strong>Vehicles:</strong> available from a time. One route at a time.</li>
-    <li><strong>Places:</strong> one vehicle loading at a time. Each place has an <code>opens_at</code> time (planned loading start). The loading area can only be used from the later of <code>opens_at</code> and the earliest time a key holder is present (if <code>needs_key</code>). "Place blocked" means blocked from <code>opens_at</code> for the chosen minutes.</li>
+    <li><strong>Places:</strong> <code>one_vehicle_at_a_time</code> controls capacity, not place identity. The checker needs one unambiguous loading area, inferred from its capacity/key role, a sole place, or a unique supply destination. Ambiguous places return question marks. The area has an <code>opens_at</code> time (planned loading start), and opens only from the later of that time and the earliest key holder's presence (if <code>needs_key</code>). "Place blocked" starts at <code>opens_at</code> for the chosen minutes.</li>
     <li><strong>Deliveries:</strong> loading cannot start before the delivery arrives.</li>
     <li><strong>Routes:</strong> households, <code>load_minutes</code> (needs a loader), <code>drive_minutes</code> (needs a driver and a vehicle). Jobs are filled <em>only</em> from <code>driver_ids</code> and <code>loader_ids</code> listed on the route - drivers primary first, then listed backups; loader lists are eligible sets with no priority. No one else may fill those jobs.</li>
     <li><strong>Start times</strong> can move freely within people's and vehicles' availability windows.</li>
@@ -670,11 +670,11 @@
   <p style="font-size:13px;color:var(--ink-mid);">The real Ravi driver card is turned down: Ravi already drives Route C and loading still fails. The checker proves “Van back 10:45. Loading team gone.”</p>
 
   <h3>How the checker decides</h3>
-  <p>After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time without trading away the proven verdict. Both passes share the deterministic solver budget. If the second pass reaches its limit, retain the proven lateness verdict and the best valid timeline; earliest-start optimality is then not claimed. A question mark means the primary lateness verdict could not be proved. Small-model presolve probing is disabled to keep the full example below three seconds.</p>
+  <p>After proving the minimum lateness cost, a second solve holds that cost fixed and minimises the sum of loading and driving start times. This removes arbitrary idle time without trading away the proven verdict. Both passes share the deterministic solver budget. If the second pass reaches its limit, retain the proven lateness verdict and the best valid timeline; earliest-start optimality is then not claimed. A question mark means the primary lateness verdict could not be proved. Small-model presolve probing reduces overhead. Warm local example runs have measured below three seconds; cold native-library import and host load can take longer.</p>
   <div class="card" style="font-size:13.5px;">
     <p><span class="badge badge-tick">tick</span> <strong>Proven zero lateness.</strong> Zero is the floor; finding zero proves the plan genuinely survives.</p>
     <p style="margin-top:8px;"><span class="badge badge-cross">cross</span> <strong>Proven minimum above zero.</strong> That minimum is the human cost, proved optimal. E.g. “Route A: 10 households not delivered” or “Route C: 8 households not delivered.” Routes that cannot run (no driver, loading area cannot open) use a "not delivered" penalty of households times the full horizon (finish time + 180 min), keeping every scenario feasible. Human cost reads "Routes A, B, C: 30 households not delivered. Nobody can open the loading area"</p>
-    <p style="margin-top:8px;"><span class="badge badge-amber">qmark</span> <strong>Deterministic time limit hit</strong> before the minimum lateness is proved. Uses <code>max_deterministic_time</code>, not wall clock, so results are the same on every machine. Never a pass. Listed by name under "What was NOT tested."</p>
+    <p style="margin-top:8px;"><span class="badge badge-amber">qmark</span> <strong>Deterministic time limit hit</strong> before the minimum lateness is proved. Uses <code>max_deterministic_time</code>, not wall clock, so the limit measures solver work; repeatability is tested with the locked inputs and solver version. Never a pass. Listed by name under "What was NOT tested."</p>
   </div>
 
   <h3>Run order</h3>
@@ -885,6 +885,7 @@ gate_detail:         str | None              <span class="comment"># Original te
 │   ├── fixes.py                 # Fixed operations, gate and all-scenario scoring
 │   ├── report.py                # Six report sections and frozen history traversal
 │   ├── credentials.py           # Private memory-only session keys
+│   ├── rate_limit.py            # Basic session/IP AI limiter; not a public boundary
 │   └── session.py               # Owner-scoped maps, evidence, runs and ancestors
 ├── web/src/
 │   ├── main.tsx
@@ -892,6 +893,7 @@ gate_detail:         str | None              <span class="comment"># Original te
 │   ├── api/client.ts            # Typed fetch and SSE
 │   ├── types.ts                 # Maintained client contracts
 │   ├── landing/                 # Approved v2 tabs, source story and illustrative grid
+│   ├── lib/coverage.ts           # Listed route cover for the plan-map summary
 │   ├── components/
 │   │   ├── FactEditor.tsx       # Constrained fact corrections
 │   │   ├── SourceTags.tsx       # Field evidence versus entity mentions
@@ -927,10 +929,13 @@ gate_detail:         str | None              <span class="comment"># Original te
 ├── tests/                       # Locked solver, API, review, fix, report and asset tests
 ├── docs/
 │   ├── sample-report.pdf
+│   ├── deployment-readiness.md   # Local support and unverified hosting preparation
 │   └── images/                  # Six gallery PNGs, thumbnail and actual-results GIF
 ├── devpost/                     # Planning docs; ignored local verification proofs
 ├── pyproject.toml
 ├── package.json
+├── Dockerfile                   # Container preparation; image not yet run
+├── render.yaml                  # Optional host configuration; no live deployment
 ├── .env.example
 ├── .gitignore
 ├── LICENSE
@@ -1009,15 +1014,15 @@ gate_detail:         str | None              <span class="comment"># Original te
   </div>
   <div class="decision">
     <h4>Every scenario kept feasible with a "not delivered" penalty</h4>
-    <p>Routes that cannot run carry a penalty lateness of households times the full horizon (finish time + 180 min). The solver always returns a number. Human cost is always statable. Tick, cross, and question mark keep their meaning - there is no fourth state.</p>
+    <p>Routes that cannot run carry a penalty lateness of households times the full horizon (finish time + 180 min). Unproved or ambiguous outcomes return a question mark; proved outcomes state their human cost. Human cost is always statable. Tick, cross, and question mark keep their meaning - there is no fourth state.</p>
   </div>
   <div class="decision">
     <h4>Id normalisation after the gate</h4>
-    <p>AI-assigned ids are rewritten to stable type-and-name slugs after validation. Two runs of the same plan always produce the same ids and the same fingerprint. Duplicate ids are rejected by the gate.</p>
+    <p>AI-assigned ids are rewritten to stable type-and-name slugs after validation. Unchanged extracted labels and checker inputs normalize consistently when only AI-assigned IDs change. Different names can produce different person/vehicle IDs; reading equivalence is scored separately after role alignment. Duplicate ids are rejected by the gate.</p>
   </div>
   <div class="decision">
     <h4>AIPlanReading and PlanMap are separate schemas</h4>
-    <p>The AI never sees the server's fingerprint, fix history, or status marks. Groq strict mode is workable because the AI schema contains only what the AI knows. The boundary between AI output and server state is explicit in code.</p>
+    <p>The reading schema never asks the provider to create the server's fingerprint, fix history or status marks. Suggestion context includes scenario results and their map fingerprint, an identifier rather than a credential. Groq strict mode is workable because the AI schema contains only what the AI knows. The boundary between AI output and server state is explicit in code.</p>
   </div>
   <div class="decision">
     <h4>Pydantic <code>extra="forbid"</code> with nullable fields</h4>
@@ -1029,7 +1034,7 @@ gate_detail:         str | None              <span class="comment"># Original te
   </div>
   <div class="decision">
     <h4>Fingerprint hashes only checker inputs</h4>
-    <p>People, vehicles, places, deliveries, routes, finish time, problem sizes - sorted canonically. Excludes timestamps and status marks. Two identical plans get the same fingerprint; changing a problem size changes it.</p>
+    <p>People, vehicles, places, deliveries, routes, finish time, problem sizes - sorted canonically. Excludes timestamps and status marks. Identical normalized checker inputs, including entity IDs, get the same fingerprint; changing a problem size changes it.</p>
   </div>
   <div class="decision">
     <h4>Singles before pairs; dimmed pairs skipped without solving</h4>
@@ -1037,7 +1042,7 @@ gate_detail:         str | None              <span class="comment"># Original te
   </div>
   <div class="decision">
     <h4>Deterministic time limit (<code>max_deterministic_time</code>) not wall clock</h4>
-    <p>Results are machine-independent. A slower machine cannot turn a result into a question mark.</p>
+    <p>Repeatability is tested with the locked inputs and solver version. Cross-platform identity is not established by those local tests.</p>
   </div>
   <div class="decision">
     <h4>One AI call returns both explanation and fix suggestions</h4>
@@ -1049,7 +1054,7 @@ gate_detail:         str | None              <span class="comment"># Original te
   </div>
   <div class="decision">
     <h4>Preview draws from stored fix results</h4>
-    <p><code>suggest-fixes</code> returns full per-scenario results. Preview is a render operation, not a solve operation. Accepting a previewed fix replays from the cache.</p>
+    <p><code>suggest-fixes</code> returns full per-scenario results and server-derived scores. Eligibility requires the selected case to survive, no new cross, and no unknown candidate results. Unknown outcomes receive no credit as fixed. Preview renders stored results without solving. Accepting a previewed fix replays from the cache.</p>
   </div>
   <div class="decision">
     <h4>example-truth.json is hand-authored; locked test runs against it</h4>
