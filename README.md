@@ -514,8 +514,8 @@ built-app command above binds to `127.0.0.1`; the saved example runs without a k
 The actual Docker image also passed a fresh Linux build, 238 offline tests and
 the complete all-100-survived browser story on a free remote runner, without
 installing Docker locally. [Successful container run](https://github.com/vighriday/failure-compiler/actions/runs/39627825863).
-This is container verification, not a deployed service. Vercel needs shared-state
-architecture work; Railway is a possible account-dependent trial. The
+This is container verification, not a deployed service. The release uses local
+judging; no public host is selected. Vercel needs shared-state architecture work. The
 [hosting comparison and public protections](docs/deployment-readiness.md) explain
 the remaining requirements. The retained Render configuration selects Free;
 account verification can still require a payment method.

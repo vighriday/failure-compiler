@@ -7,9 +7,10 @@ Use the [judge guide](judging.md): build once, start one Python server, open
 `http://127.0.0.1:8000/demo`. The complete saved example needs no key or Docker.
 The guide also covers personal AI keys and an optional private Codespaces run.
 
-A Railway trial is a plausible next hosting experiment if the owner's account
-has verified outbound access and credit. It is not a deployed demo, an unlimited
-free service or a promise that every account can proceed without a card. A public
+No public host is selected for this release. Judges should use the local setup;
+the private Codespaces option is available only within their own account's
+allowance. The platform comparison below remains research for a future hosting
+decision, not a pending deployment or a promise of free account access. A public
 URL also needs the application protections listed below.
 
 ## What was actually verified
