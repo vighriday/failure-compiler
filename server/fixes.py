@@ -394,14 +394,23 @@ def score_fix(
     ]
     current_crosses = {r.scenario_id for r in current if r.state == "cross"}
     after_crosses = {r.scenario_id for r in results if r.state == "cross"}
+    unknown = {r.scenario_id for r in results if r.state == "qmark"}
     states = {r.scenario_id: r.state for r in results}
     suggestion.scenario_results = results
     suggestion.new_crosses = sorted(after_crosses - current_crosses)
     suggestion.new_crosses_n = len(suggestion.new_crosses)
     suggestion.still_broken_n = len(current_crosses & after_crosses)
-    suggestion.fixes_n = len(current_crosses) - suggestion.still_broken_n
-    suggestion.eligible = states.get(scenario_id) == "tick" and not suggestion.new_crosses
-    if not suggestion.eligible:
+    suggestion.fixes_n = len(current_crosses - after_crosses - unknown)
+    suggestion.eligible = (
+        states.get(scenario_id) == "tick" and not suggestion.new_crosses and not unknown
+    )
+    if unknown:
+        suggestion.rejection_reason = (
+            f"The checker could not determine {len(unknown)} "
+            f"{'scenario' if len(unknown) == 1 else 'scenarios'}. "
+            "This change cannot be accepted."
+        )
+    elif not suggestion.eligible:
         result = next(r for r in results if r.scenario_id == scenario_id)
         suggestion.rejection_reason = rejection_reason(plan, candidate, suggestion, result)
     return ScoredFix(suggestion, candidate)

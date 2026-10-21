@@ -18,6 +18,20 @@ from server.labels import route_label, route_letters
 from server.models import PlanMapData, TimelineEvent
 
 
+def _loading_place(places: dict[str, dict], deliveries: dict[str, dict]) -> dict | None:
+    """Identify the single loading area separately from its capacity constraint."""
+    for field in ("one_vehicle_at_a_time", "needs_key"):
+        candidates = [place for place in places.values() if place[field]]
+        if candidates:
+            return candidates[0] if len(candidates) == 1 else None
+    if len(places) == 1:
+        return next(iter(places.values()))
+    destinations = {delivery["place_id"] for delivery in deliveries.values()}
+    if len(destinations) == 1:
+        return places.get(next(iter(destinations)))
+    return None
+
+
 def solve_scenario(
     plan: PlanMapData,
     disabled_entities: dict[str, dict],
@@ -101,15 +115,12 @@ def solve_scenario(
 
     routes = list(plan.routes)
 
-    # Find the loading area (the place with needs_key or one_vehicle_at_a_time)
-    loading_place_id: str | None = None
-    for pl in places_by_id.values():
-        if pl["one_vehicle_at_a_time"]:
-            loading_place_id = pl["id"]
-            break
+    loading_place = _loading_place(places_by_id, deliveries_by_id)
+    if loading_place is None:
+        return "qmark", None, [], "The checker needs one unambiguous loading area."
+    loading_place_id = loading_place["id"]
 
     # Determine earliest loading start based on key holders and deliveries
-    loading_place = places_by_id.get(loading_place_id, {}) if loading_place_id else {}
     earliest_loading = loading_place.get("blocked_until", loading_place.get("opens_at", 0))
 
     # If the place needs a key, loading can't start until a key holder is present
