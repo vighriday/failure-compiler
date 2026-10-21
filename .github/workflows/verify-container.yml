@@ -1,0 +1,90 @@
+name: Verify Linux container
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: container-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      RUN_LIVE_AI_TESTS: "0"
+      GEMINI_API_KEY: ""
+      GROQ_API_KEY: ""
+    steps:
+      - name: Check out the reviewed source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          enable-cache: false
+      - name: Install the verification tools
+        run: |
+          uv sync --frozen
+          npm ci
+          uv run -- python -m playwright install --with-deps chromium
+      - name: Lint, build and test on Linux
+        run: |
+          uv run -- ruff check .
+          npm run build
+          uv run -- python -m pytest -q
+      - name: Build the actual application image
+        run: docker build --tag failure-compiler:verify .
+      - name: Run the image on loopback only
+        run: |
+          docker run --detach --name failure-compiler-verify \
+            --publish 127.0.0.1:8000:8000 failure-compiler:verify
+          python - <<'PY'
+          import json
+          import time
+          import urllib.error
+          import urllib.request
+
+          for attempt in range(90):
+              try:
+                  with urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2) as response:
+                      assert json.load(response) == {'status': 'ok'}
+                  break
+              except (OSError, urllib.error.URLError):
+                  time.sleep(1)
+          else:
+              raise SystemExit('Container did not become healthy within 90 seconds')
+          for path, expected in [('/', 'text/html'), ('/third-party-notices.txt', 'text/plain')]:
+              with urllib.request.urlopen('http://127.0.0.1:8000' + path) as response:
+                  assert expected in response.headers['Content-Type']
+          print('Actual image serves its health endpoint, frontend and licence notice.')
+          PY
+      - name: Play the full saved story against the image
+        env:
+          FAILURE_COMPILER_URL: http://127.0.0.1:8000
+        run: uv run -- python scripts/verify_story.py
+      - name: Check the image has no local credential or profile files
+        run: |
+          docker exec failure-compiler-verify sh -c \
+            'test ! -e /app/.env && test ! -e /app/devpost/learner-profile.md'
+          docker stats --no-stream failure-compiler-verify
+      - name: Show container diagnostics and stop
+        if: always()
+        run: |
+          docker logs failure-compiler-verify || true
+          docker rm --force failure-compiler-verify || true
