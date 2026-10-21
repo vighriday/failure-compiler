@@ -13,6 +13,8 @@ dependencies = [
     "python-dotenv>=1.1",
     "groq>=0.25",
     "google-genai>=1.14",
+    # Security floor for the CA bundle used by provider HTTP clients.
+    "certifi>=2026.10.19",
 ]
 
 # Compatibility aliases for earlier setup commands. Live AI is a runtime
