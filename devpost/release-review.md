@@ -1,7 +1,8 @@
 # Completion verification, 20 October 2026
 
-> Historical release record. The current public-release state is summarized in
-> the final addendum below.
+> Historical release record. See the [21 October code and publication audit](audit-2026-10-21.md)
+> for the current state. The dated checkpoints below do not establish final
+> human sign-off or a completed public deployment.
 
 ## Scope of this pass
 
@@ -44,7 +45,7 @@ The final visual design, checker constraints, truth map, locked verdicts and rea
 ## Historical checkpoint
 
 At the time of this record, the hands-on review and focused learning wrap-up
-were pending. They were completed later and recorded in the checklist.
+were pending. The focused reference activity and app map were recorded later. Final hands-on sign-off remains unchecked in the checklist.
 
 ## Final addendum, 20 October 2026
 
@@ -54,7 +55,7 @@ were pending. They were completed later and recorded in the checklist.
   build, browser story, review checks, landing checks and accessibility checks
   pass. The locked count remains 100 tests, with 1 single weak spot, 3 hidden
   pairs, 12 dimmed and 84 survived.
-- The focused wrap-up and [`app-map.html`](app-map.html) are complete. The
+- The focused wrap-up and [`app-map.html`](app-map.html) are recorded. Final hands-on sign-off remains pending in the checklist. The
   timeline wording now says “One morning that gets this result” to make clear
   that displayed schedules are examples, not unique verdicts.
 - No live deployment exists. The project is local-first; the video link and

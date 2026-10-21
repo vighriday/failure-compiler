@@ -1,0 +1,241 @@
+path,bytes,sha256_lf_text_or_exact_binary,category,review_method
+.agents/skills/1-start/SKILL.md,12925,24825d3b49d2b36d72c03ad211a531a42a45512bdb83d43572f3ac0071f2c2a8,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/1-start/templates/learner-profile-template.md,5416,3f6eeca5b7e1570e684bdb750c608b5c0bbaa608f79aba11fc447c56948ac614,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/2-scope/SKILL.md,11734,1593753bbeb2a2aaf449bc4045bbe7ce4ebe3a420106c1fbf9a8e9c75174f70b,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/2-scope/templates/scope-template.md,2335,f42e72e702d104e41807ba2894833ab60328adcb37d7729e50b69534133b2195,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/3-prd/SKILL.md,11242,102a3690d033ddeec9d541c053567d4fe42a85de7f30b7d621609dc83c11f1fd,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/3-prd/references/prd-guide.md,5570,379b753c84615abda816ee30458dd77dd172c641acb51a0328e6eb45f200d1e7,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/3-prd/templates/prd-template.md,4497,1b8dfea07a8cb769c985bac5bccb16536a170e741cfebe1fa282a646d747f6f3,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/4-spec/SKILL.md,13227,3d41108a8eb5dfe87d459ff3e4a78eb795704603099bc6e0e4a3f55af6877cfd,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/4-spec/references/spec-patterns.md,11555,da9169087b753290595f253e00512bd30d65b22cbb04a9b3a90f0527d8a631e0,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/4-spec/templates/spec-template.md,5388,0d104e7eb05f74b628022caa0874e5d5efc662b9fea160e1fc2e56f1881d6c39,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/5-build/SKILL.md,22710,9ff2bb44f6fdb0d589f55ad590d9ed58972f6a4c85da5ec1578de12e7394b13a,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/5-build/references/code-tour.md,8046,0cbb3296277823ef8b14d07569045af0be908fe7732a62ab5ab156c7a61a4be6,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/5-build/templates/checklist-template.md,6159,0dfdf4bda931ec382e08119a77278d6fb82eaf62d0e2affcd66e93aa812b3e76,Workflow scaffolding,Public template/path and credential scan; not application progress
+.agents/skills/6-ship/SKILL.md,10177,0b4207adcc5326d3d26c987280c7aa685349e5ffb8264efbdaf03e4db751aca4,Workflow scaffolding,Public template/path and credential scan; not application progress
+.dockerignore,216,12ce5108665dee6a3817fb60580b8f3d9b51c625fe01651817aabc6fbcdce16d,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+.env.example,163,1d9d4fab9dd44ec70b44493a60f8b67b60a64b83338a842eb0b5dfa4d8a754bd,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+.gitignore,508,7efc21088dc9622b68b97102492b7a0472e21809b0f03e04c9f235edc1421e05,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+Dockerfile,703,33aea6b84683fe1847560bb9e3affe872d20140b0c5c1b31eda18aae9a09be06,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+LICENSE,1066,6f56c746519b12b47e86a6aa296b84a7ed8092fa3e21c49c049e45926ffbb0ae,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+README.md,54675,0e8164f713a93ec182b01151ecbdfb7c07283c979cb0ea234dffde404db78fd3,Documentation and design,Current versus historical claim/reference review; credential scan
+agent/skills/1-start/SKILL.md,12905,a220a1c535236f719942d7d58417458ede6e2a95fa2b0b8edc8b8d325a01db4a,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/1-start/templates/learner-profile-template.md,5416,3f6eeca5b7e1570e684bdb750c608b5c0bbaa608f79aba11fc447c56948ac614,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/2-scope/SKILL.md,11716,8e4375913c60fef0b938e185b129eb263b1174d2546e0495721ec2174e84a2a3,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/2-scope/templates/scope-template.md,2335,f42e72e702d104e41807ba2894833ab60328adcb37d7729e50b69534133b2195,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/3-prd/SKILL.md,11226,005a041c721a4269d6a0313abf22b1b87cc02b048093a7bdcc39038ecab5176a,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/3-prd/references/prd-guide.md,5570,379b753c84615abda816ee30458dd77dd172c641acb51a0328e6eb45f200d1e7,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/3-prd/templates/prd-template.md,4497,1b8dfea07a8cb769c985bac5bccb16536a170e741cfebe1fa282a646d747f6f3,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/4-spec/SKILL.md,13210,85b6edd13665b8db1a8022f69da571a693adadb247e66103adf4d51ea62292cf,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/4-spec/references/spec-patterns.md,11555,da9169087b753290595f253e00512bd30d65b22cbb04a9b3a90f0527d8a631e0,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/4-spec/templates/spec-template.md,5388,0d104e7eb05f74b628022caa0874e5d5efc662b9fea160e1fc2e56f1881d6c39,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/5-build/SKILL.md,22692,97ea51ac62af8ce5508117cf82a6fbfd3d356460176c4fb885abbea2f5eb1b7d,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/5-build/references/code-tour.md,8046,0cbb3296277823ef8b14d07569045af0be908fe7732a62ab5ab156c7a61a4be6,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/5-build/templates/checklist-template.md,6159,0dfdf4bda931ec382e08119a77278d6fb82eaf62d0e2affcd66e93aa812b3e76,Workflow scaffolding,Public template/path and credential scan; not application progress
+agent/skills/6-ship/SKILL.md,10160,9790d65e9a7f50f1a9beaf0122ac3abcb4a8f19fa105a222fd9d1aa8fe17e0c6,Workflow scaffolding,Public template/path and credential scan; not application progress
+assets/submission/README.md,3996,5f1a9d9102063a6b35ce0b97175ce259c0cd63940a9ba22bbddf42622ef35d77,Documentation and design,Current versus historical claim/reference review; credential scan
+assets/submission/captures.json,371,91d6b1f073de74f030302fb3b25d22dcdebc6fa3f858944b85604202036ec5e1,Documentation and design,Current versus historical claim/reference review; credential scan
+assets/submission/cover-square.png,1679645,0f4754898f61998d1a15a49d0e2dff377b2fb946774a89c20fef69cc5a9fad41,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/files.json,1557,0a22907701a21c2da19106743030d2f309fce35eb6735040430f957fe988295e,Documentation and design,Current versus historical claim/reference review; credential scan
+assets/submission/prompts.md,6959,8daf978e3e83acc462be1df2d0784373578fedb8b7825d787a3d2c26b43d2e33,Documentation and design,Current versus historical claim/reference review; credential scan
+assets/submission/screenshots/01-overview.png,111945,d4aa421c451186909949cae4e7292cf183d1d5bf72efee4063e8f241ca2bd98f,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/02-paste-plan.png,86977,1b9a3b86b65e7f383bae1a7bd98adbf63afb8ffdac7bde453d66925a603f1471,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/03-plan-map-full.png,268261,61b5d3ced3fa479f33087dc1a347adfdcd3ed8c80163e9af13d03424ab10cf97,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/03-plan-map.png,103473,7cd5c4379b0ee6a97f4641a6f557a7613bc325c066f0f29c1f79f82692390e59,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/04-live-grid.png,136540,028d76e31c42307f730998354feef81d85be364d5bb7f7f64452a9343c19bd61,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/05-broken-case.png,220627,a5120c677003120761028e1a713cb786bce990a7687445c97d28e6c780487f21,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/06-fix-turned-down.png,87865,711e34c5ee652230e6aa97fdd0ff23a9d997028b6f768ef6826384e4da69d64e,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/07-one-key-new-pair.png,212039,601cb25c949b5f4e1a8d9d8784e8eb9f0abeef73081f0a1beae0d7f92eb22c71,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/screenshots/08-all-survived.png,163803,08fe2d1a100b5d0b7830a1f20db560c7a5c6bca846824fa77c527c75972c1645,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+assets/submission/thumbnail.png,1637625,776fa1d8c007376b2536420720cc7a72303726987d91744d2bf0ce51d2520015,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+design/landing-v2/Grid.html,17687,16a9172a34942d9c05cdf0f9d43f841b2ca7dd6f231afa6a5bc786ff56e0558e,Documentation and design,Current versus historical claim/reference review; credential scan
+design/landing-v2/Landing.html,60251,3bd5b2f4b20fb57f4035af83f9d36c63e1b195a1f1f046cbd7775e76edc7046c,Documentation and design,Current versus historical claim/reference review; credential scan
+design/landing-v2/README.md,1942,e9128f5f00eeb6d3cce1c19ebada7ef6f18e07dc5b7c542cf4394918528cef41,Documentation and design,Current versus historical claim/reference review; credential scan
+design/landing-v2/verification.md,3306,d201c4034151e5552ed69c23f358961a688b7c4e715abac9943c4ce6e4ad4127,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/ai-reading-review.md,32075,ec86696256dfb9b0f34d8076e13cbf2876605109dbee9c8ffb061bd751fd8774,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/app-map.html,3829,194846c5e9bbd5956b1fa58848412926002f4493a1129a6baf98b0d7fb03a34a,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/audit-2026-10-17.md,17714,34765ea46521c3cf9ceb6084c2df4f6f66475848ec7d0ea643a1aa4df091e141,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/audit-files-2026-10-17.md,16323,a0a3910097e34701e6edd03c60b0eb3983f61149fe3341086f7bac7319fb2437,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/bakeoff-read-v1.json,185603,6a2664c62fdbf736a9431354ffcbbce745e95b045e07937b03ca6ee7f6905c6f,Recorded provider evidence,"JSON parse, credential scan and reading/capture regression contracts"
+devpost/bakeoff-read-v2.json,226229,73ba9d003e5e6762672e551a6324513b01b119a1130894d2b0934e3dfc5ddaa9,Recorded provider evidence,"JSON parse, credential scan and reading/capture regression contracts"
+devpost/bakeoff-read-v3.json,180826,11cbaf3a0ac7f092895e803d0839b9564df0308befefd382e371fecc75828d65,Recorded provider evidence,"JSON parse, credential scan and reading/capture regression contracts"
+devpost/bakeoff-read-v4.json,56011,3ae4f5aea9d64c3548a3795d313f910e072dc3a8d3e35e61bf2eeb550d3e7243,Recorded provider evidence,"JSON parse, credential scan and reading/capture regression contracts"
+devpost/bakeoff.json,196056,35f7aa149c926f7839a484e37a1506660b9c8578ebb67458a42035076c164c0a,Recorded provider evidence,"JSON parse, credential scan and reading/capture regression contracts"
+devpost/checklist.md,49724,5dc8dc169ef9ba5448d9e9a33e57194bccd709cb20b430b1e0815cd6bd2e5a0a,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/demo-runbook.md,4240,a83653bc358d23e1c96d7a8675b7ebd0708d39e3dd9aa4c90c7a8fcdeb50a003,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/prd.html,58406,409f3e9a7ab3ad8cb5eec397f98dbf97a23e9a2efd937d9b5590bef60df1d077,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/prd.md,29875,fe57a8fd218b61431049d9bc63b8983f1d42e46788b8421e8cc75ba01f457ba0,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/reading-v4-attempts.json,636,1f7e45711f9c0284c00b90462994e6c96bdd28ab3bff168e4c941ae0d3140048,Recorded provider evidence,"JSON parse, credential scan and reading/capture regression contracts"
+devpost/release-review.md,7200,5e38f1e38a4efba53349363ac808efb9d2c56e4bf2932f9a5ee057e1c54ce9a4,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/scope.html,25706,0f5d8bd46f6654c7eea58c40c39c62b0e4133f09d467bb4f7158793839ef376b,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/scope.md,11508,55d8afe78467add4c98199398d42f9bf2d1c91d7b2fea4f82446e5ed7fdf3a0e,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/source-line-review.md,3678,cff1574dc814a5a061995093c7a4654eea9b63713f859013626698da8f5bb5f5,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/spec.html,89319,4960c8ad3a429b093e8ea8837c96e771edd5c6a89cb5156e4b2a42c1752263c1,Documentation and design,Current versus historical claim/reference review; credential scan
+devpost/spec.md,69686,98e18635aae743ef9d8dc563c6eb1f9cc2cae0ac4a712a06de98c9acfd83afbe,Documentation and design,Current versus historical claim/reference review; credential scan
+docs/deployment-readiness.md,5535,5612c2d0d7b59d6f004962d511eb1e796aa9d47c62a6292c7eb5d7563501cc87,Documentation and design,Current versus historical claim/reference review; credential scan
+docs/images/01-paste-plan.png,114598,cd33b6bd2f0e294ff79770dbe1b8cf9b0fd33d8ee9c2190ab539efbb48265213,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/02-plan-map.png,119217,74a0935b794d3715831cb10a7d1fbadda4a59927fae3d2ec682c78b7a3a28470,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/03-crash-test-grid.png,94991,ec902117ade58c7e07c36b60f6731b99e2e03a2dbcaed6a3f231319db69c0a73,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/04-broken-case.png,95524,c8572273f1d99f03b8b9460ccd19570192cd2825c84ef95087dea7f2b2ca415d,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/05-fix-turned-down.png,46299,66527351908b9329ab2c11f4d4dbeb0f4966a7c8303f08233ec5a0e6838b8e9a,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/06-report.png,80492,d37caa3bf3b690737dc4a007a7030d51bbdabe669440033c33312ae76a9a7840,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/README.md,2317,f74a00b131050c24781561a90bef3e9502a626af1eb1d0a73edf7588860c7f53,Documentation and design,Current versus historical claim/reference review; credential scan
+docs/images/devpost-thumbnail.png,114598,cd33b6bd2f0e294ff79770dbe1b8cf9b0fd33d8ee9c2190ab539efbb48265213,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/flip.gif,176308,c58799fbf2c0766b4b68abd7701e8ee3f5496f744efcf27651d4a8bed22d2ce2,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/video-thumbnail.png,114598,cd33b6bd2f0e294ff79770dbe1b8cf9b0fd33d8ee9c2190ab539efbb48265213,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/images/youtube-thumbnail.png,94104,011314d0b75c95977ce3a13b48712f035cbefb36260212e54e05e57701826ae1,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+docs/sample-report.pdf,173017,0db86d37896fc099d70551a25be4664e936ecb1f10e3872ce19f085b3a34821b,Binary assets,Format/reference/hash checks; gallery dimensions and report text/print checks
+fixtures/example-corrections.json,3196,1ffb33352804325f3530dc8242d7a126b4947c132368daf7265eac3e2137563d,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+fixtures/example-fixes.json,243791,e8a379741854f024b5ebd7dfbe92a83f50fea9e7c3dda3c920b8c51773509efc,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+fixtures/example-plan.txt,901,cd038fbe3200ce4e4e70a44b15b3f309c2ba8344530ecc86e0aa4190901a27e3,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+fixtures/example-reading.json,23746,6d4c8825fb2571744a82f6b85b8edd552bac9024a5cb3cb8808934c013a7acd1,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+fixtures/example-truth.json,2033,0e65e03fa76fa6a244f621a22ee81b56e52592a7cf8562d0741c21bcea02ee76,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+fixtures/expected-results.json,18211,ff07eb315baaacb0c41120b936f1b1f381670ba8c457ce8d922212e709f2754b,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+package-lock.json,65749,4ea3862a1666dc692003e17d477fdead700d549bf6a9384bf1d281d828143d1e,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+package.json,674,ef00927f605b6d5e4672de80693d3e05cc50f593542d783bca914c7466181ead,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+pyproject.toml,914,b7ac673b72f1d518fab2007e2d7054221f2fd6f6991159e07a52de261aaa80a2,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+render.yaml,218,6ab211535c78e7cf8936f9a5534bfd420fd4e8b6787e6979abec69621dc7fba1,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+scripts/accessibility_audit.js,3464,4b0c74ba71a6814d895ae98cc6ab3263db49bcfc250289802cb2a2e2cd14f3ee,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/audit_repository.py,4141,2b553c8ca6ec102b790c8d49a9f3ee95c4acb44569276490acebc4d739cb0c2e,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/audit_sources.py,2420,88ef43f625d9e4bb2e2e6a859223707fc41394339495ffec0e4e3a5b3fef8da0,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/bakeoff.py,9345,70a6f38259fa0602e5e75334279d1bc094632d142cc64049b0409158eec33550,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/browser_fixes.py,1585,2a7b6829434b80604c224236573225e9742c1f243ddba43aed7628cb179e4c94,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/browser_review.py,3010,a3fe9c97c7eb8fd002dc808733d3904a7846806599611f6be2a0698d177091c0,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/browser_story.py,2988,40b714f1a9dd8d227ce703abc5ff22d0e1c04c5267e597f405a2b31e6c987d12,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/build_notices.py,1232,0b0f22e7dd698559a95f2128c56c33501fbf57218b56f1224678c20e713b28d6,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/capture_gallery.py,3533,2e672fa59a33a3cdc60a92d4f22a017526350076c2245c237ca487bca18202d4,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/capture_report.py,2841,00b504d67f42433961abf3b0dc34406ec8a0672cbb9cd995f513dcf8e48b6b34,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/capture_submission.py,5452,12d044de548e19fdcc43c73fa6300f9b21cb4185a10ff929fcf8feb65abe63f6,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/check_map.py,1832,9d4732432165d0f0ab1a9d01d724294c86af9d9c925aeaba21cc5dce66c3f5b2,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/check_readme_links.py,2940,a2dde25f29625236bcd8da7e8fe2303bb0668118f3f38ef0a2f49c448787ef56,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/convert_landing.mjs,9192,6e9fad197fbcf9d406bead2e634d6aaa0837565aabecd3365c58f4586a51350a,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/dev.py,6033,ab8430cd5dd5c557ba7fed7ba72ec1ffd746a1716517ea10f3f1435a4922f0fd,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/local_preview.py,1175,f1f42e984c4ca8c6eff9e6aa503f930d55277930258cb75cbf0c799cfe2e0020,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/record_example_fixes.py,9263,f16d5e9b3e991669b579fd793b27ac44bf98b10cf3de12f71b6ce5d46fd03ebd,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/record_example_reading.py,5390,6a99f6a744f7447628b6aa452244aeb694272b71bdd9aa14730c3301ff72354c,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_accessibility.py,9633,5616d216e593227651a410be0e610968faef413ffe3f3956a5c1d6bd79a3f328,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_browser.py,1209,e096158b6c31d0980370032756baa6923fe38821e8d5397a2a85688b7923fa25,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_landing.py,20564,48f5be1a75ebc0e5522ab96e53c9bcca1ebd2a3f63693be1c3d8e0c074173fec,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_live.py,15598,7f8c7b486d3e1204ae5798d4a174e25bdbc8aa0db854f88608e3af158664b532,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_recording.py,3027,d35a609b27266a6e3b40970fb7b34122bef67dd3fea954ef00a0dfad0d9c46c0,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_report_pdf.py,3828,5e3944819ce8210dcb4a2951cde8c7fbada780e6715f6c6c5c3a0bb03ae9b08f,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_review.py,5292,72d04f86b776eedf198e8418ca43c71364a054ca1cf0aaf33132fe8df4073eaa,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_saved_reading.py,5432,28f1e80c8c4a43415cc77120dcc71f31c59ba326018c99e3b02972cd43ac17b5,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+scripts/verify_story.py,15700,839430708b4941688965ec63e7b051058e571bdc3ff13b1641be497c5be78cce,Maintenance scripts,Source/static checks; only audit-listed commands executed; no provider captures
+server/__init__.py,17,61e6d53c8b0cfcb78a19d52cd11c3c599d9b6da5dbf00cc178399a2a72169e9b,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ai/__init__.py,80,bce40ee08c30ad0a907217b6adb52d44fc556d7dbd82384bb838c76d0ef555ee,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ai/adapter.py,6909,c113e3dcdb4001c192a74f37cd93747077bdd31fd4598c6316318dfe208814b1,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ai/gemini_provider.py,3154,3a0ac04ee14e3417be310dee3a5fbc15fdc9753b64716b98ad9afef5d81067ce,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ai/groq_provider.py,3498,98931aa207935f460d7c68c713c9aa66aaf28c704438c26a606868d2221b7e33,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ai/prompts.py,4437,740d54178d5c4e3b7bb142da4e11989ce660ec3247c2490da6525af7d6d72aa7,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ai/types.py,1502,2ef89226e39254908d07bc51571f6c6a4f04339e72a1b2fbb9a11240f08b3d25,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/checker/__init__.py,18,ef628c709761540ec635b4fccf36afe177520433bea9311971bcabb905d0830c,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/checker/explain.py,5831,400f43f4596d6173db1dcef2a298113f2df16c77c5bf7b6fab43f48b25d2523d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/checker/runner.py,3048,ecf6daebbd623f5abf67dcdb7da3ca87e7d79892576c6de14d5204928949478d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/checker/scenarios.py,2694,b39ac3fd470ad3788f7d7d234c28a4b73d4223042bb4a737a1d4e1467133face,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/checker/solver.py,21997,5dd50b927fb46955b9b088346aef8c2dc1447caac00dde4895f25e7bb3a943e0,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/config.py,2593,317e8fc08b7633e1b8ab636354be5563d2ed8e0321e2b9033545f29115e82e0f,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/credentials.py,1997,cfee2145d03210d5712066b429ea4f1e05e5926533dd7e209792d167eba43626,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/demo.py,2473,f2fccca69416759bd8edbdbcd2212a452d7e354d99ff7c0e150e776b0ff6305f,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/evaluation.py,11876,21d3ab18a8c51745ef59526f4c942e1df30e82e6aed7f1e3809112d445bf63df,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/facts.py,9301,7ca03c13e5402a82be39cad41ea5d11314df28e5cb8d3726ad9f61b7ac326780,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/fixes.py,29373,cb083bb4de515d7c3180a6827f44aa74f498ce90aa5ff0e5909aceef4d2f5296,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/grid.py,5184,d2dafca64ee70d91fac644326457e2d924a0fabf942e8289e9492fde4566d93d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/labels.py,542,6d0c744a9836337c5d4fe1643d5943fea2a36f9286e7d2a3ce69b54d8d4c8ac2,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/main.py,11538,27d1475968b95f77d5f86d6381110469451a08807dd3e482d2162c3b9ce06a60,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/models.py,4930,7060563eec97799a6db05445dcd340f0e558b9d9d90c37f21ea09892de0623fb,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/ordering.py,1005,949b6ef7044e6e25be17b7db6e7fd90765d5df817513bc2014f9bb321ec3e3ee,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/place_review.py,5636,4f6e78463cf7039cdb0ae978abd3c2db2424b151427c32f9a3da2f7c7b6a8949,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/rate_limit.py,1289,cbc7ccad601dfe3e1c1ce57cfa71b0b58da961b6de3a2ba8706d0290b4a3a338,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/reading.py,3028,d394f462152e73a47ce99d6bdb55dd4801e9400e7c3515ac90160b7dac914dc6,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/reading_review.py,8515,0950a9e4e96d9fe5e984d89467460a85c63a1811649070b7c46bfb4009e5cf7d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/report.py,9981,060c89d16680dc0fcfdd651b9219df67d6240db347acb107cb4b71faacbf2460,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/review.py,14934,d46d4083b2c07b09481a2c28d2030d1effd2c95746fdbdcce795b8f89d797c3d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/rule_questions.py,7075,d941a292169a5914e41ea2e3feba431e7926ab6dd78973e6343455cc9ae3550d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/session.py,3820,ecf9eeb5b2ca72c50c523f21e0e5ee59e5d36bafa27f4fdaf36dbed26106ff42,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/validation/__init__.py,68,c857eb4ac04488ce7ddf52989cd3f60ca70c56cedbbae76edaf29c5983161cac,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/validation/fingerprint.py,1577,2ad175c3b288b91df851a0513fc320273c8fe0aac7a15ebe22f0c70ce9ab0767,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/validation/gate.py,12469,f37681ae035a37c71d1573d60f4ebef5f624e101e397ba0b662acdf356c8ba4d,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/validation/models.py,8673,e89f7a67acfd86a088ba567941ee990e36f9dc9f0952f3641e7fe37d9baef435,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+server/validation/rules.py,9866,091df0bc99f1c0d6437bf0c0ab7f6a2ca8aff3fbff9052801a585a202bef3fab,Server,"Focused critical-path review; Python parse, Ruff, offline tests and browser flows"
+skills-lock.json,1457,e9432ad88a36c0e62381b390b51f048d9a98a7eaf772d30cfd8ccba480afe89e,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+tests/__init__.py,52,99848079840617e8f7f4ae8edd746ff37a93bc89fdf7e8b357196ccb3b0ba51c,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/fixtures/handmade-reading.json,5491,6de947be27ad75013dcef627ec1ad6915b24c4a84ca1014ae4c87dcd2b1e9940,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+tests/fixtures/synthetic-fix-response.json,716,38692e02cd8797564c25a54f68b360f1b9894b8916af781fec98cec95d47b9b5,Fixtures,JSON parse where applicable; fixture/schema/capture/locked-result regression tests
+tests/test_ai_adapter.py,7734,64c3bf4d87261bcd296c514d718b9ed8e1449af838222604a60e43e4d8e639bb,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_bakeoff_rescore.py,1737,35b52c1d93d50cbe9e6b5bf09201d423a114ce7cd0b63891f79e73cd22e2dcf0,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_change_builder.py,3945,1a2045013a862f09e6c0ce38fc3642a961966faae41c769dd92482e9f45f9f42,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_checker_monotone.py,736,d851533f9177ca8a5e0e560712ba08ce8ff19a7d972bd1530f0d0bab12a795b7,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_demo_reset.py,12950,77aee73149bd23ca53d98464fe9cf7ca2af10b7bfdc37a4ef130133cdc0fc721,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_deployment.py,1082,2354488ea2349ac5347cdf852d5c1ca5acca7d12158b7a7bf50028a67c80b864,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_determinism.py,466,15cbac49b450e9935879199a65322291f1290cbbbffa33f195ceaac003370c82,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_dev_launcher.py,6073,4ee63ffe7580a933e31d8d57bca5484df02c843637469db4267a4cfc948105bd,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_document_contracts.py,3193,7a7a7d1dcfa03e661831cb398953651596923b862877eef3d2e464bfe2a5a211,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_evaluation.py,6107,dad075bf48790bc16b83df8172c8eb1f5d2418a6bfe781c149d1b4ffda4ae485,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_example_fixes.py,3744,9b7f01e98cd455355544e58b9e6c329c6fc6c58b0a1352801f51e3665ec4fcb6,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_example_locked.py,2971,da9913e00634847c63c282aa0a88dc45f30a9641eccbfc074bfa2a17cc230b52,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_example_reading_sources.py,1594,0c0fdcfe6a32cd98e900ae2a92a299990653de757a2ec84510c7dd04818a2e70,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_fact_sources.py,3428,9349a5e7e707ccf5bb71463d69b02fedba4d4b19a11cdfb0d3c56f7eecd32fc7,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_fingerprint.py,4299,2ade136b3cd9f65c0630b03a70206602e82868face59fc0869b0b35466df6710,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_fix_pipeline.py,15358,c70e64bb1d512d508068eb44af28ce31df053dd6ef408058c830d7a4e11d18bc,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_fix_recording.py,4395,c94d532038242bc1b3e2ed96ef7286677deb154b4935ac316b66c392ac23965d,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_fix_unknowns.py,2120,fce2957810826efaad4a03fc0af6e3117d5af2921f24fbca655377bfd503043e,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_format_gate.py,2797,0ca5973d3e060151d7b2f84eb766144ec34bd5fe655c39ded0816aa0c6b9321c,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_label_independence.py,1843,04b88ce3ee5cf998a3fb9d606e2e46492611bfe5e2269409989084311e0c333f,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_live_api.py,20210,31fa11ded0d0bd06461b7b3c42e560f9f1b9a416e289dffc1da6010211279ea5,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_live_grid.py,2689,ba5ad652a551604efb0f9e4320c0c2d409208d53152c2d95e09a74947ed7338c,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_live_network.py,942,d0852ef9fda3433d9f16350270994dddbce3503d2c69b64c3d5dfb7715cdc81a,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_live_transport.py,898,b68e53050642a675d0ea673f3638207d795a6e01012d9991aacc47c44d8e0c4d,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_loading_place.py,5558,c20ee95da68503a48b83a06c540767801f39d6452f5ac7ed50931469415748af,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_natural_schedules.py,2695,04770ef6b0828e1c7e67d5a73c4bba32f2ffdfd875ac0e095c0369210a3347df,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_order_independence.py,1905,b506d06190e40e93e8317b484835c6d062424fcb4d1306f4b19d7f1ae983125b,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_place_review.py,4098,67dc66483a747c89cfac167938e669249d3766bcef2559ff77bce48083ae7a50,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_prompt_versions.py,883,bbce04183e6a5629f4947325900569a3aa9333cbc1ff3b4ee7c4e9a0f7cde7ca,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_provider_contracts.py,3301,805c88e27ea147ec0986ea3623c1783c97ec81888484da1b4d12e30b9ba5bfd6,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_reading_audit.py,3376,3703b68cfdf7f44c835adaf323a8f35e7d664851ee688207403a889f8e65ad9f,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_reading_matches_truth.py,3255,4cfa7184cdc7315b1722b216e3896e9fe5d2278913cfc82d4effac4bba0e1aac,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_release_assets.py,1794,6be7d32d5bbf48267f6803425c74c90c7448bde53cfff3cccf2fd457c357a16c,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_report.py,4285,4fe439b564f1821d0fa5588a988e9e773e42fa67466e3b7a2e69aa455646b08f,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_review.py,7857,030572182b9c1ea2a49f74c7736108ab9ff3a515c520c00607d5510fd81cfa3b,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_rule_questions.py,5407,1787d226e7faebadc9206c789ac5b2c3f4603ed88631e6c83750f6ee9b86217a,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_rules.py,2414,3f8b0f58e652de20954ffa94cf0b1c53b71e0f6785e46fb4551f8aa4f5fffc08,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_saved_reading.py,2976,c392e0b428286a0a235c56678bbac4ab2f42f6a928511f5f4395ce387292b2a4,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_scenario_entities.py,806,491cc599d905413942845dc36d1618665743631bc2e6c2c5a4e499b72b27f3a9,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_session_revisions.py,5257,ef52a0fa7a72f88c306b7753f363b0068b607a5aae94a36ab425a4b0d1cf9021,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_static_routes.py,1550,82487294e42b2c8a143d63ccca7bdcc6daf261786488555441f0a2c0be60bbe8,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/test_ui_coverage.py,1837,b99ed4db9934393a7ab315e077399849d77dc31939c1c92e3df56cb7123d239b,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tests/validation_helpers.py,1347,bfce85887a6080826cdbcee06a6813ba483f22c21ed3f7a6b0978914ec095847,Tests,"Python parse, Ruff and full offline pytest suite; real-network tests explicitly skipped"
+tsconfig.app.json,589,dca8446812da7134ea3acc457222e65ec327bcf828e51bafee7f0ed05f0c4ef0,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+tsconfig.json,119,770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+tsconfig.node.json,413,f121898157ce51b477c83de2da084e72a6168d1a48754a62187696014f96f07a,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+uv.lock,304605,d9b3ab2ccfde48608cb4562c147c9c63187f64d639d431a20ac6387e23e2bd4d,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+vite.config.ts,264,7f0e3431d26cb221797223aeea56eb4ab7a4abab90f34d37235a7969ce7c226f,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+web/index.html,353,27675cbe74b3732b7d8ca98dd65c71b0937d1f46eaf6b8ac0afdfd17374d58b0,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/public/third-party-notices.txt,13010,563057c2988bc875e20643ef9e1668d8441be5bb6c27817e1cdf4a8ea19925e2,Configuration and licences,Content/manifest/notice review; lock/advisory/build checks where applicable
+web/src/App.tsx,22766,76514432e9ceec576c1dc527579e46bfa851be30026f969c64bec5ba3b62b21e,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/api/client.ts,4099,078a40e739c588aded1e4d94468711cf1a6ecad15bbfd0b5e8b5133b78d5e98e,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/CasePanel.tsx,7351,927310abb44eb947bd192d99d3011bd2bb3caa039ad436759bc09d3a3f0da41e,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/CaseTimeline.tsx,3591,3609ce9bb26bfa55bcc42734b4677c907bb3950fe3945f0053ef63521c9b0dd6,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/ChangeBuilder.tsx,5108,d912acd13cad284a7b83418bd2ac150e32d442d5e837bd27d646d444b086bda3,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/CrashGrid.tsx,6036,a7cc426df4ba27bbdd2bcbcd94cc69a207a2d4b590a9a640d98449547e369751,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/FactEditor.tsx,4139,8ddbdf606ba991250398813749cebff6fbe3fb82053b4d87eadec909af0defeb,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/MissingFactQuestion.tsx,4293,300175b0101adc61e59e7814a68e2aeb608de0fc448d940d162c64b84e1e7321,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/components/SourceTags.tsx,1280,979f056922c1a846ab72039a382df3648080cecae0fb06372eacae9c98d90f29,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/LandingPage.tsx,796,263c100ac21fe425bf9f6f7a132ae9a023995b54d2910a985e92691df73aa58b,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/LandingView.tsx,46985,37a9e934bfb383811629aca11c733e8c898df9b703cfe50983dab2e0a8e8cf2f,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/SampleGrid.tsx,6687,8a312db399a1163bf026e3196b00f2b0c92b4f158d70cc16d50186ddf22f233c,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/SampleGridView.tsx,11022,381e66493481ee92476117160566bd5d4d4777c2d27f6429b0f75daeedde8e34,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/data.ts,4010,1d436105fead98d83da6a6be959e15d3984ee580a3cf35b57de9f95337f33bb6,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/landing.css,10264,a47a86d7df84da82a9e2a1666e05b216105a802de1d08dac943b0cda147f51dd,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/template-effects.css,1331,217baf09b9e35f9fab131051c346a8c5cdfea7cfece42fa68e83df93676caa0b,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/landing/useLanding.ts,20712,e11891ae0af03994e99b24585ec14d78e12e402df18afe68003860d101e85af8,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/lib/coverage.ts,795,b18de91dcfb3fc7b69ae6c204a48904b76f2fe6a12aa23f08f7b3c4e609b7df6,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/lib/labels.ts,190,18be0260c51db652029b73db345cb0632dd8fd0217130d1996d2136ce09ca89f,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/lib/results.ts,1067,a0aadda74fe81fea96cd6581b07cce0c96136ed047091240e636d213a9743d3f,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/main.tsx,1135,a40bda37b2407c96db32666ac7bd97ca8ef538ef64d829e025c2e24426f8bd9c,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/screens/CrashTest.tsx,12198,73c5e2b1a77c480e7d708d87018c8f3d996e5f17e12a4b145e3927af0945056f,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/screens/Report.tsx,9761,d3be49964ace455afbccb0fff6b8f628b8565cef326b99ff2ee84a6ba1502e74,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/screens/report.css,3360,4ee92746774c286c599036141a5b4a7ee39cba49e3b200662a91f71fda1c978e,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/styles.css,29002,f76eb8214ecb7833de1b3d748d02f548e81399adeee4604de5e4445eec822347,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/types.ts,5903,82d04916b3ffc865e4d0761f98db4d93b7ef9e7311c255cd35943ebc332518cb,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"
+web/src/vite-env.d.ts,38,65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5,Client,"TypeScript production build, source checks and exercised browser/accessibility flows"

@@ -1,5 +1,5 @@
 > [!NOTE]
-> **All seven build slices are implemented.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The hands-on review, focused learning wrap-up and app map are complete; the video and submission answers remain separate learner-owned steps.
+> **All seven build slices are implemented.** The app includes live plan reading, confirmation, the live checker, real scored AI suggestions, a fixed-choice change builder, Before/After comparison and a printable report. Gemini is primary, with Groq as fallback. The saved reading and suggestions are real, unedited provider output; the example needs no key. The screenshots and sample PDF below come from the actual example flow. The focused wrap-up and app map are recorded; final hands-on sign-off is still unchecked in the checklist. The video and submission answers remain separate learner-owned steps.
 
 <div align="center">
 
@@ -7,7 +7,7 @@
 
 **Crash-test a plan before Saturday does.**
 
-AI reads a messy plan. A strict checker tries every single problem and every pair of problems against it.<br/>
+AI reads a messy plan. A strict checker tries every listed single problem and every compatible pair against it.<br/>
 Fixes get tested before you trust them.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-2f6b3a)](LICENSE)
@@ -25,10 +25,10 @@ Fixes get tested before you trust them.
 > [!TIP]
 > **Judging in a hurry? Two minutes, five links.**
 > 1. [Demo video status](#demo-video) (recording pending)
-> 2. [The moment that matters](#the-moment) (a GIF: the obvious fix gets turned down, the real one flips the grid)
+> 2. [The moment that matters](#the-moment) (a GIF comparing before and after the real Sam fix)
 > 3. [A real report the app produced](docs/sample-report.pdf) (PDF)
 > 4. [Spot the hidden pair yourself](#can-you-spot-it) (a 60-second puzzle)
-> 5. [Check every claim with one command](#check-every-claim-yourself)
+> 5. [Reproduce the checks](#check-every-claim-yourself)
 
 ---
 
@@ -38,9 +38,9 @@ A volunteer coordinator is running a Saturday food distribution: **30 households
 
 Then the van comes back from its early pickup 30 minutes late. On its own, that's fine. Anita has to leave 90 minutes early. On its own, also fine. **Both on the same morning, and 8 households get no food.**
 
-Nobody checks combinations like that by hand, because there are too many of them. Failure Compiler checks all of them, shows you the exact morning that breaks, and tests whether a fix really works before you trust it.
+Checking every combination by hand quickly becomes impractical. Failure Compiler checks the listed singles and compatible pairs, shows a morning that breaks, and tests whether a fix works across that same set before you trust it.
 
-| Most tools and chatbots | Failure Compiler |
+| General risk review | Failure Compiler |
 |---|---|
 | A list of general risks ("have a backup driver") | The specific combination that breaks *your* plan |
 | "Infeasible" or a red bar | **"Route C: 8 households not delivered"**, with the morning drawn out |
@@ -331,7 +331,7 @@ sequenceDiagram
     K-->>App: Results stream in live
 ```
 
-**The gate.** Nothing the AI returns reaches the screen until it passes every step:
+**The gate.** Provider output must pass steps 1 to 4 before fact review. Rules and individual review in steps 5 to 7 must pass before the checker runs:
 1. It parses as JSON.
 2. It matches the schema exactly. Required fields and types are checked and extra fields are rejected ([Pydantic](https://docs.pydantic.dev/latest/), `extra="forbid"`). New provider schemas require every nullable field citation; replaying an older capture without per-field sources supplies nulls, never invented evidence.
 3. No duplicate ids, and every reference points to something that exists.
@@ -359,13 +359,13 @@ stateDiagram-v2
 
 If you correct Ravi to "can't drive", every route that lists him as a driver loses its confirmed mark and shows *Check this: Ravi changed*. The AI never re-reads your plan after you start correcting it, because a re-read could quietly change facts you already confirmed.
 
-**The fingerprint.** A confirmed map gets a SHA-256 fingerprint of exactly what the checker uses: people, vehicles, places, deliveries, routes, finish time and problem sizes. The same plan always gets the same fingerprint. Status marks and AI details don't change it. Every result carries it, and the report prints it in the footer.
+**The fingerprint.** A confirmed map gets a SHA-256 fingerprint of exactly what the checker uses: people, vehicles, places, deliveries, routes, finish time and problem sizes. The same normalized checker inputs, including their entity IDs, get the same fingerprint. Independent AI readings can choose different labels that lead to different normalized IDs; fingerprints are not a semantic equivalence score across such readings. Status marks and AI details don't change it. Every result carries it, and the report prints it in the footer.
 
 ---
 
 ## How the checker decides
 
-Each test is one run of [Google OR-Tools CP-SAT](https://developers.google.com/optimization/cp/cp_solver), a free, open-source constraint solver. It searches for the best possible morning, the one with the least **households × minutes late**, using only what your plan allows.
+Each solved test uses [Google OR-Tools CP-SAT](https://developers.google.com/optimization/cp/cp_solver), a free, open-source constraint solver. It searches for the best possible morning, the one with the least **households × minutes late**, using only what your plan allows.
 
 **Natural schedules:** once the best lateness is proved, a second pass holds it fixed and minimises the sum of load and drive start times. Timelines show the earliest sensible morning without changing the verdict. A timeout in this display pass keeps the already-proved verdict.
 
@@ -387,11 +387,11 @@ flowchart LR
 - **Only the people the plan names for a job can do that job.** Drivers are displayed primary first, then listed backups; loaders are an eligible set with no priority. Start times can move freely within everyone's hours. That's what makes "add another backup driver" a real fix that can be tested, and turned down.
 - Noon is a soft deadline, so lateness can be measured instead of just failing.
 
-**Why "not delivered" instead of "infeasible".** Some routes can't run at all, for example when nobody can open the loading area. Those routes count as "not delivered", with a penalty bigger than any possible lateness: households × (finish time + 180 minutes). So the solver always returns an answer, and the screen can say "8 households not delivered" instead of "no solution". The checker only reports a route as *late* when something becomes free later. When nobody is left to do the job, it says *not delivered*.
+**Why "not delivered" instead of "infeasible".** Some routes can't run at all, for example when nobody can open the loading area. Those routes count as "not delivered", with a penalty bigger than any possible lateness: households × (finish time + 180 minutes). A proved result can say "8 households not delivered" instead of "no solution". Unproved verdicts and an ambiguous loading area produce "?", never a pass. The checker only reports a route as *late* when something becomes free later. When nobody is left to do the job, it says *not delivered*.
 
 **Why dimming is safe.** Every problem type only *removes* options. A pair can never do better than its worse single, so a pair that contains a single weak spot is already broken, and there's no need to solve it. A test checks this on every pair. When a fix removes the weak spot, its dimmed pairs get tested properly again, and they can reveal a hidden pair. That's how the one-spare-key fix gets caught.
 
-**Why the results never change.** The solver uses one worker, a fixed seed (42), and a *deterministic* time limit that counts solver work instead of seconds, so a slower laptop gets the same answer. The locked example test checks all 100 verdicts; the determinism test compares complete repeated results.
+**Repeatable results.** The solver uses one worker, a fixed seed (42), and a *deterministic* time limit that counts solver work instead of seconds. Repeatability is checked with the locked inputs and solver version; cross-platform identity is not established by those local tests. The locked example test checks all 100 verdicts; the determinism test compares complete repeated results.
 
 ---
 
@@ -415,7 +415,7 @@ flowchart LR
 
 Every number in this README can be reproduced from the repository.
 
-Verified on 20 October 2026: **220 passed, 2 opt-in network tests skipped**. Ruff and the production build pass. The test run reports one Starlette/httpx dependency deprecation warning.
+Verified on 21 October 2026: **238 passed, 2 opt-in network tests skipped**. Ruff and the production build pass. The test run reports one Starlette/httpx dependency deprecation warning. The [current code and publication audit](devpost/audit-2026-10-21.md) records repairs, file coverage and remaining limits.
 
 | Claim | How to check it |
 |---|---|
@@ -423,7 +423,7 @@ Verified on 20 October 2026: **220 passed, 2 opt-in network tests skipped**. Ruf
 | All 100 results are locked, human-cost wording included | [`tests/test_example_locked.py`](tests/test_example_locked.py) |
 | The obvious fix fails, the real fixes pass, one spare key reveals a new pair | [`tests/test_example_fixes.py`](tests/test_example_fixes.py) |
 | A pair is never better than its singles, which is why dimming is safe | [`tests/test_checker_monotone.py`](tests/test_checker_monotone.py) |
-| Same map, same results, every run | [`tests/test_determinism.py`](tests/test_determinism.py) |
+| Locked inputs repeat with the installed solver version | [`tests/test_determinism.py`](tests/test_determinism.py) |
 | Bad AI output is rejected, and the error names the field | [`tests/test_format_gate.py`](tests/test_format_gate.py) |
 | Changing one fact un-confirms everything that depends on it | [`tests/test_rules.py`](tests/test_rules.py) |
 | The fingerprint changes only when the checker's inputs change | [`tests/test_fingerprint.py`](tests/test_fingerprint.py) |
@@ -483,7 +483,7 @@ The interface follows the supplied Landing v2 design: Overview, a scroll-linked 
 
 1. Copy `.env.example` to `.env` in the project folder. Add a [Gemini key](https://aistudio.google.com/apikey) as `GEMINI_API_KEY`; add a [Groq key](https://console.groq.com/keys) as `GROQ_API_KEY` to enable fallback. The server reads these keys when handling a live request.
 2. Open **Start** and paste your plan. Or expand **Use your own AI key**, choose its provider and enter a key for this session. A typed key takes precedence for that provider; the selected provider is tried first. With environment keys, Gemini is tried first and Groq is the fallback.
-3. Click **Read plan**, check the facts and their labelled field citations or entity mentions, and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted.
+3. Click **Read plan**, check the facts and their labelled field citations or entity mentions, and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted. Any unknown result blocks acceptance; unknowns are never credited as fixed failures.
 
 Typed keys stay only in the local server's session memory. They are never written to files, logged, added to a map or returned in an API response. The server sends an HttpOnly session cookie; that cookie contains no key. Closing a tab does not clear server memory. Opening `/demo` clears that browser's typed keys, reviews, maps, results and fixes, rotates its cookie, clears browser storage and returns to the landing page; other browsers are unaffected. Restarting the server clears all sessions. `.env` keys remain in your local ignored file.
 
@@ -587,7 +587,7 @@ That last one is the project's own idea, turned on itself: a plan that looked ri
 - [x] **Slice 6:** live Gemini/Groq flow, real saved reading and approved real suggestions, fixed-choice coordinator changes, offline end-to-end verification
 - [x] **Slice 7:** report, Before/After, printable sample PDF, gallery assets and accessibility
 
-Implementation progress, hands-on review, focused wrap-up and app map are complete. Video recording and Devpost answers belong to the learner. Deployment is optional and is not part of the tested demo path.
+Implementation, the recorded focused wrap-up and the app map are complete. Final hands-on sign-off remains pending in the checklist. Video recording and Devpost answers belong to the learner. Deployment is optional and is not part of the tested demo path.
 
 <!-- Keep this paragraph truthful. Edit the wording however you like. -->
 **How it was built.** The skills ran across several coding agents. Each switch happened when a usage limit ran out, and nothing was lost because the `devpost/` files and git carry the state. I also used Claude in a separate chat as a reviewer, to stress-test my answers and check each draft before approving it.
@@ -620,7 +620,7 @@ failure-compiler/
 │   │   └── rules.py         The plain rules, in one place only
 │   └── checker/
 │       ├── scenarios.py     Singles and pairs from the problem list
-│       ├── solver.py        One CP-SAT run per scenario
+│       ├── solver.py        CP-SAT verdict and schedule passes
 │       ├── runner.py        Singles first, dimming, streaming
 │       └── explain.py       Reasons from checker inputs and schedule
 ├── web/                     React, Vite and TypeScript (strict)
