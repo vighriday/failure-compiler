@@ -294,4 +294,8 @@ if (ROOT / "web/dist").is_dir():
 
     @app.get("/{path:path}")
     def serve_app(path: str) -> FileResponse:
+        if path == "api" or path.startswith("api/"):
+            raise HTTPException(404, "API endpoint not found.")
+        if path == "third-party-notices.txt":
+            return FileResponse(ROOT / "web/dist/third-party-notices.txt", media_type="text/plain")
         return FileResponse(ROOT / "web/dist/index.html")

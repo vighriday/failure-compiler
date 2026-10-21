@@ -3,8 +3,14 @@
 .env.*
 !.env.example
 node_modules
+.venv
+.pytest_cache
+.ruff_cache
 web/dist
 devpost/screens
+devpost/learner-profile.md
+.oxcode-memory
+oxcode.hooks.json
 __pycache__
 *.py[cod]
 Landing page.zip

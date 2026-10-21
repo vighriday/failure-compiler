@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY web ./web
+COPY fixtures/example-plan.txt ./fixtures/example-plan.txt
 COPY tsconfig*.json vite.config.ts ./
 RUN npm run build
 
