@@ -18,6 +18,8 @@ Fixes get tested before you trust them.
 
 **[Demo video status](#demo-video)** &nbsp;·&nbsp; **[Run it locally](#run-it-locally)** &nbsp;·&nbsp; **[Read the planning docs](#built-plan-first)**
 
+**Judges: [start here](docs/judging.md).** No hosted public demo is available. The full example runs locally without a key or Docker; the guide includes your own keys and a private browser-workspace option.
+
 [![Failure Compiler: the actual landing hero](docs/images/video-thumbnail.png)](#demo-video)
 
 </div>
@@ -415,7 +417,7 @@ flowchart LR
 
 Every number in this README can be reproduced from the repository.
 
-Verified on 21 October 2026: **238 passed, 2 opt-in network tests skipped**. Ruff and the production build pass. The test run reports one Starlette/httpx dependency deprecation warning. The [current code and publication audit](devpost/audit-2026-10-21.md) records repairs, file coverage and remaining limits.
+Verified on 21 October 2026: **238 passed, 2 opt-in network tests skipped** on Windows and on the fresh Linux runner. Ruff and the production build pass. Windows reports one upstream Starlette/httpx deprecation warning; Linux reports three upstream warnings. The [code and publication audit](devpost/audit-2026-10-21.md) records the earlier snapshot; the [judge/hosting follow-up](docs/deployment-readiness.md) records the actual-image proof and current limits.
 
 | Claim | How to check it |
 |---|---|
@@ -459,30 +461,31 @@ Real-network smoke tests run only when you explicitly set `RUN_LIVE_AI_TESTS=1` 
 
 ## Run it locally
 
-You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, and Node.js 20 or newer.
+You need [uv](https://docs.astral.sh/uv/), which installs Python 3.12 for you, and Node.js 20 or newer (22 LTS is used in the Linux verification). No Docker, environment activation or browser-test download is needed to use the app. See the [judge guide](docs/judging.md) for tool downloads, keys, the complete example and troubleshooting.
 
-The repository is public. Setup below was verified in a fresh Windows clone without an `.env` file; download and cold-start time varies.
+The repository is public. The built frontend and API use one server and one address. Its production path also passed the actual Linux container story; download and cold-start time varies.
 
 ```bash
 git clone https://github.com/vighriday/failure-compiler.git
 cd failure-compiler
-uv sync
-npm install
-uv run -- python scripts/dev.py
+uv sync --frozen --no-dev --python 3.12
+npm ci
+npm run build
+uv run --no-dev -- python -m uvicorn server.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open **http://127.0.0.1:5173** and click **Try the example plan**, then **Read plan**. Or open **Start** and click **Load the example plan**. No account and no AI key needed. `uv sync` includes the AI SDKs and the Python test/browser tools; install Chromium separately using the verification command above.
+Open **http://127.0.0.1:8000/demo**, choose **Start**, **Load the example plan**, then **Read plan**. No account or AI key is needed. The `--no-dev` setup installs only the application's Python packages. Keep the terminal open and press **Ctrl+C** to stop. Subsequent starts need only the final command. If PowerShell blocks `npm.ps1`, use `npm.cmd ci` and `npm.cmd run build`.
 
 For the saved reading, answer the Hall question with **Same place as another listing**, choose **Loading bay**, and review its facts individually. Confirm guesses individually, answer the arrival questions after reviewing the associated facts, then confirm the plan. These steps produce the locked 100-scenario example.
 
-The launcher waits for the API health check and web page before printing both addresses. It allows up to 90 seconds for a cold start and names any server still starting. Keep that terminal open; press `Ctrl+C` to stop both servers. If a port is already in use, it stops without launching a duplicate.
+For source editing with automatic frontend reloads, use `uv run -- python scripts/dev.py` instead. That development launcher uses ports 8000 and 5173, waits up to 90 seconds for readiness, reports slow startup and rejects duplicate ports. The judge setup above uses only port 8000. Do not start both modes at once.
 
 The interface follows the supplied Landing v2 design: Overview, a scroll-linked Plan story, Read, Crash test, Trust and Start. Sample illustrations are labelled; after loading a plan, Read and Crash test use the real confirmation and checker flow. The design templates and conversion instructions are in [`design/landing-v2/`](design/landing-v2/).
 
 ### Read your own plan
 
-1. Copy `.env.example` to `.env` in the project folder. Add a [Gemini key](https://aistudio.google.com/apikey) as `GEMINI_API_KEY`; add a [Groq key](https://console.groq.com/keys) as `GROQ_API_KEY` to enable fallback. The server reads these keys when handling a live request.
-2. Open **Start** and paste your plan. Or expand **Use your own AI key**, choose its provider and enter a key for this session. A typed key takes precedence for that provider; the selected provider is tried first. With environment keys, Gemini is tried first and Groq is the fallback.
+1. Open **Start**, paste your plan and expand **Use your own AI key**. Choose Gemini or Groq and enter your own key for this session; no `.env` file is required. Get keys from [Google AI Studio](https://aistudio.google.com/apikey) or [Groq](https://console.groq.com/keys). Provider eligibility, quotas and charges depend on your account.
+2. Alternatively, copy `.env.example` to `.env` in the project folder and set `GEMINI_API_KEY` and/or `GROQ_API_KEY`. A typed key takes precedence for its provider; the selected provider is tried first. With environment keys, Gemini is tried first and Groq is the fallback. A real check on 21 October succeeded with Groq; Gemini returned HTTP 504. The saved example stays available without either provider.
 3. Click **Read plan**, check the facts and their labelled field citations or entity mentions, and answer every guess and question. Confirm the map, run its tests and open a cross to request live suggestions. Every suggestion passes the format/rules gate and is checked across the full scenario grid before it can be accepted. Any unknown result blocks acceptance; unknowns are never credited as fixed failures.
 
 Typed keys stay only in the local server's session memory. They are never written to files, logged, added to a map or returned in an API response. The server sends an HttpOnly session cookie; that cookie contains no key. Closing a tab does not clear server memory. Opening `/demo` clears that browser's typed keys, reviews, maps, results and fixes, rotates its cookie, clears browser storage and returns to the landing page; other browsers are unaffected. Restarting the server clears all sessions. `.env` keys remain in your local ignored file.
@@ -493,7 +496,8 @@ Screen 1 shows the Gemini data notice: Google may use content to improve its pro
 
 | Task | Command |
 |---|---|
-| Run the app | `uv run -- python scripts/dev.py` |
+| Run the built app for judging | `uv run --no-dev -- python -m uvicorn server.main:app --host 127.0.0.1 --port 8000` |
+| Source-editing development servers | `uv run -- python scripts/dev.py` |
 | Run all tests | `uv run -- python -m pytest -q` |
 | Print the results for any map file | `uv run -- python scripts/check_map.py fixtures/example-truth.json` |
 | Lint | `uv run -- ruff check .` |
@@ -505,13 +509,16 @@ Playwright is included by `uv sync`. Install its browser once with `uv run -- py
 
 ### Deployment status
 
-This is a **local-first proof of concept**. The supported and tested behavior is the
-local launcher above: FastAPI binds to `127.0.0.1`, keys stay in local server
-memory, and the saved example runs without a key. No live deployment is included
-or required for the demo. A Dockerfile and deployment notes are retained as
-optional preparation, but they are not a claim that a public instance exists.
-If you deploy it yourself, review the session, HTTPS, rate-limit and secret
-requirements in the [deployment readiness notes](docs/deployment-readiness.md).
+This is a **local-first proof of concept** with no public application URL. The
+built-app command above binds to `127.0.0.1`; the saved example runs without a key.
+The actual Docker image also passed a fresh Linux build, 238 offline tests and
+the complete all-100-survived browser story on a free remote runner, without
+installing Docker locally. [Successful container run](https://github.com/vighriday/failure-compiler/actions/runs/39627825863).
+This is container verification, not a deployed service. Vercel needs shared-state
+architecture work; Railway is a possible account-dependent trial. The
+[hosting comparison and public protections](docs/deployment-readiness.md) explain
+the remaining requirements. The retained Render configuration selects Free;
+account verification can still require a payment method.
 
 ### Provider measurements
 

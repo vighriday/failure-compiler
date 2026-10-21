@@ -111,7 +111,9 @@ Rules are implemented only in Python (`server/validation/rules.py`). The browser
 
 Runtime: local, two processes. Started with one cross-platform command (PowerShell-compatible, no `make`).
 
-Start command (after `uv sync` and `npm install` in the repository root):
+Judges use the built app on one port: `uv sync --frozen --no-dev --python 3.12`, `npm ci`, `npm run build`, then `uv run --no-dev -- python -m uvicorn server.main:app --host 127.0.0.1 --port 8000`. Open `http://127.0.0.1:8000/demo`. No Docker, browser-test binary or API key is needed for the saved example. `docs/judging.md` covers the complete story, own-key entry and troubleshooting. The actual Linux image and full saved story passed the remote container workflow; this is not a public deployment.
+
+Development start command (after `uv sync` and `npm install` in the repository root):
 ```
 uv run -- python scripts/dev.py
 ```
@@ -620,7 +622,7 @@ failure-compiler/
 ├── devpost/                     # Planning docs; ignored local verification proofs
 ├── pyproject.toml
 ├── package.json
-├── Dockerfile                   # Container preparation; image not yet run
+├── Dockerfile                   # Linux image and full example verified in remote CI
 ├── render.yaml                  # Optional host configuration; no live deployment
 ├── .env.example
 ├── .gitignore

@@ -540,7 +540,8 @@
 <section id="runs">
   <h2>Where It Runs and How Someone Tries It</h2>
   <div class="card">
-    <p><strong>Start command</strong> (after <code>uv sync</code> and <code>npm install</code> in the repository root):</p>
+    <p><strong>Judges:</strong> run <code>uv sync --frozen --no-dev --python 3.12</code>, <code>npm ci</code>, <code>npm run build</code>, then <code>uv run --no-dev -- python -m uvicorn server.main:app --host 127.0.0.1 --port 8000</code>. Open <code>http://127.0.0.1:8000/demo</code>. The saved example needs no Docker, browser-test binary or key. See <code>docs/judging.md</code> for the story, personal keys and troubleshooting. The actual Linux image and full saved story passed remote verification; no public service was deployed.</p>
+    <p><strong>Development start command</strong> (after <code>uv sync</code> and <code>npm install</code> in the repository root):</p>
     <pre><code>uv run -- python scripts/dev.py</code></pre>
     <p>Starts <code>uvicorn server.main:app --host 127.0.0.1 --port 8000</code> and <code>vite --port 5173</code> in parallel. Cross-platform; no <code>make</code>. Server binds to 127.0.0.1 only.</p>
     <p style="margin-top:10px;"><strong>Open:</strong> <code>http://127.0.0.1:5173</code>. Default <code>uv sync</code> includes live SDKs and development tools; install Chromium separately with <code>uv run -- python -m playwright install chromium</code>.</p>
@@ -934,7 +935,7 @@ gate_detail:         str | None              <span class="comment"># Original te
 ├── devpost/                     # Planning docs; ignored local verification proofs
 ├── pyproject.toml
 ├── package.json
-├── Dockerfile                   # Container preparation; image not yet run
+├── Dockerfile                   # Linux image and full example verified in remote CI
 ├── render.yaml                  # Optional host configuration; no live deployment
 ├── .env.example
 ├── .gitignore
