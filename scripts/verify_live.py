@@ -177,7 +177,7 @@ def main_cli():
             providers.mode = "success"
             page.get_by_role("button", name="Try again", exact=True).click()
             expect(page.locator(".placeholder-notice")).to_contain_text(
-                "Live AI reading. Read by gemini"
+                "Live AI reading. Read by Gemini"
             )
             page.get_by_role("tab", name="Start", exact=True).click()
             expect(key).to_have_value("")
@@ -187,7 +187,7 @@ def main_cli():
             page.get_by_role("button", name="Confirm plan", exact=True).click()
             expect(page.locator(".crash-count")).to_contain_text("84 survived", timeout=60000)
             expect(page.locator(".result-cell")).to_have_count(100)
-            expect(page.locator(".live-view-bar")).to_contain_text("Read by gemini")
+            expect(page.locator(".live-view-bar")).to_contain_text("Read by Gemini")
             expect(page.locator(".live-view-bar")).to_contain_text("YOUR PLAN")
             providers.env_keys = {"GROQ_API_KEY": "offline-groq-fallback-test-key"}
             providers.mode = "both_failed"
@@ -272,7 +272,7 @@ def main_cli():
             providers.mode = "fallback"
             page.get_by_role("button", name="Try again", exact=True).click()
             expect(page.locator(".placeholder-notice")).to_contain_text(
-                "Live AI reading. Read by groq"
+                "Live AI reading. Read by Groq"
             )
             expect(page.locator(".placeholder-notice")).to_contain_text("fallback provider")
             assert not errors, errors

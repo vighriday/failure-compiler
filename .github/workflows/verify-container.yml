@@ -48,6 +48,8 @@ jobs:
           uv run -- ruff check .
           npm run build
           uv run -- python -m pytest -q
+      - name: Verify recorded own-key browser controls
+        run: uv run -- python scripts/verify_live.py
       - name: Build the actual application image
         run: docker build --tag failure-compiler:verify .
       - name: Run the image on loopback only
