@@ -2,6 +2,14 @@
 
 `Landing.html` and `Grid.html` preserve the supplied v2 design reference. They are source templates, not pages served by the app. The older landing version, editor runtime and reference screenshots are not production dependencies.
 
+## Design provenance
+
+The project owner supplied these custom references and confirmed on 22 October
+2026 that they were generated using Claude Design. They were incorporated during
+the build and converted to React and TypeScript. They are disclosed as supplied,
+AI-generated design work; they are not presented as hand-written project code.
+Dependency and font licences are listed in the root README and bundled notices.
+
 The historical bootstrap command `node scripts/convert_landing.mjs` generates `LandingView.tsx`, `SampleGridView.tsx` and their hover/focus styles. The converter uses htmlparser2 to preserve markup, inline styles, loops, conditions and event bindings as native React. The finished views also contain later manual accessibility and live-flow changes; rerunning the converter can overwrite them and requires a full diff review and browser verification. Interaction logic lives in `web/src/landing/useLanding.ts` and `SampleGrid.tsx`.
 
 GSAP, its React hook and ScrollTrigger manage animation, scroll progress and cleanup. Responsive and accessibility additions live in `web/src/landing/landing.css`. Fonts are self-hosted with the existing Fontsource packages.

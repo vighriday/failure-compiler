@@ -730,6 +730,7 @@ I wanted to test a familiar failure: a plan looks complete, every job has a back
 
 ## Acknowledgements
 
+- The owner supplied custom Landing v2 and Grid references generated using Claude Design, then incorporated through the [documented React conversion](design/landing-v2/README.md#design-provenance).
 - [Devpost Learn](https://learn-ai-basics.devpost.com/) and the [Learn Skill Pack](https://github.com/challengepost/learn-ai-basics) (MIT), which shaped how this was planned and built
 - [Google OR-Tools](https://github.com/google/or-tools/blob/stable/LICENSE) (Apache-2.0); [FastAPI](https://github.com/fastapi/fastapi/blob/master/LICENSE), [Pydantic](https://github.com/pydantic/pydantic/blob/main/LICENSE), [React](https://github.com/facebook/react/blob/main/LICENSE) and [Vite](https://github.com/vitejs/vite/blob/main/LICENSE) (MIT); [IBM Plex Sans and Mono](https://github.com/IBM/plex/blob/master/LICENSE.txt) (SIL Open Font License 1.1)
 - GSAP and `@gsap/react` use the [GSAP Standard License](https://gsap.com/standard-license). [Bundled dependency notices](web/public/third-party-notices.txt) retain the shipped React and font notices.
