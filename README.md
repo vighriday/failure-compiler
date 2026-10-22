@@ -20,6 +20,8 @@ Fixes get tested before you trust them.
 
 **Judges: [start here](docs/judging.md).** No hosted public demo is available. The full example runs locally without a key or Docker; the guide includes your own keys and a private browser-workspace option.
 
+**[Submission readiness audit](devpost/submission-readiness.md):** verified repository evidence, the official requirements and the remaining owner steps, checked on 22 October 2026.
+
 [![Failure Compiler: the actual landing hero](docs/images/video-thumbnail.png)](#demo-video)
 
 </div>
