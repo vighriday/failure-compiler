@@ -1,5 +1,18 @@
 # Demo click runbook: 2:30
 
+## Fewest-click recording
+
+Use the [short voiceover and scene guide](video-script.md) with
+`uv run -- python scripts/present_demo.py` while the development app is running
+at `http://127.0.0.1:5173`. The separate recording window pauses at 11 scenes;
+click **Next scene** or press **F8**, and the helper performs the normal review
+and fix controls. It uses the saved real AI responses and live checker, with a
+visible guide label. It does not alter app facts or results. Scroll at any pause.
+
+If using the one-server setup below instead, pass
+`--url http://127.0.0.1:8000` to the recording helper. The detailed manual click
+path remains below for recording without the helper.
+
 ## Recording setup
 
 - Browser content area: **1440x900**, browser zoom **100%**. Keep normal motion on.

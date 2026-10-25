@@ -155,6 +155,8 @@ Two actual Playwright frames, before and after accepting the real Sam loader car
 
 **Video link: pending recording.** The gallery, before/after frames and [five-page sample report](docs/sample-report.pdf) are available now. The [2:30 click runbook](devpost/demo-runbook.md) uses a 1440x900 viewport at 100% zoom. Start each take at **http://127.0.0.1:5173/demo** when using the development launcher, or **http://127.0.0.1:8000/demo** when serving the built app. This clears only that browser's state and returns to the landing page.
 
+For fewer manual actions, use the [short voiceover and recording guide](devpost/video-script.md). Its separate local browser pauses at 11 scenes; Next/F8 performs the usual review and fix controls using saved real AI responses and the live checker.
+
 Actual-app thumbnail candidates: [YouTube, 1280x720](docs/images/youtube-thumbnail.png) · [Devpost, 1500x1000](docs/images/devpost-thumbnail.png).
 
 ---
