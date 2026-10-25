@@ -28,7 +28,7 @@ Fixes get tested before you trust them.
 
 > [!TIP]
 > **Judging in a hurry? Two minutes, five links.**
-> 1. [Demo video status](#demo-video) (recording pending)
+> 1. [Demo video status](#demo-video) (recorded; link pending)
 > 2. [The moment that matters](#the-moment) (a GIF comparing before and after the real Sam fix)
 > 3. [A real report the app produced](docs/sample-report.pdf) (PDF)
 > 4. [Spot the hidden pair yourself](#can-you-spot-it) (a 60-second puzzle)
@@ -153,7 +153,7 @@ Two actual Playwright frames, before and after accepting the real Sam loader car
 
 ### Demo video
 
-**Video link: pending recording.** The gallery, before/after frames and [five-page sample report](docs/sample-report.pdf) are available now. The [2:30 click runbook](devpost/demo-runbook.md) uses a 1440x900 viewport at 100% zoom. Start each take at **http://127.0.0.1:5173/demo** when using the development launcher, or **http://127.0.0.1:8000/demo** when serving the built app. This clears only that browser's state and returns to the landing page.
+**Video recorded; upload link pending.** Recording completion was reported by the owner on 25 October 2026. The video URL and playback have not yet been verified. The gallery, before/after frames and [five-page sample report](docs/sample-report.pdf) are available now. The [2:30 click runbook](devpost/demo-runbook.md) uses a 1440x900 viewport at 100% zoom. Start each take at **http://127.0.0.1:5173/demo** when using the development launcher, or **http://127.0.0.1:8000/demo** when serving the built app. This clears only that browser's state and returns to the landing page.
 
 For fewer manual actions, use the [short voiceover and recording guide](devpost/video-script.md). Its separate local browser pauses at 11 scenes; Next/F8 performs the usual review and fix controls using saved real AI responses and the live checker.
 
